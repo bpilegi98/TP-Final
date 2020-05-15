@@ -1,0 +1,86 @@
+create database tpfinal;
+use tpfinal;
+
+create table Countries(
+idCountry int auto_increment primary key,
+countryName varchar(50) unique
+);
+
+create table Provinces(
+idProvince int auto_increment primary key,
+provinceName varchar(50),
+idCountry int,
+constraint fk_country foreign key (idCountry) references Countries(idCountry)
+);
+
+create table Cities(
+idCity int auto_increment primary key,
+cityName varchar(50),
+prefixNumber int,
+idProvince int,
+constraint fk_province foreign key (idProvince) references Provinces(idProvince)
+);
+
+create table Persons(
+idPerson int auto_increment primary key,
+firstname varchar(50),
+lastname varchar(50),
+dni int unique,
+idCity int,
+userType int,
+constraint fk_city_person foreign key (idCity) references Cities(idCity)
+);
+
+create table Fees(
+idFee int auto_increment primary key,
+sourceCityId int,
+destinationCityId int,
+pricePerMinute float,
+costPerMinute float,
+constraint fk_sourceCity_fee foreign key (sourceCityId) references Cities(idCity),
+constraint fk_destinationCity_fee foreign key (destinationCityId) references Cities(idCity)
+);
+
+create table TelephoneLines(
+idTelephoneLine int auto_increment primary key,
+lineNumber varchar(50) unique,
+userType int,
+idPerson int,
+suspended boolean,
+constraint fk_person_telephoneLine foreign key (idPerson) references Persons(idPerson)
+);
+
+create table Invoices(
+idInvoice int auto_increment primary key,
+calls int,
+cost float,
+totalPrice float,
+dateCreation date,
+dateExpiration date,
+idTelephoneLine int,
+idPerson int,
+paid boolean,
+constraint fk_telephoneLine foreign key (idTelephoneLine) references TelephoneLines(idTelephoneLine),
+constraint fk_person_invoice foreign key (idPerson) references Persons(idPerson)
+);
+
+create table Calls(
+idCall int auto_increment primary key,
+sourceNumber varchar(50),
+destinationNumber varchar(50),
+pricePerMinute float,
+durationSecs int,
+totalCost float,
+totalPrice float,
+idInvoice int,
+sourceCityId int,
+destinationCityId int,
+constraint fk_invoice foreign key (idInvoice) references Invoices(idInvoice),
+constraint fk_sourceCity_call foreign key (sourceCityId) references Cities(idCity),
+constraint fk_destinationCity_call foreign key (destinationCityId) references Cities(idCity)
+);
+
+
+
+
+
