@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController("/")
+@RestController("")
 @RequestMapping("/province")
 public class ProvinceController {
 
@@ -20,7 +20,7 @@ public class ProvinceController {
     }
 
     @PostMapping("/")
-    public void addProvince(Province newProvince)
+    public void addProvince(@RequestBody Province newProvince)
     {
         provinceService.addProvince(newProvince);
     }
