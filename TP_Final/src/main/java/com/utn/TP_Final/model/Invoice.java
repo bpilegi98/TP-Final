@@ -33,14 +33,14 @@ public class Invoice {
     private Date dateCreation;
 
     @Column(name = "dateExpiration")
-    private Date dateExpation;
+    private Date dateExpiration;
 
     @Column(name = "paid")
     private boolean paid;
 
-    @JoinColumn(name = "idTelephoneLine") //hacer el onetomany y manytoone?
+    @JoinColumn(name = "idTelephoneLine") 
     private TelephoneLine telephoneLine;
 
-    @JoinColumn(name = "idPerson") //hacer el onetomany y manytoone?
+    @JoinColumn(name = "idPerson")
     private Person person;
 }
