@@ -2,6 +2,7 @@ package com.utn.TP_Final.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.utn.TP_Final.model.enums.UserType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,7 +30,8 @@ public class Person
     @Column(name = "dni", unique = true)
     private Integer dni;
     @Column(name = "userType")
-    private Integer userType;
+    @Enumerated(EnumType.STRING)
+    private UserType userType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
@@ -39,4 +41,8 @@ public class Person
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<TelephoneLine> telephoneLines;
+
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Invoice> invoices;
 }

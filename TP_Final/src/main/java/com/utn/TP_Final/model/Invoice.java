@@ -1,6 +1,7 @@
 package com.utn.TP_Final.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,9 +39,13 @@ public class Invoice {
     @Column(name = "paid")
     private boolean paid;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
     @JoinColumn(name = "idTelephoneLine") 
     private TelephoneLine telephoneLine;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
     @JoinColumn(name = "idPerson")
     private Person person;
 }

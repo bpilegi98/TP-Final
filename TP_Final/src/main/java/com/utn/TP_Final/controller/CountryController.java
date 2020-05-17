@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController("")
 @RequestMapping("/country")
@@ -29,5 +30,11 @@ public class CountryController {
     public List<Country> getAll(@RequestParam(required = false) String name)
     {
         return countryService.getAll(name);
+    }
+
+    @GetMapping("/")
+    public Optional<Country> getById(@RequestParam(required = true)Integer id)
+    {
+        return countryService.findById(id);
     }
 }

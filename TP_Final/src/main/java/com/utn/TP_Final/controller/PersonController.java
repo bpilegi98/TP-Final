@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController("")
 @RequestMapping("/person")
@@ -31,5 +32,23 @@ public class PersonController {
     public List<Person> getAll(@RequestParam(required = false) String name)
     {
         return personService.getAll(name);
+    }
+
+    @GetMapping("/")
+    public Person getByDni(@RequestParam(required = true)Integer dni)
+    {
+        return personService.getByDni(dni);
+    }
+
+    @GetMapping("/")
+    public Person getByLineNumber(@RequestParam(required = true)String lineNumber)
+    {
+        return personService.getByLineNumber(lineNumber);
+    }
+
+    @GetMapping("/")
+    public Optional<Person> getById(@RequestParam(required = true)Integer id)
+    {
+        return personService.getById(id);
     }
 }

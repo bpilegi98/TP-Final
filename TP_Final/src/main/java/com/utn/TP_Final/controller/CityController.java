@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController("")
 @RequestMapping("/city")
@@ -29,5 +30,17 @@ public class CityController {
     public List<City> getAll(@RequestParam(required = false)String name)
     {
         return cityService.getAll(name);
+    }
+
+    @GetMapping("/")
+    public Optional<City> getById(@RequestParam(required = false)Integer id)
+    {
+        return cityService.getById(id);
+    }
+
+    @GetMapping("/")
+    public City getByPrefix(@RequestParam(required = false)Integer prefix)
+    {
+        return cityService.getByPrefix(prefix);
     }
 }

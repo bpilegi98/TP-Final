@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Objects.isNull;
 
@@ -33,5 +34,9 @@ public class ProvinceService {
         return provinceRepository.findByName(name);
     }
 
+    public Optional<Province> getById(Integer id)
+    {
+        return provinceRepository.findById(id);
+    }
 
 }

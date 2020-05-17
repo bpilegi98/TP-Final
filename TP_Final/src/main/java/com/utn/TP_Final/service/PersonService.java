@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Objects.isNull;
 
@@ -29,6 +30,22 @@ public class PersonService {
         {
             return personRepository.findAll();
         }
-        return personRepository.findByName(name);
+        return personRepository.findByLastname(name);
     }
+
+    public Person getByDni(Integer dni)
+    {
+        return personRepository.findByDni(dni);
+    }
+
+    public Person getByLineNumber(String lineNumber)
+    {
+        return personRepository.findByLineNumber(lineNumber);
+    }
+
+    public Optional<Person> getById(Integer id)
+    {
+        return personRepository.findById(id);
+    }
+
 }

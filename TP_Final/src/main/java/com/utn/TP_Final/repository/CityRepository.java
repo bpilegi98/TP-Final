@@ -12,4 +12,7 @@ public interface CityRepository extends JpaRepository<City, Integer> {
 
     @Query(value = "select * from cities where cityName = ?1", nativeQuery = true)
     List<City> findByName(String name);
+
+    @Query(value = "select * from cities where prefixNumber = ?1", nativeQuery = true)
+    City findByPrefix(Integer prefix);
 }

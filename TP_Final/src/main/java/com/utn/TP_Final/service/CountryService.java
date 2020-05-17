@@ -6,6 +6,7 @@ import com.utn.TP_Final.repository.CountryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Objects.isNull;
 
@@ -37,6 +38,11 @@ public class CountryService {
             return countryRepository.findAll();
         }
         return countryRepository.findByName(name);
+    }
+
+    public Optional<Country> findById(Integer id)
+    {
+        return countryRepository.findById(id);
     }
 
 }

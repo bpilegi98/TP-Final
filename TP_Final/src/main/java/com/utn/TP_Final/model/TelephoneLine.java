@@ -1,11 +1,15 @@
 package com.utn.TP_Final.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.utn.TP_Final.model.enums.LineStatus;
+import com.utn.TP_Final.model.enums.LineType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,14 +26,20 @@ public class TelephoneLine {
     @Column(name = "lineNumber", unique = true)
     private String lineNumber;
 
-    @Column(name = "userType")
-    private Integer userType;
+    @Column(name = "lineType")
+    @Enumerated(EnumType.STRING)
+    private LineType lineType;
 
-    @Column(name = "suspended")
-    private boolean suspended;
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private LineStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @JoinColumn(name = "idPerson")
     private Person person;
+
+    @OneToMany(mappedBy = "telephoneLine",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Invoice> invoices;
 }

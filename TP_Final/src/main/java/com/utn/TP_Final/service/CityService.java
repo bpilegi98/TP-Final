@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Objects.isNull;
 
@@ -31,5 +32,15 @@ public class CityService {
             return cityRepository.findAll();
         }
         return cityRepository.findByName(name);
+    }
+
+    public Optional<City> getById(Integer id)
+    {
+        return cityRepository.findById(id);
+    }
+
+    public City getByPrefix(Integer prefix)
+    {
+        return cityRepository.findByPrefix(prefix);
     }
 }
