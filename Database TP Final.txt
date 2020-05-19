@@ -1,3 +1,5 @@
+SET GLOBAL time_zone = '-3:00';
+
 create database tpfinal;
 use tpfinal;
 
@@ -27,7 +29,7 @@ firstname varchar(50),
 lastname varchar(50),
 dni int unique,
 idCity int,
-userType int,
+userType enum('ADMIN', 'EMPLOYEE', 'CUSTOMER'),
 constraint fk_city_person foreign key (idCity) references Cities(idCity)
 );
 
@@ -44,9 +46,9 @@ constraint fk_destinationCity_fee foreign key (destinationCityId) references Cit
 create table TelephoneLines(
 idTelephoneLine int auto_increment primary key,
 lineNumber varchar(50) unique,
-userType int,
+lineType enum('MOBILE', 'RESIDENTIAL'),
 idPerson int,
-suspended boolean,
+status enum('SUSPENDED', 'ACTIVE', 'DELETED'),
 constraint fk_person_telephoneLine foreign key (idPerson) references Persons(idPerson)
 );
 
@@ -79,8 +81,3 @@ constraint fk_invoice foreign key (idInvoice) references Invoices(idInvoice),
 constraint fk_sourceCity_call foreign key (sourceCityId) references Cities(idCity),
 constraint fk_destinationCity_call foreign key (destinationCityId) references Cities(idCity)
 );
-
-
-
-
-
