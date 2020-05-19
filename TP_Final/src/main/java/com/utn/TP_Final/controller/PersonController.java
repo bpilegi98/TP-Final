@@ -34,19 +34,19 @@ public class PersonController {
         return personService.getAll(name);
     }
 
-    @GetMapping("/")
+    @GetMapping("/{dni}")
     public Person getByDni(@RequestParam(required = true)Integer dni)
     {
         return personService.getByDni(dni);
     }
 
-    @GetMapping("/")
+    @GetMapping("/{lineNumber}")
     public Person getByLineNumber(@RequestParam(required = true)String lineNumber)
     {
         return personService.getByLineNumber(lineNumber);
     }
 
-    @GetMapping("/")
+    @GetMapping("/{id}")
     public Optional<Person> getById(@RequestParam(required = true)Integer id)
     {
         return personService.getById(id);

@@ -30,12 +30,12 @@ public class InvoiceService {
         invoiceRepository.delete(invoice);
     }
 
-    public List<Invoice> getAll(Date from, Date to)
+    /*public List<Invoice> getAll(Date from, Date to)
     {
         if(isNull(from) || isNull(to))
         {
             return invoiceRepository.findAll();
         }
         return invoiceRepository.findBetweenDates(from, to);
-    }
+    }*/
 }

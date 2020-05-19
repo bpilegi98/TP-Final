@@ -10,6 +10,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Entity
 @Table(name = "Calls")
 public class Call {
 
@@ -18,10 +19,12 @@ public class Call {
     @Column(name = "idCall")
     private Integer idCall;
 
-    @JoinColumn(name = "idTelephoneLine")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "idTelephoneLine", referencedColumnName = "idTelephoneLine")
     private TelephoneLine sourceNumber;
 
-    @JoinColumn(name = "idTelehoneLine")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "idTelehoneLine", referencedColumnName = "idTelephoneLine")
     private TelephoneLine destinationNumber;
 
     @Column(name = "pricePerMinute")
@@ -36,12 +39,15 @@ public class Call {
     @Column(name = "totalPrice")
     private float totalPrice;
 
-    @JoinColumn(name = "idInvoice")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "idInvoice", referencedColumnName = "idInvoice")
     private Invoice invoice;
 
-    @JoinColumn(name = "idCity")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "idCity", referencedColumnName = "idCity", insertable = false, updatable = false)
     private City sourceCity;
 
-    @JoinColumn(name = "idCity")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "idCity", referencedColumnName = "idCity", insertable = false, updatable = false)
     private City destinationCity;
 }

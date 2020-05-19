@@ -32,14 +32,14 @@ public class CityController {
         return cityService.getAll(name);
     }
 
-    @GetMapping("/")
-    public Optional<City> getById(@RequestParam(required = false)Integer id)
+    @GetMapping("/{id}")
+    public Optional<City> getById(@RequestParam(required = true)Integer id)
     {
         return cityService.getById(id);
     }
 
-    @GetMapping("/")
-    public City getByPrefix(@RequestParam(required = false)Integer prefix)
+    @GetMapping("/{prefix}")
+    public City getByPrefix(@RequestParam(required = true)Integer prefix)
     {
         return cityService.getByPrefix(prefix);
     }

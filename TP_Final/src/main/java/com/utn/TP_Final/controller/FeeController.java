@@ -32,25 +32,25 @@ public class FeeController {
         return feeService.getAll();
     }
 
-    @GetMapping("/")
+    @GetMapping("/{id}")
     public Optional<Fee> getById(@RequestParam(required = true)Integer id)
     {
         return feeService.getById(id);
     }
 
-    @GetMapping("/")
+    @GetMapping("/{sourceCityName}")
     public List<Fee> getBySourceCity(@RequestParam(required = true)String cityName)
     {
         return feeService.getBySourceCity(cityName);
     }
 
-    @GetMapping("/")
+    @GetMapping("/{destinationCityName}")
     public List<Fee> getByDestinationCity(@RequestParam(required = true)String cityName)
     {
         return feeService.getByDestinationCity(cityName);
     }
 
-    @GetMapping("/")
+    @GetMapping("/{prefixNumber}")
     public Fee getByPrefix(@RequestParam(required = true)Integer prefixNumber)
     {
         return feeService.getByPrefix(prefixNumber);

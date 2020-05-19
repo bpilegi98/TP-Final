@@ -12,6 +12,6 @@ import java.util.List;
 public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
 
     //hacer @Query que devuelva los invoice de entre dos fechas // FIJARSE QUE FUNCIONE BIEN
-    @Query(value = "select * from invoices where dateCreation = ?1 and dateExpiration = ?2")
-    List<Invoice> findBetweenDates(Date from, Date to);
+    //@Query(value = "select * from invoices where dateCreation = ?1 and dateExpiration = ?2")
+    //List<Invoice> findBetweenDates(Date from, Date to);
 }

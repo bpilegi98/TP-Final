@@ -33,6 +33,5 @@ public class Province {
     private Country country;
 
     @OneToMany(mappedBy = "province", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
     private List<City> cities;
 }

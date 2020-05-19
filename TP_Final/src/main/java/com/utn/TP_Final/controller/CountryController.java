@@ -32,7 +32,7 @@ public class CountryController {
         return countryService.getAll(name);
     }
 
-    @GetMapping("/")
+    @GetMapping("/{id}")
     public Optional<Country> getById(@RequestParam(required = true)Integer id)
     {
         return countryService.findById(id);

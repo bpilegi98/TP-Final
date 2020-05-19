@@ -10,6 +10,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Entity
 @Table(name = "Fees")
 public class Fee {
 
@@ -24,9 +25,11 @@ public class Fee {
     @Column(name = "costPerMinute")
     private float costPerMinute;
 
-    @JoinColumn(name = "idCity")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "idCity", referencedColumnName = "idCity", insertable = false, updatable = false)
     private City sourceCity;
 
-    @JoinColumn(name = "idCity")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "idCity", referencedColumnName = "idCity", insertable = false, updatable = false)
     private City destinationCity;
 }

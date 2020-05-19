@@ -32,7 +32,7 @@ public class ProvinceController {
         return provinceService.getAll(name);
     }
 
-    @GetMapping("/")
+    @GetMapping("/{id}")
     public Optional<Province> getById(@RequestParam(required = true)Integer id)
     {
         return provinceService.getById(id);

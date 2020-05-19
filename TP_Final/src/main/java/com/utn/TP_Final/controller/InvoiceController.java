@@ -26,9 +26,9 @@ public class InvoiceController {
         invoiceService.addInvoice(newInvoice);
     }
 
-    @GetMapping("/")
+   /* @GetMapping("/")
     public List<Invoice> getAll(@RequestBody(required = false)Date from, Date to)
     {
         return invoiceService.getAll(from, to);
-    }
+    }*/
 }
