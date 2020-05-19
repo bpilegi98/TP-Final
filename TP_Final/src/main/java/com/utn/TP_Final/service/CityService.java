@@ -25,6 +25,11 @@ public class CityService {
         cityRepository.save(newCity);
     }
 
+    public void deleteCity(City city)
+    {
+        cityRepository.delete(city);
+    }
+
     public List<City> getAll(String name)
     {
         if(isNull(name))

@@ -25,6 +25,11 @@ public class PersonService {
         personRepository.save(newPerson);
     }
 
+    public void deletePerson(Person person)
+    {
+        personRepository.delete(person);
+    }
+
     public List<Person> getAll(String name) {
         if(isNull(name))
         {

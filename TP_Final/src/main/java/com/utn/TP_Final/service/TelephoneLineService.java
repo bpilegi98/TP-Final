@@ -23,6 +23,11 @@ public class TelephoneLineService {
         telephoneLineRepository.save(newTelephoneLine);
     }
 
+    public void deleteTelephoneLine(TelephoneLine telephoneLine)
+    {
+        telephoneLineRepository.delete(telephoneLine);
+    }
+
     public List<TelephoneLine> getAll(String lineNumber)
     {
         if(isNull(lineNumber))

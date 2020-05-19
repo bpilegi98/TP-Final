@@ -25,6 +25,11 @@ public class InvoiceService {
         invoiceRepository.save(newInvoice);
     }
 
+    public void deleteInvoice(Invoice invoice)
+    {
+        invoiceRepository.delete(invoice);
+    }
+
     public List<Invoice> getAll(Date from, Date to)
     {
         if(isNull(from) || isNull(to))

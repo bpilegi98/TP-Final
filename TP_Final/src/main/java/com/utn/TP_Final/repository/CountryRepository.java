@@ -11,6 +11,6 @@ import java.util.List;
 @Repository
 public interface CountryRepository extends JpaRepository<Country, Integer> {
 
-    @Query(value = "select * from countries where countryName = ?1", nativeQuery = true) //fijarse si funciona
+    @Query(value = "select * from countries where countryName = ?1", nativeQuery = true)
     List<Country> findByName(String name);
 }

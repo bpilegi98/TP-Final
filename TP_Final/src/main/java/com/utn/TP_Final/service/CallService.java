@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CallService {
@@ -23,8 +24,18 @@ public class CallService {
         callRepository.save(newCall);
     }
 
+    public void deleteCall(Call call)
+    {
+        callRepository.delete(call);
+    }
+
     public List<Call> getAll()
     {
         return callRepository.findAll();
+    }
+
+    public Optional<Call> getById(Integer id)
+    {
+        return callRepository.findById(id);
     }
 }

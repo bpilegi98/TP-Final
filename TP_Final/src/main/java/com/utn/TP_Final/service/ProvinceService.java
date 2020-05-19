@@ -25,6 +25,11 @@ public class ProvinceService {
         provinceRepository.save(newProvince);
     }
 
+    public void deleteProvince(Province province)
+    {
+        provinceRepository.delete(province);
+    }
+
     public List<Province> getAll(String name)
     {
         if(isNull(name))
