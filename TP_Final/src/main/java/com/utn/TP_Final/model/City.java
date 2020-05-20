@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name = "Cities")
+@Table(name = "cities")
 public class City {
 
     @Id

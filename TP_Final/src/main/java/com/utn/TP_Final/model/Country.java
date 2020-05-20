@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name = "Countries")
+@Table(name = "countries")
 public class Country {
 
     @Id
@@ -25,6 +25,9 @@ public class Country {
     @Column(name = "countryName", unique = true)
     private String countryName;
 
-   @OneToMany(mappedBy = "country", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-   private List<Province> provinces;
+    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Province> provinces;
+
+   //al menos sabemos que lo rompe (no sabemos porque lo rompe)
+    //okay lo probamos y te avisamos en estos dias
 }
