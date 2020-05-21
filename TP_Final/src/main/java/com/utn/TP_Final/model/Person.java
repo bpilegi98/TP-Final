@@ -34,7 +34,7 @@ public class Person
     private UserType userType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
+    @JsonBackReference(value="person-city")
     @JoinColumn(name = "idCity")
     private City city;
 

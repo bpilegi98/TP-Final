@@ -28,7 +28,7 @@ public class City {
     private Integer prefixNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
+    @JsonBackReference(value="city-province")
     @JoinColumn(name = "idProvince")
     private Province province;
 

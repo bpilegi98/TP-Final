@@ -35,7 +35,7 @@ public class TelephoneLine {
     private LineStatus lineStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
+    @JsonBackReference(value="telephoneline-person")
     @JoinColumn(name = "idPerson")
     private Person person;
 

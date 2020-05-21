@@ -40,12 +40,12 @@ public class Invoice {
     private boolean paid;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
+    @JsonBackReference(value="fee-telephoneline")
     @JoinColumn(name = "idTelephoneLine")
     private TelephoneLine telephoneLine;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
+    @JsonBackReference(value="fee-person")
     @JoinColumn(name = "idPerson")
     private Person person;
 }
