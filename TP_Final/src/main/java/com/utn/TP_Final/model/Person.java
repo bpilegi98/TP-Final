@@ -29,6 +29,10 @@ public class Person
     private String lastname;
     @Column(name = "dni", unique = true)
     private Integer dni;
+    @Column(name = "username", unique = true)
+    private String username;
+    @Column(name = "password")
+    private String password;
     @Column(name = "userType")
     @Enumerated(EnumType.STRING)
     private UserType userType;

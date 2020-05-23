@@ -1,6 +1,9 @@
 package com.utn.TP_Final.controller;
 
 
+import com.utn.TP_Final.exceptions.PersonAlreadyExistsException;
+import com.utn.TP_Final.exceptions.PersonNotExistsException;
+import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.Person;
 import com.utn.TP_Final.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +26,7 @@ public class PersonController {
 
 
     @PostMapping("/")
-    public void addPerson(@RequestBody Person newPerson)
+    public void addPerson(@RequestBody Person newPerson) throws PersonAlreadyExistsException
     {
         personService.addPerson(newPerson);
     }
@@ -50,5 +53,21 @@ public class PersonController {
     public Optional<Person> getById(@RequestParam(required = true)Integer id)
     {
         return personService.getById(id);
+    }
+
+    @GetMapping("/{username}")
+    public Person getByUsername(@RequestParam(required = true)String username, @RequestParam(required = true)String password){
+        return personService.getByUsername(username, password);
+    }
+
+    @PostMapping("/login")
+    public Person login(@RequestBody String username, @RequestBody String password) throws PersonNotExistsException, ValidationException
+    {
+        if((username != null) && (password != null))
+        {
+            return personService.login(username, password);
+        }else{
+            throw new ValidationException("You must complete the fields.");
+        }
     }
 }

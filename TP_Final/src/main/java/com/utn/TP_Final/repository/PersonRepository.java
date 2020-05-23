@@ -19,4 +19,7 @@ public interface PersonRepository extends JpaRepository<Person, Integer> {
     @Query(value = "select * from persons p join telephonelines t on p.idPerson = t.idPerson where lineNumber = ?1", nativeQuery = true)
     Person findByLineNumber(String lineNumber);
 
+    @Query(value = "select * from persons where username = ?1 and password = ?2", nativeQuery = true)
+    Person findByUsername(String username, String password);
+
 }
