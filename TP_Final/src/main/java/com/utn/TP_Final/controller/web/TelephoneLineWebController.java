@@ -62,4 +62,28 @@ public class TelephoneLineWebController {
         telephoneLineController.removeTelephoneLine(lineNumber);
         return ResponseEntity.status(HttpStatus.GONE).build();
     }
+
+    @PutMapping("/suspend")
+    public ResponseEntity suspendTelephoneLine(@RequestHeader("Authorization")String sessionToken, @RequestBody String lineNumber) throws TelephoneLineNotExistsException
+    {
+        Person currentUser = sessionManager.getLoggedUser(sessionToken);
+        if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        telephoneLineController.suspendTelephoneLine(lineNumber);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PutMapping("/active")
+    public ResponseEntity activeTelephoneLine(@RequestHeader("Authorization")String sessionToken, @RequestBody String lineNumber) throws TelephoneLineNotExistsException
+    {
+        Person currentUser = sessionManager.getLoggedUser(sessionToken);
+        if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        telephoneLineController.activeTelephoneLine(lineNumber);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }

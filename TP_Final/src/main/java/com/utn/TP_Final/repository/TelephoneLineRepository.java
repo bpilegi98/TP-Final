@@ -15,4 +15,10 @@ public interface TelephoneLineRepository extends JpaRepository<TelephoneLine, In
 
     @Query(value = "remove from telephonelines where linenumber = ?1", nativeQuery = true)
     void delete(String lineNumber);
+
+    @Query(value = "update telephonelines set linestatus = 'SUSPENDED' where linenumber = ?1", nativeQuery = true)
+    void suspendTelephoneLine(String lineNumber);
+
+    @Query(value = "update telephonelines set linestatus = 'ACTIVE' where linenumber = ?1", nativeQuery = true)
+    void activeTelephoneLine(String lineNumber);
 }

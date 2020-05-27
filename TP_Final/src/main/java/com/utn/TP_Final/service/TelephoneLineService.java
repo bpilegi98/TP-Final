@@ -36,4 +36,14 @@ public class TelephoneLineService {
         }
         return telephoneLineRepository.findByLineNumber(lineNumber);
     }
+
+    public void suspendTelephoneLine(String lineNumber)
+    {
+        telephoneLineRepository.suspendTelephoneLine(lineNumber);
+    }
+
+    public void activeTelephoneLine(String lineNumber)
+    {
+        telephoneLineRepository.activeTelephoneLine(lineNumber);
+    }
 }

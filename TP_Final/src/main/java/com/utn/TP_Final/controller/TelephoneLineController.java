@@ -36,4 +36,16 @@ public class TelephoneLineController {
     {
         return telephoneLineService.getAll(lineNumber);
     }
+
+    @PutMapping("/suspend/{lineNumber}")
+    public void suspendTelephoneLine(@RequestBody(required = true)String lineNumber)
+    {
+        telephoneLineService.suspendTelephoneLine(lineNumber);
+    }
+
+    @PutMapping("/active/{lineNumber}")
+    public void activeTelephoneLine(@RequestBody(required = true)String lineNumber)
+    {
+        telephoneLineService.activeTelephoneLine(lineNumber);
+    }
 }
