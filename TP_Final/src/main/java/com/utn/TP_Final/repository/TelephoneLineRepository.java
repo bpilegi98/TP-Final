@@ -12,4 +12,7 @@ public interface TelephoneLineRepository extends JpaRepository<TelephoneLine, In
 
     @Query(value = "select * from TelephoneLines where lineNumber = ?1", nativeQuery = true)
     List<TelephoneLine> findByLineNumber(String lineNumber);
+
+    @Query(value = "remove from telephonelines where linenumber = ?1", nativeQuery = true)
+    void delete(String lineNumber);
 }

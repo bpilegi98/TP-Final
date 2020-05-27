@@ -27,9 +27,9 @@ public class PersonService {
         personRepository.save(newPerson);
     }
 
-    public void deletePerson(Person person)
+    public void deletePerson(Integer dni)
     {
-        personRepository.delete(person);
+        personRepository.delete(dni);
     } //esto es como el remove user
 
     public List<Person> getAll(String name) {
@@ -64,5 +64,7 @@ public class PersonService {
         Person person = personRepository.findByUsername(username, password);
         return Optional.ofNullable(person).orElseThrow(()-> new PersonNotExistsException());
     }
+
+    //ver como hacer el logout
 
 }

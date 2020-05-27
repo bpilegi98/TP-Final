@@ -23,9 +23,9 @@ public class TelephoneLineService {
         telephoneLineRepository.save(newTelephoneLine);
     }
 
-    public void deleteTelephoneLine(TelephoneLine telephoneLine)
+    public void deleteTelephoneLine(String lineNumber)
     {
-        telephoneLineRepository.delete(telephoneLine);
+        telephoneLineRepository.delete(lineNumber);
     }
 
     public List<TelephoneLine> getAll(String lineNumber)

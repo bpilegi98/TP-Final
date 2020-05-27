@@ -25,6 +25,12 @@ public class TelephoneLineController {
         telephoneLineService.addTelephoneLine(newTelephoneLine);
     }
 
+    @PostMapping("/delete/{lineNumber}")
+    public void removeTelephoneLine(@RequestBody(required = true)String lineNumber)
+    {
+        telephoneLineService.deleteTelephoneLine(lineNumber);
+    }
+
     @GetMapping("/")
     public List<TelephoneLine> getAll(@RequestBody(required = false)String lineNumber)
     {

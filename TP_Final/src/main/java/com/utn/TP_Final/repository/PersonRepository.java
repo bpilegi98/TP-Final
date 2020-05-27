@@ -22,4 +22,7 @@ public interface PersonRepository extends JpaRepository<Person, Integer> {
     @Query(value = "select * from persons where username = ?1 and password = ?2", nativeQuery = true)
     Person findByUsername(String username, String password);
 
+    @Query(value = "remove from persons where dni = ?1", nativeQuery = true)
+    void delete(Integer dni);
+
 }
