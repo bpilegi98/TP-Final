@@ -10,15 +10,15 @@ import java.util.List;
 @Repository
 public interface TelephoneLineRepository extends JpaRepository<TelephoneLine, Integer> {
 
-    @Query(value = "select * from TelephoneLines where lineNumber = ?1", nativeQuery = true)
+    @Query(value = "select * from TelephoneLines where line_number = ?1", nativeQuery = true)
     List<TelephoneLine> findByLineNumber(String lineNumber);
 
-    @Query(value = "remove from telephonelines where linenumber = ?1", nativeQuery = true)
+    @Query(value = "remove from telephonelines where line_number = ?1", nativeQuery = true)
     void delete(String lineNumber);
 
-    @Query(value = "update telephonelines set linestatus = 'SUSPENDED' where linenumber = ?1", nativeQuery = true)
+    @Query(value = "update telephonelines set status = 'SUSPENDED' where line_number = ?1", nativeQuery = true)
     void suspendTelephoneLine(String lineNumber);
 
-    @Query(value = "update telephonelines set linestatus = 'ACTIVE' where linenumber = ?1", nativeQuery = true)
+    @Query(value = "update telephonelines set status = 'ACTIVE' where line_number = ?1", nativeQuery = true)
     void activeTelephoneLine(String lineNumber);
 }

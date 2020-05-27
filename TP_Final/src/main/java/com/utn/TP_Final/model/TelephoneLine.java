@@ -32,7 +32,7 @@ public class TelephoneLine {
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private LineStatus lineStatus;
+    private LineStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference(value="telephoneline-person")

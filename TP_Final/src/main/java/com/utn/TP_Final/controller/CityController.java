@@ -32,13 +32,13 @@ public class CityController {
         return cityService.getAll(name);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/getById/{id}")
     public Optional<City> getById(@RequestParam(required = true)Integer id)
     {
         return cityService.getById(id);
     }
 
-    @GetMapping("/{prefix}")
+    @GetMapping("/getByPrefix/{prefix}")
     public City getByPrefix(@RequestParam(required = true)Integer prefix)
     {
         return cityService.getByPrefix(prefix);
