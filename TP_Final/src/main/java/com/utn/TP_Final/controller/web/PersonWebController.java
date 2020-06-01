@@ -1,12 +1,11 @@
 package com.utn.TP_Final.controller.web;
 
 
-import com.utn.TP_Final.controller.PersonController;
-import com.utn.TP_Final.exceptions.PersonAlreadyExistsException;
-import com.utn.TP_Final.exceptions.PersonNotExistsException;
-import com.utn.TP_Final.model.Person;
+import com.utn.TP_Final.controller.UserController;
+import com.utn.TP_Final.exceptions.UserAlreadyExistsException;
+import com.utn.TP_Final.exceptions.UserNotExistsException;
+import com.utn.TP_Final.model.User;
 import com.utn.TP_Final.session.SessionManager;
-import org.aspectj.weaver.patterns.PerObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,49 +17,49 @@ import java.util.List;
 @RequestMapping("/api/person")
 public class PersonWebController {
 
-    private final PersonController personController;
+    private final UserController userController;
     private final SessionManager sessionManager;
 
     @Autowired
-    public PersonWebController(PersonController personController, SessionManager sessionManager) {
-        this.personController = personController;
+    public PersonWebController(UserController userController, SessionManager sessionManager) {
+        this.userController = userController;
         this.sessionManager = sessionManager;
     }
 
     @GetMapping
-    public ResponseEntity<List<Person>> getPersons(@RequestHeader("Authorization") String sessionToken)
+    public ResponseEntity<List<User>> getPersons(@RequestHeader("Authorization") String sessionToken)
     {
-        Person currentUser = sessionManager.getLoggedUser(sessionToken);
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
         if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
         {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        List<Person> persons = personController.getAll(null); //asi esta bien pasar el param?
-        return (persons.size() > 0) ? ResponseEntity.ok(persons) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        List<User> users = userController.getAll(null); //asi esta bien pasar el param?
+        return (users.size() > 0) ? ResponseEntity.ok(users) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 
     @PostMapping("/add")
-    public ResponseEntity newPerson(@RequestHeader("Authorization") String sessionToken, @RequestBody Person person) throws PersonAlreadyExistsException
+    public ResponseEntity newPerson(@RequestHeader("Authorization") String sessionToken, @RequestBody User user) throws UserAlreadyExistsException
     {
-        Person currentUser = sessionManager.getLoggedUser(sessionToken);
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
         if(currentUser == null || currentUser.getUserType().equals("CUSTOMER")) //si solo el admin puede dar de alta y baja datos y los employee solo modifican agregar el usertype a la condicion
         {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        personController.addPerson(person);
+        userController.addUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/delete")
-    public ResponseEntity deletePerson(@RequestHeader("Authorization")String sessionToken, @RequestBody Integer dni) throws PersonNotExistsException
+    public ResponseEntity deletePerson(@RequestHeader("Authorization")String sessionToken, @RequestBody String dni) throws UserNotExistsException
     {
-        Person currentUser = sessionManager.getLoggedUser(sessionToken);
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
         if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
         {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        personController.removePerson(dni);
+        userController.removeUser(dni);
         return ResponseEntity.status(HttpStatus.GONE).build();
     }
 }

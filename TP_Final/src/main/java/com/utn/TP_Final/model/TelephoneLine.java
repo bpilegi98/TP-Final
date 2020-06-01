@@ -1,7 +1,6 @@
 package com.utn.TP_Final.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.utn.TP_Final.model.enums.LineStatus;
 import com.utn.TP_Final.model.enums.LineType;
 import lombok.AllArgsConstructor;
@@ -15,18 +14,18 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name = "TelephoneLines")
+@Table(name = "telephone_lines")
 public class TelephoneLine {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idTelephoneLine")
-    private Integer idTelephoneLine;
+    @Column(name = "id")
+    private Integer id;
 
-    @Column(name = "lineNumber", unique = true)
+    @Column(name = "line_number", unique = true)
     private String lineNumber;
 
-    @Column(name = "lineType")
+    @Column(name = "line_type")
     @Enumerated(EnumType.STRING)
     private LineType lineType;
 
@@ -35,9 +34,9 @@ public class TelephoneLine {
     private LineStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference(value="telephoneline-person")
-    @JoinColumn(name = "idPerson")
-    private Person person;
+    @JsonBackReference(value="telephone_lines-user")
+    @JoinColumn(name = "id_user")
+    private User user;
 
     @OneToMany(mappedBy = "telephoneLine",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Invoice> invoices;

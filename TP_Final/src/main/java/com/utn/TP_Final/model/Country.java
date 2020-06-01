@@ -19,11 +19,11 @@ public class Country {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idCountry")
-    private int idCountry;
+    @Column(name = "id")
+    private int id;
 
-    @Column(name = "countryName", unique = true)
-    private String countryName;
+    @Column(name = "name", unique = true)
+    private String name;
 
     @OneToMany(mappedBy = "country", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Province> provinces;

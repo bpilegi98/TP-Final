@@ -1,6 +1,6 @@
 package com.utn.TP_Final.session;
 
-import com.utn.TP_Final.model.Person;
+import com.utn.TP_Final.model.User;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -15,9 +15,9 @@ public class SessionManager {
 
     int sessionExpiration = 60;
 
-    public String createSession(Person person){
+    public String createSession(User user){
         String token = UUID.randomUUID().toString();
-        sessionMap.put(token, new Session(token, person, new Date(System.currentTimeMillis())));
+        sessionMap.put(token, new Session(token, user, new Date(System.currentTimeMillis())));
         return token;
     }
 
@@ -48,8 +48,8 @@ public class SessionManager {
         }
     }
 
-    public Person getLoggedUser(String token)
+    public User getLoggedUser(String token)
     {
-        return getSession(token).getLoggedPerson();
+        return getSession(token).getLoggedUser();
     }
 }

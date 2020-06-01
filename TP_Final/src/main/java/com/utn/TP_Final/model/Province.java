@@ -20,16 +20,16 @@ public class Province {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idProvince")
-    private int idProvince;
+    @Column(name = "id")
+    private int id;
 
-    @Column(name = "provinceName")
-    private String provinceName;
+    @Column(name = "name")
+    private String name;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference(value="province-country")
-    @JoinColumn(name = "idCountry")
+    @JoinColumn(name = "id_country")
     private Country country;
 
     @OneToMany(mappedBy = "province", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

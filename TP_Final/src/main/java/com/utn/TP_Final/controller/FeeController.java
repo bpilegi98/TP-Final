@@ -49,10 +49,12 @@ public class FeeController {
     {
         return feeService.getByDestinationCity(cityName);
     }
-
+/*
     @GetMapping("/getByPrefix/{prefixNumber}")
     public Fee getByPrefix(@RequestParam(required = true)Integer prefixNumber)
     {
         return feeService.getByPrefix(prefixNumber);
     }
+
+ */
 }

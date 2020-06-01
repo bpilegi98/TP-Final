@@ -44,7 +44,7 @@ public class CityService {
         return cityRepository.findById(id);
     }
 
-    public City getByPrefix(Integer prefix)
+    public City getByPrefix(String prefix)
     {
         return cityRepository.findByPrefix(prefix);
     }

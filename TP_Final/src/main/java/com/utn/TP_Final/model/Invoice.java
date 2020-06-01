@@ -18,34 +18,31 @@ public class Invoice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idInvoice")
-    private Integer idInvoice;
+    @Column(name = "id")
+    private Integer id;
 
-    @Column(name = "calls")
-    private Integer calls;
-
-    @Column(name = "cost")
-    private float cost;
-
-    @Column(name = "totalPrice")
+    @Column(name = "total_price")
     private float totalPrice;
 
-    @Column(name = "dateCreation")
+    @Column(name = "total_cost")
+    private float totalCost;
+
+    @Column(name = "date_creation")
     private Date dateCreation;
 
-    @Column(name = "dateExpiration")
+    @Column(name = "date_expiration")
     private Date dateExpiration;
 
     @Column(name = "paid")
     private boolean paid;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference(value="fee-telephoneline")
-    @JoinColumn(name = "idTelephoneLine")
+    @JsonBackReference(value="fee-telephone_lines")
+    @JoinColumn(name = "id_telephone_line")
     private TelephoneLine telephoneLine;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference(value="fee-person")
-    @JoinColumn(name = "idPerson")
-    private Person person;
+    @JsonBackReference(value="fee-user")
+    @JoinColumn(name = "id_user")
+    private User user;
 }

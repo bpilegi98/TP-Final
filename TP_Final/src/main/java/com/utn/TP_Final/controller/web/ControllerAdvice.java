@@ -2,7 +2,7 @@ package com.utn.TP_Final.controller.web;
 
 import com.utn.TP_Final.dto.ErrorDto;
 import com.utn.TP_Final.exceptions.InvalidLoginException;
-import com.utn.TP_Final.exceptions.PersonNotExistsException;
+import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.exceptions.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,7 +26,7 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(PersonNotExistsException.class)
+    @ExceptionHandler(UserNotExistsException.class)
     public ErrorDto handlePersonNotExists()
     {
         return new ErrorDto(3, "Person doesn't exists");

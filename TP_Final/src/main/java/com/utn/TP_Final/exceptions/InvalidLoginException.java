@@ -6,7 +6,7 @@ public class InvalidLoginException extends Throwable{
         super(message);
     }
 
-    public InvalidLoginException(PersonNotExistsException e) { //esto esta bien? me lo recomendó el IDE pero no sé
+    public InvalidLoginException(UserNotExistsException e) { //esto esta bien? me lo recomendó el IDE pero no sé
         super(e.toString());
     }
 }

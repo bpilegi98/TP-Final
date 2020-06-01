@@ -39,7 +39,7 @@ public class CityController {
     }
 
     @GetMapping("/getByPrefix/{prefix}")
-    public City getByPrefix(@RequestParam(required = true)Integer prefix)
+    public City getByPrefix(@RequestParam(required = true)String prefix)
     {
         return cityService.getByPrefix(prefix);
     }

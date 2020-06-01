@@ -4,7 +4,7 @@ package com.utn.TP_Final.controller.web;
 import com.utn.TP_Final.controller.TelephoneLineController;
 import com.utn.TP_Final.exceptions.TelephoneLineAlreadyExistsException;
 import com.utn.TP_Final.exceptions.TelephoneLineNotExistsException;
-import com.utn.TP_Final.model.Person;
+import com.utn.TP_Final.model.User;
 import com.utn.TP_Final.model.TelephoneLine;
 import com.utn.TP_Final.session.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class TelephoneLineWebController {
     @GetMapping
     public ResponseEntity<List<TelephoneLine>> getTelephoneLines(@RequestHeader("Authorization") String sessionToken)
     {
-        Person currentUser = sessionManager.getLoggedUser(sessionToken);
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
         if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
         {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -42,7 +42,7 @@ public class TelephoneLineWebController {
     @PostMapping("/add")
     public ResponseEntity newTelephoneLine(@RequestHeader("Authorization") String sessionToken, @RequestBody TelephoneLine telephoneLine) throws TelephoneLineAlreadyExistsException
     {
-        Person currentUser = sessionManager.getLoggedUser(sessionToken);
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
         if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
         {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -54,7 +54,7 @@ public class TelephoneLineWebController {
     @PostMapping("/delete")
     public ResponseEntity deleteTelephoneLine(@RequestHeader("Authorization") String sessionToken, @RequestBody String lineNumber) throws TelephoneLineNotExistsException
     {
-        Person currentUser = sessionManager.getLoggedUser(sessionToken);
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
         if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
         {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -66,7 +66,7 @@ public class TelephoneLineWebController {
     @PutMapping("/suspend")
     public ResponseEntity suspendTelephoneLine(@RequestHeader("Authorization")String sessionToken, @RequestBody String lineNumber) throws TelephoneLineNotExistsException
     {
-        Person currentUser = sessionManager.getLoggedUser(sessionToken);
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
         if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
         {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -78,7 +78,7 @@ public class TelephoneLineWebController {
     @PutMapping("/active")
     public ResponseEntity activeTelephoneLine(@RequestHeader("Authorization")String sessionToken, @RequestBody String lineNumber) throws TelephoneLineNotExistsException
     {
-        Person currentUser = sessionManager.getLoggedUser(sessionToken);
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
         if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
         {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();

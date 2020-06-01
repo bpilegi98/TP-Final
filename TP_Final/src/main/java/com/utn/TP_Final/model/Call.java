@@ -1,6 +1,7 @@
 package com.utn.TP_Final.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,43 +12,48 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name = "Calls")
+@Table(name = "calls")
 public class Call {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idCall")
-    private Integer idCall;
+    @Column(name = "id")
+    private Integer id;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "idTelephoneLine", referencedColumnName = "idTelephoneLine")
-    private TelephoneLine sourceNumber;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "idTelehoneLine", referencedColumnName = "idTelephoneLine")
-    private TelephoneLine destinationNumber;
-
-    @Column(name = "pricePerMinute")
+    @Column(name = "price_per_minute")
     private float pricePerMinute;
 
-    @Column(name = "durationSecs")
+    @Column(name = "duration_secs")
     private Integer durationSecs;
 
-    @Column(name = "totalCost")
+    @Column(name = "total_cost")
     private float totalCost;
 
-    @Column(name = "totalPrice")
+    @Column(name = "total_price")
     private float totalPrice;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "idInvoice", referencedColumnName = "idInvoice")
-    private Invoice invoice;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference(value="city-province")
+    @JoinColumn(name = "id_province")
+    private Province province;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "idCity", referencedColumnName = "idCity", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference(value = "call-source_number")
+    @JoinColumn(name = "id_source_number")
+    private TelephoneLine sourceNumber;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference(value = "call-destination_number")
+    @JoinColumn(name = "id_destination_number")
+    private TelephoneLine destinationNumber;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference(value="call-source_city")
+    @JoinColumn(name = "id_source_city")
     private City sourceCity;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "idCity", referencedColumnName = "idCity", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference(value="user-destination_city")
+    @JoinColumn(name = "id_destination_city")
     private City destinationCity;
 }

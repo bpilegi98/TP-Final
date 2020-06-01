@@ -1,6 +1,5 @@
 package com.utn.TP_Final.config;
 
-import com.utn.TP_Final.model.Person;
 import com.utn.TP_Final.session.SessionFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +11,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.List;
 
 @org.springframework.context.annotation.Configuration
 @PropertySource("application.yml")

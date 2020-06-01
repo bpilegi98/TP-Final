@@ -47,9 +47,11 @@ public class FeeService {
     {
         return feeRepository.findByDestinationCity(cityName);
     }
-
+/*
     public Fee getByPrefix(Integer prefixNumber)
     {
         return feeRepository.findByPrefix(prefixNumber);
     }
+
+ */
 }

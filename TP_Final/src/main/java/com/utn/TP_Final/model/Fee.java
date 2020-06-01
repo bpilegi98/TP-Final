@@ -16,20 +16,20 @@ public class Fee {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idFee")
-    private Integer idFee;
+    @Column(name = "id")
+    private Integer id;
 
-    @Column(name = "pricePerMinute")
+    @Column(name = "price_per_minute")
     private float pricePerMinute;
 
-    @Column(name = "costPerMinute")
+    @Column(name = "cost_per_minute")
     private float costPerMinute;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "idCity", referencedColumnName = "idCity", insertable = false, updatable = false)
+    @JoinColumn(name = "id_source_city",  insertable = false, updatable = false)
     private City sourceCity;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "idCity", referencedColumnName = "idCity", insertable = false, updatable = false)
+    @JoinColumn(name = "id_destination_city", insertable = false, updatable = false)
     private City destinationCity;
 }
