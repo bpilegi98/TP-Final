@@ -28,6 +28,8 @@ public class Country {
     @OneToMany(mappedBy = "country", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Province> provinces;
 
-   //al menos sabemos que lo rompe (no sabemos porque lo rompe)
-    //okay lo probamos y te avisamos en estos dias
+    public Country(String name) {
+        this.name = name;
+    }
+
 }

@@ -32,6 +32,7 @@ public class CallController {
         return callService.getAll();
     }
 
+
     @GetMapping("/{id}")
     public Optional<Call> getById(Integer id)
     {

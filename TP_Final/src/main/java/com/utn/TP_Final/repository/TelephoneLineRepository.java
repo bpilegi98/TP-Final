@@ -21,4 +21,9 @@ public interface TelephoneLineRepository extends JpaRepository<TelephoneLine, In
 
     @Query(value = "update telephone_lines set status = 'ACTIVE' where line_number = ?1", nativeQuery = true)
     void activeTelephoneLine(String lineNumber);
+
+    //si comentas la query es exactamente lo mismo
+    @Query(value = "select * from telephone_lines where line_number like ?1%",nativeQuery = true)
+    List<TelephoneLine> findByLineNumberStartsWith(String prefix);
+
 }

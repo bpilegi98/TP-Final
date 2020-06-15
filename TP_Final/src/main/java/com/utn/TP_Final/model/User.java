@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name = "Users")
+@Table(name = "users")
 public class User
 {
 
@@ -25,17 +25,23 @@ public class User
 
     @Column(name = "firstname")
     private String firstname;
+
     @Column(name = "lastname")
     private String lastname;
+
     @Column(name = "dni", unique = true)
     private String dni;
+
     @Column(name = "username", unique = true)
     private String username;
+
     @Column(name = "password")
     private String password;
+
     @Column(name = "userType")
     @Enumerated(EnumType.STRING)
     private UserType userType;
+
     @Column(name="is_active")
     private boolean active;
 

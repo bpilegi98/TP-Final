@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 
 @AllArgsConstructor
@@ -15,7 +16,8 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "telephone_lines")
-public class TelephoneLine {
+public class TelephoneLine implements Serializable {
+//implementa serializable porque hay un bug con hibernte cuando la key no es una primary, implementar serializable lo "arregla"
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

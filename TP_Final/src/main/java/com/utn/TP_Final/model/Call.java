@@ -14,6 +14,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "calls")
 public class Call {
+    //TODO Agregarle el id de los numeros de telefono
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,19 +33,22 @@ public class Call {
     @Column(name = "total_price")
     private float totalPrice;
 
+
+    /*
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference(value="city-province")
     @JoinColumn(name = "id_province")
     private Province province;
+     */
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference(value = "call-source_number")
-    @JoinColumn(name = "id_source_number")
+    @JoinColumn(name = "source_number", referencedColumnName = "line_number")
     private TelephoneLine sourceNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference(value = "call-destination_number")
-    @JoinColumn(name = "id_destination_number")
+    @JoinColumn(name = "destination_number",referencedColumnName = "line_number")
     private TelephoneLine destinationNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
