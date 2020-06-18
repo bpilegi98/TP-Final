@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("")
 public class LoginController {
 
     UserController userController;
@@ -27,7 +27,9 @@ public class LoginController {
         this.sessionManager = sessionManager;
     }
 
+    @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginDto loginDto) throws InvalidLoginException, ValidationException
+    //fijarse si hay mas exceptions para agregar
     {
         ResponseEntity responseEntity;
         try

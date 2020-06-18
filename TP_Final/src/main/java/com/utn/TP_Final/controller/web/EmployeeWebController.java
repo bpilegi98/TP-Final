@@ -2,10 +2,13 @@ package com.utn.TP_Final.controller.web;
 
 
 import com.utn.TP_Final.controller.TelephoneLineController;
+import com.utn.TP_Final.controller.UserController;
 import com.utn.TP_Final.exceptions.TelephoneLineAlreadyExistsException;
 import com.utn.TP_Final.exceptions.TelephoneLineNotExistsException;
-import com.utn.TP_Final.model.User;
+import com.utn.TP_Final.exceptions.UserAlreadyExistsException;
+import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.model.TelephoneLine;
+import com.utn.TP_Final.model.User;
 import com.utn.TP_Final.session.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,19 +18,58 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/telephoneLine")
-public class TelephoneLineWebController {
+@RequestMapping("/backoffice")
+public class EmployeeWebController {
 
+    private final UserController userController;
     private final TelephoneLineController telephoneLineController;
     private final SessionManager sessionManager;
 
     @Autowired
-    public TelephoneLineWebController(TelephoneLineController telephoneLineController, SessionManager sessionManager) {
+    public EmployeeWebController(UserController userController, TelephoneLineController telephoneLineController, SessionManager sessionManager) {
+        this.userController = userController;
         this.telephoneLineController = telephoneLineController;
         this.sessionManager = sessionManager;
     }
 
-    @GetMapping
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getPersons(@RequestHeader("Authorization") String sessionToken)
+    {
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
+        if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        List<User> users = userController.getAll(null); //asi esta bien pasar el param?
+        return (users.size() > 0) ? ResponseEntity.ok(users) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+
+    @PostMapping("/users/add")
+    public ResponseEntity newPerson(@RequestHeader("Authorization") String sessionToken, @RequestBody User user) throws UserAlreadyExistsException
+    {
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
+        if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        userController.addUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/users/delete")
+    public ResponseEntity deletePerson(@RequestHeader("Authorization")String sessionToken, @RequestBody String dni) throws UserNotExistsException
+    {
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
+        if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        userController.removeUser(dni);
+        return ResponseEntity.status(HttpStatus.GONE).build();
+    }
+
+    @GetMapping("/telephoneLines")
     public ResponseEntity<List<TelephoneLine>> getTelephoneLines(@RequestHeader("Authorization") String sessionToken)
     {
         User currentUser = sessionManager.getLoggedUser(sessionToken);
@@ -39,7 +81,7 @@ public class TelephoneLineWebController {
         return (telephoneLines.size() > 0) ? ResponseEntity.ok(telephoneLines) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PostMapping("/add")
+    @PostMapping("/telephoneLines/add")
     public ResponseEntity newTelephoneLine(@RequestHeader("Authorization") String sessionToken, @RequestBody TelephoneLine telephoneLine) throws TelephoneLineAlreadyExistsException
     {
         User currentUser = sessionManager.getLoggedUser(sessionToken);
@@ -51,7 +93,7 @@ public class TelephoneLineWebController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PostMapping("/delete")
+    @PostMapping("/telephoneLines/delete")
     public ResponseEntity deleteTelephoneLine(@RequestHeader("Authorization") String sessionToken, @RequestBody String lineNumber) throws TelephoneLineNotExistsException
     {
         User currentUser = sessionManager.getLoggedUser(sessionToken);
@@ -63,7 +105,7 @@ public class TelephoneLineWebController {
         return ResponseEntity.status(HttpStatus.GONE).build();
     }
 
-    @PutMapping("/suspend")
+    @PutMapping("/telephoneLines/suspend")
     public ResponseEntity suspendTelephoneLine(@RequestHeader("Authorization")String sessionToken, @RequestBody String lineNumber) throws TelephoneLineNotExistsException
     {
         User currentUser = sessionManager.getLoggedUser(sessionToken);
@@ -75,7 +117,7 @@ public class TelephoneLineWebController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PutMapping("/active")
+    @PutMapping("/telephoneLines/active")
     public ResponseEntity activeTelephoneLine(@RequestHeader("Authorization")String sessionToken, @RequestBody String lineNumber) throws TelephoneLineNotExistsException
     {
         User currentUser = sessionManager.getLoggedUser(sessionToken);
