@@ -79,6 +79,7 @@ total_cost float,
 total_price float,
 source_number varchar(50),
 destination_number varchar(50),
+date_call date,
 id_source_city int,
 id_destination_city int,
 constraint fk_source_number_call foreign key (source_number) references telephone_lines(line_number),
@@ -104,8 +105,8 @@ constraint fk_call_ic foreign key(id_call) references calls(id)
 delimiter //
 create procedure add_users()
 begin
-insert into users(firstname, lastname, dni, username, password, id_city, user_type,is_active) values ('bianca', 'pilegi', '41307541', 'bpilegi98','1234', 1, 'ADMIN',true);
-insert into users(firstname, lastname, dni, username, password, id_city, user_type,is_active) values ('juan martin', 'ludue�a', '41306543', 'juanludu', '4321', 1, 'EMPLOYEE',true);
+insert into users(firstname, lastname, dni, username, password, id_city, user_type,is_active) values ('bianca', 'pilegi', '41307541', 'bpilegi98','1234', 1, 'AERIAL',true);
+insert into users(firstname, lastname, dni, username, password, id_city, user_type,is_active) values ('juan martin', 'ludueña', '41306543', 'juanludu', '4321', 1, 'EMPLOYEE',true);
 insert into users(firstname, lastname, dni, username, password, id_city, user_type,is_active) values ('fisrtname1', 'lastname1', '1111111', 'username1', 'password1', 3, 'CUSTOMER',true);
 insert into users(firstname, lastname, dni, username, password, id_city, user_type,is_active) values ('fisrtname2', 'lastname2', '2222222', 'username2', 'password2', 4, 'CUSTOMER',true);
 insert into users(firstname, lastname, dni, username, password, id_city, user_type,is_active) values ('fisrtname3', 'lastname3', '3333333', 'username3', 'password3', 4, 'CUSTOMER',true);
@@ -150,12 +151,12 @@ end //
 delimiter //
 create procedure add_calls()
 begin
-insert into calls (source_number, destination_number, price_per_minute, duration_secs, total_cost, total_price, id_source_city, id_destination_city) values ('2236784509', '2235436785', 0.5, 160, 0.13, 1.3, 1, 1);
-insert into calls (source_number, destination_number, price_per_minute, duration_secs, total_cost, total_price, id_source_city, id_destination_city) values ('2236784509', '2215908654', 5, 60, 2, 5, 1, 3);
-insert into calls (source_number, destination_number, price_per_minute, duration_secs, total_cost, total_price, id_source_city, id_destination_city) values ('2236784509', '2235436785', 0.5, 60, 0.05, 0.5, 1, 1);
-insert into calls (source_number, destination_number, price_per_minute, duration_secs, total_cost, total_price, id_source_city, id_destination_city) values ('2236784509', '115098521', 3, 120, 2, 6, 1, 2);
-insert into calls (source_number, destination_number, price_per_minute, duration_secs, total_cost, total_price, id_source_city, id_destination_city) values ('2236784509', '115098521', 3, 180, 3, 9, 1, 2);
-insert into calls (source_number, destination_number, price_per_minute, duration_secs, total_cost, total_price, id_source_city, id_destination_city) values ('2236784509', '115098521', 3, 30, 0.5, 1.5, 1, 2);
+insert into calls (source_number, destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', '2235436785', 0.5, 160, 0.13, 1.3,'2020-06-01' , 1, 1);
+insert into calls (source_number, destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', '2215908654', 5, 60, 2, 5, '2020-06-05', 1, 3);
+insert into calls (source_number, destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', '2235436785', 0.5, 60, 0.05, 0.5, '2020-06-09', 1, 1);
+insert into calls (source_number, destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', '115098521', 3, 120, 2, 6, '2020-06-09', 1, 2);
+insert into calls (source_number, destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', '115098521', 3, 180, 3, 9, '2020-06-11', 1, 2);
+insert into calls (source_number, destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', '115098521', 3, 30, 0.5, 1.5, '2020-06-13', 1, 2);
 end //
 
 
@@ -189,22 +190,90 @@ call add_calls();
 
 
 
--- nombre apellido con el numero que mas llamo
+-- Devolver el numero al que más llamó un usuario
 
-select u.firstname, u.lastname, c.destination_number ,  count(c.destination_number) as cant_llamados
-from users u 
+select u.firstname, u.lastname, c.destination_number as dest from users u 
 inner join telephone_lines t 
-on t.id_user = u.id
-inner join calls c
+on t.id_user = u.id 
+inner join calls c 
+on c.source_number = t.line_number 
+where u.id = 1 
+group by c.destination_number 
+order by  count(c.destination_number) desc 
+limit 1;
+
+
+-- Endpoint que devuelva la cantidad de llamados que recibio la linea X
+
+select t.line_number as LineNumber, count(c.id) as CallsReceived from calls c
+inner join telephone_lines t
+on c.destination_number = t.line_number
+where c.destination_number = '115098521';
+
+select * from calls 
+
+-- API 
+-- 2) Consulta de llamadas del usuario logueado por rango de fechas
+
+delimiter //
+create procedure user_calls_between_dates(IN fromD date, IN toD date, IN idLoggedUser int)
+begin
+select c.destination_number as calledNumber, c.duration_secs as callDuration, c.total_price as totalPrice
+from calls c 
+join telephone_lines t
 on c.source_number = t.line_number
-where u.id = 1
-group by c.destination_number
-order by  cant_llamados desc;
+join users u
+on t.id_user = u.id
+where u.id = idLoggedUser and c.date_call between fromD and toD;
+end //
+
+-- 3) Consulta de facturas del usuario logueado por rango de fechas.
+
+delimiter //
+create procedure user_invoices_between_dates(IN fromD date, IN toD date, IN idLoggedUser int)
+begin
+select i.date_creation as period_from, i.date_expiration as period_to, t.line_number, i.total_price, i.paid
+from invoices i 
+join telephone_lines t
+on i.id_telephone_line = t.id
+join users u
+on t.id_user = u.id
+where u.id = idLoggedUser and i.date_creation between fromD and toD;
+end //
 
 
-insert into invoices (total_price, total_cost, date_creation, date_expiration, id_telephone_line, id_user, paid) values (23.3, 7.68, now(), DATE_ADD(now(), INTERVAL 1 MONTH), 2, 2, false);
+-- 4) Consulta de TOP 10 destinos más llamados por el usuario
 
-select DATE_ADD(month,1,now())
+delimiter //
+create procedure user_top_most_called(IN idLoggedUser int)
+begin
+select c.destination_number as number_called, count(c.destination_number) as times_called
+from calls c 
+join telephone_lines t
+on c.source_number = t.line_number
+join users u
+on t.id_user = u.id
+where u.id = idLoggedUser
+group by number_called
+limit 10;
+end //
 
 
-select DATE_ADD(now(), INTERVAL 1 MONTH)
+-- BACK OFFICE
+-- 2) Manejo de clientes
+-- 3) Alta , baja y suspensión de líneas.
+-- 4) Consulta de tarifas
+-- 5) Consulta de llamadas por usuario.
+-- 6) Consulta de facturación. La facturación se hará directamente por un proceso interno en la base datos.
+
+-- AERIAL
+-- Se debe permitir también el agregado de llamadas, con un login especial, ya que
+-- este método de nuestra API será llamado nada más que por el área de
+-- infraestructura cada vez que se produzca una llamada. El área de infraestructura
+-- sólo enviará la siguiente información de llamadas :
+-- ○ Número de origen
+-- ○ Número de destino
+-- ○ Duración de la llamada
+-- ○ Fecha y hora de la llamada
+-- La tarifa y las localidades de destino deberán calcularse al momento de guardar la
+-- llamada y no será recibido por la API REST.
