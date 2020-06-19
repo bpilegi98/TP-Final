@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("")
+@RequestMapping("/")
 public class LoginController {
 
     UserController userController;
@@ -36,6 +36,7 @@ public class LoginController {
         {
             User user = userController.login(loginDto.getUsername(), loginDto.getPassword());
             String token = sessionManager.createSession(user);
+            System.out.println("EL TOKEN RECIEN CREADO:  "+token);
             responseEntity = ResponseEntity.ok().headers(createHeaders(token)).build();
         }catch (UserNotExistsException e){
             throw new InvalidLoginException(e);
@@ -51,7 +52,7 @@ public class LoginController {
 
     private HttpHeaders createHeaders(String token) {
         HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Authorization", token);
+        responseHeaders.set(HttpHeaders.AUTHORIZATION, token);
         return responseHeaders;
     }
 }

@@ -11,9 +11,11 @@ import com.utn.TP_Final.model.TelephoneLine;
 import com.utn.TP_Final.model.User;
 import com.utn.TP_Final.session.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 
@@ -33,8 +35,9 @@ public class EmployeeWebController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getPersons(@RequestHeader("Authorization") String sessionToken)
+    public ResponseEntity<List<User>> getPersons(@RequestHeader(HttpHeaders.AUTHORIZATION) String sessionToken)
     {
+
         User currentUser = sessionManager.getLoggedUser(sessionToken);
         if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
         {

@@ -1,5 +1,6 @@
 package com.utn.TP_Final.session;
 
+import antlr.StringUtils;
 import com.utn.TP_Final.model.User;
 import org.springframework.stereotype.Component;
 
@@ -8,12 +9,14 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.UUID;
 
+import static org.aspectj.util.LangUtil.isEmpty;
+
 @Component
 public class SessionManager {
 
     Map<String, Session> sessionMap = new Hashtable<>();
 
-    int sessionExpiration = 6000000;
+    int sessionExpiration = 200;
 
     public String createSession(User user){
         String token = UUID.randomUUID().toString();
@@ -21,7 +24,10 @@ public class SessionManager {
         return token;
     }
 
+    //aca no faltaria un filtro de null?
     public Session getSession(String token){
+        System.out.println("aca?");
+        if(isEmpty(token))return null;
         Session session = sessionMap.get(token);
         if(session!=null)
         {
@@ -43,7 +49,7 @@ public class SessionManager {
             if(v.getLastAction().getTime() < System.currentTimeMillis() + (sessionExpiration*1000))
             {
                 System.out.println("Session expired " + k);
-                sessionMap.remove(v);
+                sessionMap.remove(k);
             }
         }
     }
