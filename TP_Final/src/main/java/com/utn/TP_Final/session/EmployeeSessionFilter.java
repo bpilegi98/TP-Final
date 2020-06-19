@@ -21,10 +21,9 @@ public class EmployeeSessionFilter extends OncePerRequestFilter {
     {
         String sessionToken = request.getHeader("Authorization");
         Session session = sessionManager.getSession(sessionToken);
-
         if(session != null)
         {
-            if(session.getLoggedUser().getUserType().equals("EMPLOYEE"))
+            if(String.valueOf(session.getLoggedUser().getUserType()).equals("EMPLOYEE"))
             {
                 filterChain.doFilter(request, response);
             }

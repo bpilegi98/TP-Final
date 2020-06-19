@@ -24,7 +24,7 @@ public class AerialSessionFilter extends OncePerRequestFilter {
 
         if(session != null)
         {
-            if(session.getLoggedUser().getUserType().equals("AERIAL"))
+            if(String.valueOf(session.getLoggedUser().getUserType()).equals("AERIAL"))
             {
                 filterChain.doFilter(request, response);
             }
