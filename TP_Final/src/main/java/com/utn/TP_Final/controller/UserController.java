@@ -5,10 +5,15 @@ import com.utn.TP_Final.exceptions.UserAlreadyExistsException;
 import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.User;
+import com.utn.TP_Final.projections.CallsBetweenDates;
 import com.utn.TP_Final.service.UserService;
+import com.utn.TP_Final.session.Session;
+import com.utn.TP_Final.session.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,5 +81,11 @@ public class UserController {
         }else{
             throw new ValidationException("You must complete the fields.");
         }
+    }
+
+    @GetMapping("/getCallsBetweenDates")
+    public List<CallsBetweenDates> getCallsBetweenDates(@PathVariable Date from, @PathVariable Date to, @RequestBody(required = false) Integer idLoggedUser)
+    {
+        return userService.getCallsBetweenDates(from, to, idLoggedUser);
     }
 }

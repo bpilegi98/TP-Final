@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -32,6 +33,9 @@ public class Call {
 
     @Column(name = "total_price")
     private float totalPrice;
+
+    @Column(name = "date_call")
+    private Date date_call;
 
 
     /*

@@ -2,10 +2,12 @@ package com.utn.TP_Final.service;
 
 import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.model.User;
+import com.utn.TP_Final.projections.CallsBetweenDates;
 import com.utn.TP_Final.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,5 +67,10 @@ public class UserService {
     }
 
     //ver como hacer el logout
+
+    public List<CallsBetweenDates> getCallsBetweenDates(Date from, Date to, Integer idLoggedUser)
+    {
+        return userRepository.getCallsBetweenDates(from, to, idLoggedUser);
+    }
 
 }

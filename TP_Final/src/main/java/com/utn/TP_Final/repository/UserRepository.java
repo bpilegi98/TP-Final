@@ -1,10 +1,13 @@
 package com.utn.TP_Final.repository;
 
 import com.utn.TP_Final.model.User;
+import com.utn.TP_Final.projections.CallsBetweenDates;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -24,5 +27,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query(value = "remove from users where dni = ?1", nativeQuery = true)
     void delete(String dni);
+
+    @Procedure(name = "user_calls_between_dates")
+    List<CallsBetweenDates> getCallsBetweenDates(Date from, Date to, Integer idLoggedUser); //agregar exceptions correspondientes
 
 }
