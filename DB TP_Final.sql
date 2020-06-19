@@ -32,7 +32,7 @@ lastname varchar(50),
 dni varchar(50) unique,
 username varchar(50) UNIQUE,
 password varchar(50),
-user_type enum('ADMIN', 'EMPLOYEE', 'CUSTOMER'),
+user_type enum('AERIAL', 'EMPLOYEE', 'CUSTOMER'),
 is_active boolean,
 id_city int,
 constraint fk_city_user foreign key (id_city) references cities(id)
@@ -105,7 +105,7 @@ constraint fk_call_ic foreign key(id_call) references calls(id)
 delimiter //
 create procedure add_users()
 begin
-insert into users(firstname, lastname, dni, username, password, id_city, user_type,is_active) values ('bianca', 'pilegi', '41307541', 'bpilegi98','1234', 1, 'AERIAL',true);
+insert into users(firstname, lastname, dni, username, password, id_city, user_type,is_active) values ('bianca', 'pilegi', '41307541', 'bpilegi98','1234', 1, 'CUSTOMER',true);
 insert into users(firstname, lastname, dni, username, password, id_city, user_type,is_active) values ('juan martin', 'ludueña', '41306543', 'juanludu', '4321', 1, 'EMPLOYEE',true);
 insert into users(firstname, lastname, dni, username, password, id_city, user_type,is_active) values ('fisrtname1', 'lastname1', '1111111', 'username1', 'password1', 3, 'CUSTOMER',true);
 insert into users(firstname, lastname, dni, username, password, id_city, user_type,is_active) values ('fisrtname2', 'lastname2', '2222222', 'username2', 'password2', 4, 'CUSTOMER',true);
@@ -277,3 +277,6 @@ end //
 -- ○ Fecha y hora de la llamada
 -- La tarifa y las localidades de destino deberán calcularse al momento de guardar la
 -- llamada y no será recibido por la API REST.
+
+
+-- HOLA JUAN Q TAL
