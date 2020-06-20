@@ -26,7 +26,6 @@ public class SessionManager {
 
     //aca no faltaria un filtro de null?
     public Session getSession(String token){
-        System.out.println("aca?");
         if(isEmpty(token))return null;
         Session session = sessionMap.get(token);
         if(session!=null)

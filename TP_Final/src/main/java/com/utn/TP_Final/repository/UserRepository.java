@@ -2,9 +2,12 @@ package com.utn.TP_Final.repository;
 
 import com.utn.TP_Final.model.User;
 import com.utn.TP_Final.projections.CallsBetweenDates;
+import com.utn.TP_Final.projections.InvoicesBetweenDates;
+import com.utn.TP_Final.projections.TopMostCalledDestinations;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -28,7 +31,13 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query(value = "remove from users where dni = ?1", nativeQuery = true)
     void delete(String dni);
 
-    @Procedure(name = "user_calls_between_dates")
-    List<CallsBetweenDates> getCallsBetweenDates(Date from, Date to, Integer idLoggedUser); //agregar exceptions correspondientes
+    //averiguar el tema de manejo de fechas q chocan los formatos
+    @Query(value = "call user_calls_between_dates(:fromD, :toD, :idLoggedUser);", nativeQuery = true)
+    List<CallsBetweenDates> getCallsBetweenDates(@Param("fromD") Date from, @Param("toD") Date to, @Param("idLoggedUser") Integer idLoggedUser); //agregar exceptions correspondientes
 
+    @Query(value = "call user_invoices_between_dates(:fromD, :toD, :idLoggedUser);", nativeQuery = true)
+    List<InvoicesBetweenDates> getInvoicesBetweenDates(@Param("fromD") Date from, @Param("toD") Date to, @Param("idLoggedUser")Integer idLoggedUser);
+
+    @Query(value = "call user_top_most_called(:idLoggedUser);", nativeQuery = true)
+    List<TopMostCalledDestinations> getTopMostCalledDestinations(@Param("idLoggedUser") Integer idLoggedUser);
 }

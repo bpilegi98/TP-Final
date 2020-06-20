@@ -3,10 +3,10 @@ package com.utn.TP_Final.projections;
 public interface CallsBetweenDates {
 
     String getCalledNumber();
-    Integer getDurationSecs();
+    Integer getCallDuration();
     float getTotalPrice();
 
     void setCalledNumber(String calledNumber);
-    void setDurationSecs(Integer durationSecs);
+    void setCallDuration(Integer durationSecs);
     void setTotalPrice(float totalPrice);
 }

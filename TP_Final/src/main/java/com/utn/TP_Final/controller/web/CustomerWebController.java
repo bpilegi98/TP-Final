@@ -6,6 +6,8 @@ import com.utn.TP_Final.controller.InvoiceController;
 import com.utn.TP_Final.controller.UserController;
 import com.utn.TP_Final.model.User;
 import com.utn.TP_Final.projections.CallsBetweenDates;
+import com.utn.TP_Final.projections.InvoicesBetweenDates;
+import com.utn.TP_Final.projections.TopMostCalledDestinations;
 import com.utn.TP_Final.session.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,7 +36,7 @@ public class CustomerWebController {
     }
 
     @GetMapping("/getCallsBetweenDates")
-    public ResponseEntity<List<CallsBetweenDates>> getCallsBetweenDates(@RequestHeader("Authorization") String sessionToken, @PathVariable Date from, @PathVariable Date to, @RequestBody(required = false) Integer idLoggedUser)
+    public ResponseEntity<List<CallsBetweenDates>> getCallsBetweenDates(@RequestHeader("Authorization") String sessionToken, @PathVariable Date from, @PathVariable Date to, Integer idLoggedUser)
     {
        User currentUser = sessionManager.getLoggedUser(sessionToken);
 
@@ -42,8 +44,35 @@ public class CustomerWebController {
        {
            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
        }
-       List<CallsBetweenDates> callsBetweenDates = userController.getCallsBetweenDates(from, to, sessionManager.getLoggedUser(sessionToken).getId());
+       List<CallsBetweenDates> callsBetweenDates = userController.getCallsBetweenDates(from, to, currentUser.getId());
        return (callsBetweenDates.size() > 0) ? ResponseEntity.ok(callsBetweenDates) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/getInvoicesBetweenDates")
+    public ResponseEntity<List<InvoicesBetweenDates>> getInvoicesBetweenDates(@RequestHeader("Authorization")String sessionToken, @PathVariable Date from, @PathVariable Date to, Integer idLoggedUser)
+    {
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
+
+        if(currentUser == null)
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        List<InvoicesBetweenDates> invoicesBetweenDates = userController.getInvoicesBetweenDates(from, to, currentUser.getId());
+        return (invoicesBetweenDates.size() > 0) ? ResponseEntity.ok(invoicesBetweenDates) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/getTopMostCalledDestinations")
+    public ResponseEntity<List<TopMostCalledDestinations>> getTopMostCalledDestinations(@RequestHeader("Authorization") String sessionToken, Integer idLoggedUser)
+    {
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
+
+        if(currentUser == null)
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        List<TopMostCalledDestinations> topMostCalledDestinations = userController.getTopMostCalledDestinatons(currentUser.getId());
+        return (topMostCalledDestinations.size() > 0) ? ResponseEntity.ok(topMostCalledDestinations) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     //Métodos de projections con sus respectivas urls :D
