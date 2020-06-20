@@ -1,4 +1,4 @@
-SET GLOBAL time_zone = '-3:00';
+﻿SET GLOBAL time_zone = '-3:00';
 drop database tpfinal;
 create database tpfinal;
 use tpfinal;
@@ -264,19 +264,35 @@ end //
 -- 3) Alta , baja y suspensión de líneas.
 -- 4) Consulta de tarifas
 
--- VER COMO HACER PARA QUE QUEDE TODO EN LA MISMA FILA
 delimiter //
-create procedure backoffice_request_fee(IN idCityFrom int, IN idCityTo int)
+create procedure backoffice_request_fee_by_id(IN idCityFrom int, IN idCityTo int)
 begin
-select c.name as city, f.price_per_minute as fee 
+select cf.name as cityFrom, ct.name as cityTo, f.price_per_minute as fee 
 from fees f 
-inner join cities c 
-on f.id_source_city = c.id or f.id_destination_city = c.id
+inner join cities cf
+on f.id_source_city = cf.id 
+inner join cities ct
+on f.id_destination_city = ct.id
+where f.id_source_city = idCityFrom and f.id_destination_city = idCityTo;
+end // 
+
+drop procedure backoffice_request_fee_by_id;
+call backoffice_request_fee_by_id(1, 2);
+
+delimiter //
+create procedure backoffice_request_fee(IN cityFrom varchar(50), IN cityTo varchar(50))
+begin
+DECLARE idCityFrom int;
+DECLARE idCityTo int;
+SELECT id FROM cities c WHERE c.name = cityFrom INTO idCityFrom;
+SELECT id FROM cities c WHERE c.name = cityTo INTO idCityTo;
+select cityFrom, cityTo, f.price_per_minute as fee 
+from fees f 
 where f.id_source_city = idCityFrom and f.id_destination_city = idCityTo;
 end // 
 
 drop procedure backoffice_request_fee;
-call backoffice_request_fee(1, 2);
+call backoffice_request_fee("Mar del Plata", "Buenos Aires");
 
 
 -- 5) Consulta de llamadas por usuario.
@@ -296,6 +312,13 @@ end //
 
 -- 6) Consulta de facturación. La facturación se hará directamente por un proceso interno en la base datos.
 
+-- ver facturas de un usuario
+-- ver facturas pagadas/sin pagar de un usuario
+-- ver facturas de un mes
+-- ver facturas de un año
+-- ver facturas de un periodo
+-- ver ganancias 
+
 -- AERIAL
 -- Se debe permitir también el agregado de llamadas, con un login especial, ya que
 -- este método de nuestra API será llamado nada más que por el área de
@@ -308,4 +331,76 @@ end //
 -- La tarifa y las localidades de destino deberán calcularse al momento de guardar la
 -- llamada y no será recibido por la API REST.
 
+select * from calls
 
+-- TRIGGER de calls
+drop trigger tbi_call_complete_and_check
+DELIMITER // 
+CREATE TRIGGER tbi_call_complete_and_check BEFORE INSERT ON calls FOR EACH ROW
+BEGIN 
+declare ppp float;
+declare cpp float;
+declare cost float;
+declare price float;
+declare id_source int;
+declare id_dest int;
+declare duration_minutes int;
+
+IF not EXISTS (select * 
+FROM telephone_lines t
+WHERE NEW.source_number = t.line_number) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'El numero origen no existe', mysql_errno = 1000;
+END if;
+
+if not exists (select * 
+FROM telephone_lines t
+WHERE NEW.destination_number = t.line_number) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'El numero destino no existe', mysql_errno = 1000;
+END IF;
+
+if (NEW.destination_number = NEW.source_number) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'Los numeros son iguales', mysql_errno = 1000;
+END IF;
+
+IF
+(NEW.duration_secs <= 0) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'Los duracion debe ser mayor q cero', mysql_errno = 1000;
+END IF;
+
+IF (NEW.date_call > now()) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'La fecha no puede ser futura', mysql_errno = 1000;
+END IF;
+
+IF (NEW.date_call < (NOW() - INTERVAL 10 DAY)) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'La fecha tiene no puede ser anterior a 10 dias', mysql_errno = 1000;
+END IF;
+
+call  find_city_by_phone_number(new.source_number,@out_id_source);
+select @out_id_source into id_source;
+
+call  find_city_by_phone_number(new.destination_number,@out_id_dest);
+select @out_id_dest into id_dest;
+
+select f.price_per_minute, f.cost_per_minute
+from fees f
+where (f.id_source_city = id_source) and (f.id_destination_city = id_dest) into ppp,cpp;
+
+select CEIL(new.duration_secs / 60) into duration_minutes;
+
+select ppp * duration_minutes , cpp * duration_minutes into price,cost;
+
+SET NEW.price_per_minute = ppp;
+SET NEW.total_cost = cost;
+SET NEW.total_price = price;
+SET NEW.id_source_city = id_source;
+SET NEW.id_destination_city = id_dest;
+END//
+
+insert into calls (source_number, destination_number,duration_secs,date_call) value ("2215908654","2235436785",235,"2020-06-18");
+
+delimiter //
+CREATE PROCEDURE find_city_by_phone_number(in phone_number varchar(30), out id_city int)
+begin
+DECLARE prefix varchar(3);
+SELECT left (phone_number, LENGTH(phone_number) - 7) into prefix;
+select c.id 
+from cities c 
+where c.prefix_number = prefix  INTO id_city;
+end //
+
+call find_city_by_phone_number("115098521",@id_city)
+select @id_city

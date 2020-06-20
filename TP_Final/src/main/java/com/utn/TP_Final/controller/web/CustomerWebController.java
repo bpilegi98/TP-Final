@@ -10,6 +10,7 @@ import com.utn.TP_Final.projections.InvoicesBetweenDates;
 import com.utn.TP_Final.projections.TopMostCalledDestinations;
 import com.utn.TP_Final.session.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +37,7 @@ public class CustomerWebController {
     }
 
     @GetMapping("/getCallsBetweenDates")
-    public ResponseEntity<List<CallsBetweenDates>> getCallsBetweenDates(@RequestHeader("Authorization") String sessionToken, @PathVariable Date from, @PathVariable Date to, Integer idLoggedUser)
+    public ResponseEntity<List<CallsBetweenDates>> getCallsBetweenDates(@RequestHeader("Authorization") String sessionToken, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date from, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date to, Integer idLoggedUser)
     {
        User currentUser = sessionManager.getLoggedUser(sessionToken);
 

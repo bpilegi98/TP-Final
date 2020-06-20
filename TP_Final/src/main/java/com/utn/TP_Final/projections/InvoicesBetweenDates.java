@@ -1,6 +1,6 @@
 package com.utn.TP_Final.projections;
 
-import java.util.Date;
+import java.sql.Date;
 
 public interface InvoicesBetweenDates {
 

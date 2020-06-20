@@ -6,8 +6,6 @@ import com.utn.TP_Final.service.InvoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.List;
 
 @RestController("")
 @RequestMapping("/invoice")
