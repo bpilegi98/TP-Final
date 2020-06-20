@@ -263,7 +263,37 @@ end //
 -- 2) Manejo de clientes
 -- 3) Alta , baja y suspensión de líneas.
 -- 4) Consulta de tarifas
+
+-- VER COMO HACER PARA QUE QUEDE TODO EN LA MISMA FILA
+delimiter //
+create procedure backoffice_request_fee(IN idCityFrom int, IN idCityTo int)
+begin
+select c.name as city, f.price_per_minute as fee 
+from fees f 
+inner join cities c 
+on f.id_source_city = c.id or f.id_destination_city = c.id
+where f.id_source_city = idCityFrom and f.id_destination_city = idCityTo;
+end // 
+
+drop procedure backoffice_request_fee;
+call backoffice_request_fee(1, 2);
+
+
 -- 5) Consulta de llamadas por usuario.
+
+delimiter //
+create procedure backoffice_request_calls_user(IN idLoggedUser int)
+begin
+select u.firstname, u.lastname, u.dni, count(ca.id) as callsMade
+from users u
+inner join telephone_lines t 
+on u.id = t.id_user
+inner join calls ca
+on t.line_number = ca.source_number
+where u.id = idLoggedUser
+group by u.id;
+end //
+
 -- 6) Consulta de facturación. La facturación se hará directamente por un proceso interno en la base datos.
 
 -- AERIAL
@@ -279,4 +309,3 @@ end //
 -- llamada y no será recibido por la API REST.
 
 
--- HOLA JUAN Q TAL

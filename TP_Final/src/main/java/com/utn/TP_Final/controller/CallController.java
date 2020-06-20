@@ -2,6 +2,8 @@ package com.utn.TP_Final.controller;
 
 
 import com.utn.TP_Final.model.Call;
+import com.utn.TP_Final.projections.CallsFromUser;
+import com.utn.TP_Final.projections.CallsFromUserSimple;
 import com.utn.TP_Final.service.CallService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -37,5 +39,17 @@ public class CallController {
     public Optional<Call> getById(Integer id)
     {
         return callService.getById(id);
+    }
+
+    @GetMapping("/getCallsFromUserSimple")
+    public CallsFromUserSimple getCallsFromUserSimple(@PathVariable String dni)
+    {
+        return callService.getCallsFromUserSimple(dni);
+    }
+
+    @GetMapping("/getCallsFromUser")
+    public List<CallsFromUser> getCallsFromUser(@PathVariable String dni)
+    {
+        return callService.getCallsFromUser(dni);
     }
 }

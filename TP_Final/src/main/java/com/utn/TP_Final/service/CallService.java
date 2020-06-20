@@ -2,6 +2,8 @@ package com.utn.TP_Final.service;
 
 
 import com.utn.TP_Final.model.Call;
+import com.utn.TP_Final.projections.CallsFromUser;
+import com.utn.TP_Final.projections.CallsFromUserSimple;
 import com.utn.TP_Final.repository.CallRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,5 +39,15 @@ public class CallService {
     public Optional<Call> getById(Integer id)
     {
         return callRepository.findById(id);
+    }
+
+    public CallsFromUserSimple getCallsFromUserSimple(String dni)
+    {
+        return callRepository.getCallsFromUserSimple(dni);
+    }
+
+    public List<CallsFromUser> getCallsFromUser(String dni)
+    {
+        return callRepository.getCallsFromUser(dni);
     }
 }

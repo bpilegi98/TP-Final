@@ -1,6 +1,7 @@
 package com.utn.TP_Final.controller.web;
 
 
+import com.utn.TP_Final.controller.CallController;
 import com.utn.TP_Final.controller.TelephoneLineController;
 import com.utn.TP_Final.controller.UserController;
 import com.utn.TP_Final.exceptions.TelephoneLineAlreadyExistsException;
@@ -9,6 +10,8 @@ import com.utn.TP_Final.exceptions.UserAlreadyExistsException;
 import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.model.TelephoneLine;
 import com.utn.TP_Final.model.User;
+import com.utn.TP_Final.projections.CallsFromUser;
+import com.utn.TP_Final.projections.CallsFromUserSimple;
 import com.utn.TP_Final.session.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -25,12 +28,14 @@ public class EmployeeWebController {
 
     private final UserController userController;
     private final TelephoneLineController telephoneLineController;
+    private final CallController callController;
     private final SessionManager sessionManager;
 
     @Autowired
-    public EmployeeWebController(UserController userController, TelephoneLineController telephoneLineController, SessionManager sessionManager) {
+    public EmployeeWebController(UserController userController, TelephoneLineController telephoneLineController, CallController callController, SessionManager sessionManager) {
         this.userController = userController;
         this.telephoneLineController = telephoneLineController;
+        this.callController = callController;
         this.sessionManager = sessionManager;
     }
 
@@ -130,5 +135,30 @@ public class EmployeeWebController {
         }
         telephoneLineController.activeTelephoneLine(lineNumber);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/getCallsFromUserSimple")
+    public ResponseEntity<CallsFromUserSimple> getCallsFromUserSimple(@RequestHeader("Authorization")String sessionToken, @PathVariable String dni)
+    {
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
+        if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
+        //Acá no hay q poner el String.valueOf()?? Intenté pero no me dejó
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        CallsFromUserSimple callsFromUserSimple = callController.getCallsFromUserSimple(dni);
+        return (callsFromUserSimple != null) ? ResponseEntity.ok(callsFromUserSimple) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/getCallsFromUser")
+    public ResponseEntity<List<CallsFromUser>> getCallsFromUser(@RequestHeader("Authorization")String sessionToken, @PathVariable String dni)
+    {
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
+        if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        List<CallsFromUser> callsFromUsers = callController.getCallsFromUser(dni);
+        return (callsFromUsers.size() > 0) ? ResponseEntity.ok(callsFromUsers) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
