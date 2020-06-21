@@ -346,6 +346,10 @@ declare id_source int;
 declare id_dest int;
 declare duration_minutes int;
 
+IF ((NEW.price_per_minute IS NOT NULL) OR (NEW.total_cost IS NOT NULL) OR (NEW.total_price IS NOT NULL) OR (NEW.id_source_city IS NOT NULL) OR (NEW.id_destination_city IS NOT NULL) )
+THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'Valor ingresado no permitido', mysql_errno = 1000;
+END IF;
+
 IF not EXISTS (select * 
 FROM telephone_lines t
 WHERE NEW.source_number = t.line_number) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'El numero origen no existe', mysql_errno = 1000;
@@ -391,6 +395,8 @@ SET NEW.id_destination_city = id_dest;
 END//
 
 insert into calls (source_number, destination_number,duration_secs,date_call) value ("2215908654","2235436785",235,"2020-06-18");
+insert into calls (total_price) value (200);
+
 
 delimiter //
 CREATE PROCEDURE find_city_by_phone_number(in phone_number varchar(30), out id_city int)
