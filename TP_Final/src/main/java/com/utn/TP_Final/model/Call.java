@@ -60,7 +60,7 @@ public class Call {
     private City sourceCity;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference(value="user-destination_city")
+    @JsonBackReference(value="call-destination_city")
     @JoinColumn(name = "id_destination_city")
     private City destinationCity;
 

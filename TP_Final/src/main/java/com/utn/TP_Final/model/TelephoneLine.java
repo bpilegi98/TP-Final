@@ -42,4 +42,10 @@ public class TelephoneLine implements Serializable {
 
     @OneToMany(mappedBy = "telephoneLine",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Invoice> invoices;
+
+    @OneToMany(mappedBy = "sourceNumber", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Call> callsSource;
+
+    @OneToMany(mappedBy = "destinationNumber", cascade = CascadeType.ALL,  fetch = FetchType.LAZY)
+    private List<Call> callsDestination;
 }

@@ -24,21 +24,14 @@ public class AerialWebController {
         this.sessionManager = sessionManager;
     }
 
-    /*
-    @PostMapping("/addCall/")
-    public ResponseEntity addCall(@RequestHeader("Authorization") String sessionToken, @RequestBody CallDto callDto)
-    {
-        callController.addCall(callDto.getSourceNumber(), callDto.getDestinationNumber(), callDto.getDuration(), callDto.getDate());
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-     */
 
     @PostMapping("/addCall/")
-    public ResponseEntity addCall(@RequestHeader("Authorization")String sessionToken, @RequestBody Call newCall)
+    public ResponseEntity addCallDto(@RequestHeader("Authorization") String sessionToken, @RequestBody CallDto callDto)
     {
-        callController.addCall(newCall);
+        callController.addCallDto(callDto.getSourceNumber(), callDto.getDestinationNumber(), callDto.getDuration(), callDto.getDate());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
 
     //agregar métodos de la aerial
 }

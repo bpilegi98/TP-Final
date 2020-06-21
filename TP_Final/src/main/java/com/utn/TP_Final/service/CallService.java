@@ -26,12 +26,6 @@ public class CallService {
     }
 
     //no es dto aca? xd
-    /*
-    public void addCall(String sourceNumber, String destinationNumber, Integer duration, Date date)
-    {
-        callRepository.addCall(sourceNumber, destinationNumber, duration, date);
-    }
-    */
 
     public void addCall(Call newCall)
     {

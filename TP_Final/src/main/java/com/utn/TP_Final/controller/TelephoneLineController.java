@@ -48,4 +48,9 @@ public class TelephoneLineController {
     {
         telephoneLineService.activeTelephoneLine(lineNumber);
     }
+
+    @GetMapping("/findByNumber")
+    public TelephoneLine findByNumber(@RequestParam String number){
+        return telephoneLineService.findByNumber(number);
+    }
 }

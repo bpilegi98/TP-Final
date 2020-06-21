@@ -34,6 +34,13 @@ public class City {
     @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<User> users;
 
+    @OneToMany(mappedBy = "sourceCity", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<Call> callsSource;
+
+    @OneToMany(mappedBy = "destinationCity", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<Call> callsDestination;
+
+
     public City(String name, String prefixNumber) {
         this.name = name;
         this.prefixNumber = prefixNumber;

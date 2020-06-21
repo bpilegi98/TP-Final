@@ -18,23 +18,38 @@ public class CallController {
 
     private final CallService callService;
 
+    private final TelephoneLineController telephoneLineController;
+    private final CityController cityController;
+
     @Autowired
-    public CallController(CallService callService) {
+    public CallController(CallService callService, TelephoneLineController telephoneLineController, CityController cityController) {
         this.callService = callService;
+        this.telephoneLineController = telephoneLineController;
+        this.cityController= cityController;
     }
 
-/*
+
+
     @PostMapping("/")
     public void addCall( @RequestBody String sourceNumber,@RequestBody String destinationNumber,@RequestBody Integer duration,@RequestBody Date date)
     {
-     callService.addCall(sourceNumber,destinationNumber,duration,date);
+
+     Call call = new Call();
+     call.setDateCall(date);
+     call.setDurationSecs(duration);
+     call.setSourceNumber(telephoneLineController.findByNumber(sourceNumber));
+     call.setDestinationNumber(telephoneLineController.findByNumber(destinationNumber));
+
+     String prefixSource = sourceNumber.substring(0,sourceNumber.length()-7);
+     String prefixDest = destinationNumber.substring(0,destinationNumber.length()-7);
+
+     call.setDestinationCity(cityController.getByPrefix(prefixDest));
+     call.setSourceCity(cityController.getByPrefix(prefixSource));
+
+
+     callService.addCall(call);
     }
- */
-    @PostMapping("/")
-    public void addCall(@RequestBody Call newCall)
-    {
-        callService.addCall(newCall);
-    }
+
 
     @GetMapping("/")
     public List<Call> getAll()

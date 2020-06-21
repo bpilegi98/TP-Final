@@ -23,9 +23,10 @@ public interface CallRepository extends JpaRepository<Call, Integer> {
     @Query(value = "call backoffice_request_calls_user(:dni);", nativeQuery = true)
     List<CallsFromUser> getCallsFromUser(@Param("dni")String dni);
 
-/*
+    /*
+    @Modifying
     @Query(value = "call add_call_aerial(:sourceNumber, :destinationNumber, :duration, :dateCall)", nativeQuery = true)
-    void addCall(@Param("sourceNumber")String sourceNumber, @Param("destinationNumber")String destinationNumber, @Param("duration")Integer duration, @Param("dateCall")Date date);
-*/
+    void addCallDto(@Param("sourceNumber")String sourceNumber, @Param("destinationNumber")String destinationNumber, @Param("duration")Integer duration, @Param("dateCall")Date date);
+     */
 
 }

@@ -46,4 +46,8 @@ public class TelephoneLineService {
     {
         telephoneLineRepository.activeTelephoneLine(lineNumber);
     }
+
+    public TelephoneLine findByNumber(String number){
+        return  telephoneLineRepository.findByLineNumber(number).get(0);
+    }
 }
