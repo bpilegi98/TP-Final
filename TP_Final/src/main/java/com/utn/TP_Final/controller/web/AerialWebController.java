@@ -28,7 +28,14 @@ public class AerialWebController {
     @PostMapping("/addCall/")
     public ResponseEntity addCallDto(@RequestHeader("Authorization") String sessionToken, @RequestBody CallDto callDto)
     {
-        callController.addCallDto(callDto.getSourceNumber(), callDto.getDestinationNumber(), callDto.getDuration(), callDto.getDate());
+        callController.addCall(callDto.getSourceNumber(), callDto.getDestinationNumber(), callDto.getDuration(), callDto.getDate());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/addCall2/")
+    public ResponseEntity addCallDto2(@RequestHeader("Authorization") String sessionToken, @RequestBody CallDto callDto)
+    {
+        callController.addCall2(callDto.getSourceNumber(), callDto.getDestinationNumber(), callDto.getDuration(), callDto.getDate());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

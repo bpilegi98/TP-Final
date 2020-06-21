@@ -18,25 +18,29 @@ public class Call {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(name = "price_per_minute")
+    @Column(name = "price_per_minute", nullable = false)
     private float pricePerMinute;
 
     @Column(name = "duration_secs")
     private Integer durationSecs;
 
-    @Column(name = "total_cost")
+    @Column(name = "total_cost", nullable = false)
     private float totalCost;
 
-    @Column(name = "total_price")
+    @Column(name = "total_price", nullable = false)
     private float totalPrice;
 
     @Column(name = "date_call")
     private Date dateCall;
 
+    @Column(name = "source_number", nullable = false)
+    private String sourceNumber;
 
+    @Column(name = "destination_number", nullable = false)
+    private String destinationNumber;
     /*
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference(value="city-province")
@@ -46,13 +50,13 @@ public class Call {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference(value = "call-source_number")
-    @JoinColumn(name = "source_number", referencedColumnName = "line_number")
-    private TelephoneLine sourceNumber;
+    @JoinColumn(name = "id_source_number", referencedColumnName = "id")
+    private TelephoneLine idSourceNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference(value = "call-destination_number")
-    @JoinColumn(name = "destination_number",referencedColumnName = "line_number")
-    private TelephoneLine destinationNumber;
+    @JoinColumn(name = "id_destination_number",referencedColumnName = "id")
+    private TelephoneLine idDestinationNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference(value="call-source_city")
@@ -64,7 +68,7 @@ public class Call {
     @JoinColumn(name = "id_destination_city")
     private City destinationCity;
 
-    public Call(TelephoneLine sourceNumber, TelephoneLine destinationNumber,Integer durationSecs, Date date_call ) {
+    public Call(String sourceNumber, String destinationNumber,Integer durationSecs, Date dateCall ) {
         this.durationSecs = durationSecs;
         this.dateCall = dateCall;
         this.sourceNumber = sourceNumber;

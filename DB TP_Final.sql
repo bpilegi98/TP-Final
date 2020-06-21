@@ -1,4 +1,4 @@
-SET GLOBAL time_zone = '-3:00';
+﻿SET GLOBAL time_zone = '-3:00';
 drop database tpfinal;
 create database tpfinal;
 use tpfinal;
@@ -78,12 +78,14 @@ duration_secs int,
 total_cost float,
 total_price float,
 source_number varchar(50),
+id_source_number int,
 destination_number varchar(50),
+id_destination_number int,
 date_call date,
 id_source_city int,
 id_destination_city int,
-constraint fk_source_number_call foreign key (source_number) references telephone_lines(line_number),
-constraint fk_destination_number_call foreign key (destination_number) references telephone_lines(line_number),
+constraint fk_id_source_number_call foreign key (id_source_number) references telephone_lines(id),
+constraint fk_id_destination_number_call foreign key (id_destination_number) references telephone_lines(id),
 constraint fk_id_source_city_call foreign key (id_source_city) references cities(id),
 constraint fk_id_destination_city_call foreign key (id_destination_city) references cities(id)
 );
@@ -151,15 +153,17 @@ end //
 delimiter //
 create procedure add_calls()
 begin
-insert into calls (source_number, destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', '2235436785', 0.5, 160, 0.13, 1.3,'2020-06-01' , 1, 1);
-insert into calls (source_number, destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', '2215908654', 5, 60, 2, 5, '2020-06-05', 1, 3);
-insert into calls (source_number, destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', '2235436785', 0.5, 60, 0.05, 0.5, '2020-06-09', 1, 1);
-insert into calls (source_number, destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', '115098521', 3, 120, 2, 6, '2020-06-09', 1, 2);
-insert into calls (source_number, destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', '115098521', 3, 180, 3, 9, '2020-06-11', 1, 2);
-insert into calls (source_number, destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', '115098521', 3, 30, 0.5, 1.5, '2020-06-13', 1, 2);
+insert into calls (source_number, id_source_number, destination_number, id_destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', 1, '2235436785', 2, 0.5, 160, 0.13, 1.3,'2020-06-01' , 1, 1);
+insert into calls (source_number, id_source_number, destination_number, id_destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', 1, '2215908654', 3, 5, 60, 2, 5, '2020-06-05', 1, 3);
+insert into calls (source_number, id_source_number, destination_number, id_destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', 1, '2235436785', 2, 0.5, 60, 0.05, 0.5, '2020-06-09', 1, 1);
+insert into calls (source_number, id_source_number, destination_number, id_destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', 1, '115098521', 3, 3,120, 2, 6, '2020-06-09', 1, 2);
+insert into calls (source_number, id_source_number, destination_number, id_destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', 1, '115098521', 3, 3,180, 3, 9, '2020-06-11', 1, 2);
+insert into calls (source_number, id_source_number, destination_number, id_destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', 1, '115098521', 3, 1.5,30, 0.5, 1.5, '2020-06-13', 1, 2);
 end //
 
-
+select * from calls
+select * from telephone_lines
+select * from users
 delimiter //
 create procedure add_invoices()
 begin
@@ -329,11 +333,111 @@ call backoffice_request_calls_user('41307541');
 -- 6) Consulta de facturación. La facturación se hará directamente por un proceso interno en la base datos.
 
 -- ver facturas de un usuario
+delimiter //
+create procedure backoffice_invoices_from_user(IN dni varchar(50))
+begin
+select u.dni, u.lastname, u.firstname, t.line_number, i.date_creation, i.date_expiration, i.total_cost, i.total_price
+from users u
+inner join telephone_lines t
+on u.id = t.id_user
+inner join invoices i
+on t.id = i.id_telephone_line
+where u.dni = dni;
+end //
+
 -- ver facturas pagadas/sin pagar de un usuario
+delimiter //
+create procedure backoffice_invoices_from_user_paid(IN dni varchar(50))
+begin
+select u.dni, u.lastname, u.firstname, t.line_number, i.date_creation, i.date_expiration, i.total_cost, i.total_price
+from users u
+inner join telephone_lines t
+on u.id = t.id_user
+inner join invoices i
+on t.id = i.id_telephone_line
+where u.dni = dni and i.paid = 1;
+end //
+
+call backoffice_invoices_from_user_paid('41307541');
+
+delimiter //
+create procedure backoffice_invoices_from_user_not_paid(IN dni varchar(50))
+begin
+select u.dni, u.lastname, u.firstname, t.line_number, i.date_creation, i.date_expiration, i.total_cost, i.total_price
+from users u
+inner join telephone_lines t
+on u.id = t.id_user
+inner join invoices i
+on t.id = i.id_telephone_line
+where u.dni = dni and i.paid = 0;
+end //
+
+call backoffice_invoices_from_user_not_paid('41307541');
+
 -- ver facturas de un mes
+delimiter //
+create procedure backoffice_invoices_from_month(IN monthI varchar(50))
+begin
+select t.line_number, i.date_creation, i.date_expiration, i.total_cost, i.total_price
+from telephone_lines t
+inner join invoices i
+on t.id = i.id_telephone_line
+where month(i.date_creation) = monthI;
+end //
+
 -- ver facturas de un año
+
+delimiter //
+create procedure backoffice_invoices_from_year(IN yearI varchar(50))
+begin
+select t.line_number, i.date_creation, i.date_expiration, i.total_cost, i.total_price
+from telephone_lines t
+inner join invoices i
+on t.id = i.id_telephone_line
+where year(i.date_creation) = yearI;
+end //
+
+
 -- ver facturas de un periodo
+
+delimiter //
+create procedure backoffice_invoices_between_dates(IN fromI varchar(50), IN toI varchar(50))
+begin
+select t.line_number, i.date_creation, i.date_expiration, i.total_cost, i.total_price
+from telephone_lines t
+inner join invoices i
+on t.id = i.id_telephone_line
+where i.date_creation between fromI and toI;
+end //
+
 -- ver ganancias 
+
+delimiter //
+create procedure backoffice_check_income()
+begin
+select (sum(i.total_price)-sum(i.total_cost)) as income
+from invoices i;
+end //
+
+-- ver ganancias de un mes
+
+delimiter //
+create procedure backoffice_check_income_month(IN monthI varchar(50))
+begin
+select (sum(i.total_price)-sum(i.total_cost)) as income
+from invoices i
+where month(i.date_creation) = monthI;
+end //
+
+-- ver ganancias de un año
+
+delimiter //
+create procedure backoffice_check_income_year(IN yearI varchar(50))
+begin
+select (sum(i.total_price)-sum(i.total_cost)) as income
+from invoices i
+where year(i.date_creation) = yearI;
+end //
 
 -- AERIAL
 -- Se debe permitir también el agregado de llamadas, con un login especial, ya que
@@ -362,10 +466,6 @@ declare id_source int;
 declare id_dest int;
 declare duration_minutes int;
 
-IF ((NEW.price_per_minute IS NOT NULL) OR (NEW.total_cost IS NOT NULL) OR (NEW.total_price IS NOT NULL) OR (NEW.id_source_city IS NOT NULL) OR (NEW.id_destination_city IS NOT NULL) )
-THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'Valor ingresado no permitido', mysql_errno = 1000;
-END IF;
-
 IF not EXISTS (select * 
 FROM telephone_lines t
 WHERE NEW.source_number = t.line_number) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'El numero origen no existe', mysql_errno = 1000;
@@ -389,11 +489,11 @@ END IF;
 IF (NEW.date_call < (NOW() - INTERVAL 10 DAY)) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'La fecha tiene no puede ser anterior a 10 dias', mysql_errno = 1000;
 END IF;
 
-call  find_city_by_phone_number(new.source_number,@out_id_source);
-select @out_id_source into id_source;
 
-call  find_city_by_phone_number(new.destination_number,@out_id_dest);
-select @out_id_dest into id_dest;
+SELECT c.id FROM cities c WHERE new.source_number LIKE CONCAT(c.prefix_number, '%') ORDER BY LENGTH(c.prefix_number) DESC LIMIT 1 into id_source;
+
+SELECT c.id FROM cities c WHERE new.destination_number LIKE CONCAT(c.prefix_number, '%') ORDER BY LENGTH(c.prefix_number) DESC LIMIT 1 into id_dest;
+
 
 select f.price_per_minute, f.cost_per_minute
 from fees f
@@ -403,6 +503,8 @@ select CEIL(new.duration_secs / 60) into duration_minutes;
 
 select ppp * duration_minutes , cpp * duration_minutes into price,cost;
 
+SET NEW.id_source_number = (select t.id from telephone_lines t where t.line_number = NEW.source_number  limit 1);
+SET NEW.id_destination_number = (select t.id from telephone_lines t where t.line_number = NEW.destination_number  limit 1);
 SET NEW.price_per_minute = ppp;
 SET NEW.total_cost = cost;
 SET NEW.total_price = price;
@@ -410,22 +512,8 @@ SET NEW.id_source_city = id_source;
 SET NEW.id_destination_city = id_dest;
 END//
 
-insert into calls (source_number, destination_number,duration_secs,date_call) value ("2215908654","2235436785",235,"2020-06-18");
+insert into calls (source_number, destination_number,duration_secs,date_call) value ("2236784509","2235436785",120,"2020-06-20");
 insert into calls (total_price) value (200);
-
-
-delimiter //
-CREATE PROCEDURE find_city_by_phone_number(in phone_number varchar(30), out id_city int)
-begin
-DECLARE prefix varchar(3);
-SELECT left (phone_number, LENGTH(phone_number) - 7) into prefix;
-select c.id 
-from cities c 
-where c.prefix_number = prefix  INTO id_city;
-end //
-
-call find_city_by_phone_number("115098521",@id_city);
-select @id_city;
 
 -- STORED PROCEDURE ADD CALL
 
@@ -440,4 +528,5 @@ call add_call_aerial("2236784509", "2235436785", 120, "2020-06-20");
 select * from calls
 
 delete from calls where id = 9
+
 

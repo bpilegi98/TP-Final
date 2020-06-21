@@ -31,6 +31,7 @@ public class City {
     @JoinColumn(name = "id_province")
     private Province province;
 
+    /*
     @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<User> users;
 
@@ -40,7 +41,7 @@ public class City {
     @OneToMany(mappedBy = "destinationCity", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Call> callsDestination;
 
-
+     */
     public City(String name, String prefixNumber) {
         this.name = name;
         this.prefixNumber = prefixNumber;

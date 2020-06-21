@@ -37,9 +37,12 @@ public class CallController {
      Call call = new Call();
      call.setDateCall(date);
      call.setDurationSecs(duration);
+     /*
      call.setSourceNumber(telephoneLineController.findByNumber(sourceNumber));
      call.setDestinationNumber(telephoneLineController.findByNumber(destinationNumber));
 
+
+      */
      String prefixSource = sourceNumber.substring(0,sourceNumber.length()-7);
      String prefixDest = destinationNumber.substring(0,destinationNumber.length()-7);
 
@@ -48,6 +51,14 @@ public class CallController {
 
 
      callService.addCall(call);
+    }
+
+    @PostMapping("/2/")
+    public void addCall2( @RequestBody String sourceNumber,@RequestBody String destinationNumber,@RequestBody Integer duration,@RequestBody Date date)
+    {
+        Call call = new Call(sourceNumber,destinationNumber,duration,date);
+        System.out.println(call.getSourceNumber() + " //// "+ call.getDestinationNumber());
+        callService.addCall(call);
     }
 
 

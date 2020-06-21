@@ -40,6 +40,7 @@ public class TelephoneLine implements Serializable {
     @JoinColumn(name = "id_user")
     private User user;
 
+    /*
     @OneToMany(mappedBy = "telephoneLine",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Invoice> invoices;
 
@@ -48,4 +49,6 @@ public class TelephoneLine implements Serializable {
 
     @OneToMany(mappedBy = "destinationNumber", cascade = CascadeType.ALL,  fetch = FetchType.LAZY)
     private List<Call> callsDestination;
+     */
 }
+
