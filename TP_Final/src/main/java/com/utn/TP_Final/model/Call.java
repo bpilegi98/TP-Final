@@ -34,7 +34,7 @@ public class Call {
     private float totalPrice;
 
     @Column(name = "date_call")
-    private Date date_call;
+    private Date dateCall;
 
 
     /*
@@ -63,4 +63,12 @@ public class Call {
     @JsonBackReference(value="user-destination_city")
     @JoinColumn(name = "id_destination_city")
     private City destinationCity;
+
+    public Call(TelephoneLine sourceNumber, TelephoneLine destinationNumber,Integer durationSecs, Date date_call ) {
+        this.durationSecs = durationSecs;
+        this.dateCall = dateCall;
+        this.sourceNumber = sourceNumber;
+        this.destinationNumber = destinationNumber;
+    }
+
 }

@@ -1,13 +1,17 @@
 package com.utn.TP_Final.service;
 
 
+import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.model.Call;
 import com.utn.TP_Final.projections.CallsFromUser;
 import com.utn.TP_Final.projections.CallsFromUserSimple;
 import com.utn.TP_Final.repository.CallRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.validation.ValidationException;
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,9 +25,9 @@ public class CallService {
         this.callRepository = callRepository;
     }
 
-    public void addCall(Call newCall)
-    {
-        callRepository.save(newCall);
+    //no es dto aca? xd
+    public void addCall(String sourceNumber, String destinationNumber, Integer duration, Date date) throws ValidationException {
+        callRepository.addCall(sourceNumber,destinationNumber,duration,date);
     }
 
     public void deleteCall(Call call)

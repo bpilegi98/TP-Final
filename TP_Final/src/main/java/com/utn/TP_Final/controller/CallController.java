@@ -8,6 +8,7 @@ import com.utn.TP_Final.service.CallService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,10 +23,11 @@ public class CallController {
         this.callService = callService;
     }
 
+
     @PostMapping("/")
-    public void addCall(@RequestBody Call newCall)
+    public void addCall( @RequestParam String sourceNumber,@RequestParam String destinationNumber,@RequestParam Integer duration,@RequestParam Date date)
     {
-        callService.addCall(newCall);
+     callService.addCall(sourceNumber,destinationNumber,duration,date);
     }
 
     @GetMapping("/")

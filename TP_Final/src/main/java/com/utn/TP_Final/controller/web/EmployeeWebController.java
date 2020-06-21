@@ -161,4 +161,5 @@ public class EmployeeWebController {
         List<CallsFromUser> callsFromUsers = callController.getCallsFromUser(dni);
         return (callsFromUsers.size() > 0) ? ResponseEntity.ok(callsFromUsers) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
 }
