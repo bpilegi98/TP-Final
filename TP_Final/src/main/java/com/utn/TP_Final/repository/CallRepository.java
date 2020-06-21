@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.sql.Date;
 import java.util.List;
@@ -22,9 +23,9 @@ public interface CallRepository extends JpaRepository<Call, Integer> {
     @Query(value = "call backoffice_request_calls_user(:dni);", nativeQuery = true)
     List<CallsFromUser> getCallsFromUser(@Param("dni")String dni);
 
-    @Modifying
-    @Query(value= "insert into calls (source_number, destination_number,duration_secs,date_call) value (?1,?2,?3,?4)",nativeQuery = true)
-    void addCall(String sourceNumber,String destinationNumber,Integer duration,Date date);
-
+/*
+    @Query(value = "call add_call_aerial(:sourceNumber, :destinationNumber, :duration, :dateCall)", nativeQuery = true)
+    void addCall(@Param("sourceNumber")String sourceNumber, @Param("destinationNumber")String destinationNumber, @Param("duration")Integer duration, @Param("dateCall")Date date);
+*/
 
 }

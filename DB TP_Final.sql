@@ -1,4 +1,4 @@
-﻿SET GLOBAL time_zone = '-3:00';
+SET GLOBAL time_zone = '-3:00';
 drop database tpfinal;
 create database tpfinal;
 use tpfinal;
@@ -298,7 +298,7 @@ call backoffice_request_fee("Mar del Plata", "Buenos Aires");
 -- 5) Consulta de llamadas por usuario.
 
 delimiter //
-create procedure backoffice_request_calls_user(IN idLoggedUser int)
+create procedure backoffice_request_calls_user_simple(IN dni int)
 begin
 select u.firstname, u.lastname, u.dni, count(ca.id) as callsMade
 from users u
@@ -306,9 +306,25 @@ inner join telephone_lines t
 on u.id = t.id_user
 inner join calls ca
 on t.line_number = ca.source_number
-where u.id = idLoggedUser
+where u.dni = dni
 group by u.id;
 end //
+
+delimiter //
+create procedure backoffice_request_calls_user(IN dni int)
+begin
+select u.firstname, u.lastname, u.dni, ca.id as idCall, ca.total_cost as totalCost, ca.total_price as totalPrice, ca.date_call as dateCall,
+ca.source_number as sourceNumber, ca.destination_number as destinationNumber
+from calls ca
+inner join telephone_lines t
+on ca.source_number = t.line_number
+inner join users u
+on t.id_user = u.id
+where u.dni = dni;
+end //
+
+drop procedure backoffice_request_calls_user;
+call backoffice_request_calls_user('41307541');
 
 -- 6) Consulta de facturación. La facturación se hará directamente por un proceso interno en la base datos.
 
@@ -408,5 +424,20 @@ from cities c
 where c.prefix_number = prefix  INTO id_city;
 end //
 
-call find_city_by_phone_number("115098521",@id_city)
-select @id_city
+call find_city_by_phone_number("115098521",@id_city);
+select @id_city;
+
+-- STORED PROCEDURE ADD CALL
+
+delimiter //
+create procedure add_call_aerial(IN sourceNumber varchar(50), IN destinationNumber varchar(50), IN duration int, IN dateCall date)
+begin 
+insert into calls(source_number, destination_number, duration_secs, date_call) values (sourceNumber, destinationNumber, duration, dateCall);
+end //
+
+call add_call_aerial("2236784509", "2235436785", 120, "2020-06-20");
+
+select * from calls
+
+delete from calls where id = 9
+

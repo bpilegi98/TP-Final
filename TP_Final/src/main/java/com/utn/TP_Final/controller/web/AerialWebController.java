@@ -1,6 +1,7 @@
 package com.utn.TP_Final.controller.web;
 
 import com.utn.TP_Final.controller.CallController;
+import com.utn.TP_Final.dto.CallDto;
 import com.utn.TP_Final.model.Call;
 import com.utn.TP_Final.session.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +24,20 @@ public class AerialWebController {
         this.sessionManager = sessionManager;
     }
 
+    /*
     @PostMapping("/addCall/")
-    public ResponseEntity addCall(@RequestHeader("Authorization") String sessionToken, @RequestParam String sourceNumber,@RequestParam String destinationNumber,@RequestParam Integer duration,@RequestParam Date date)
+    public ResponseEntity addCall(@RequestHeader("Authorization") String sessionToken, @RequestBody CallDto callDto)
     {
-        callController.addCall(sourceNumber,destinationNumber,duration,date);
-       return ResponseEntity.status(HttpStatus.OK).build();
+        callController.addCall(callDto.getSourceNumber(), callDto.getDestinationNumber(), callDto.getDuration(), callDto.getDate());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+     */
+
+    @PostMapping("/addCall/")
+    public ResponseEntity addCall(@RequestHeader("Authorization")String sessionToken, @RequestBody Call newCall)
+    {
+        callController.addCall(newCall);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     //agregar métodos de la aerial

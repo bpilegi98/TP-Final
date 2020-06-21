@@ -23,11 +23,17 @@ public class CallController {
         this.callService = callService;
     }
 
-
+/*
     @PostMapping("/")
-    public void addCall( @RequestParam String sourceNumber,@RequestParam String destinationNumber,@RequestParam Integer duration,@RequestParam Date date)
+    public void addCall( @RequestBody String sourceNumber,@RequestBody String destinationNumber,@RequestBody Integer duration,@RequestBody Date date)
     {
      callService.addCall(sourceNumber,destinationNumber,duration,date);
+    }
+ */
+    @PostMapping("/")
+    public void addCall(@RequestBody Call newCall)
+    {
+        callService.addCall(newCall);
     }
 
     @GetMapping("/")

@@ -41,10 +41,6 @@ public class CustomerWebController {
     {
        User currentUser = sessionManager.getLoggedUser(sessionToken);
 
-       if(currentUser == null) //añadir filtro de backoffice y aerial?
-       {
-           return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-       }
        List<CallsBetweenDates> callsBetweenDates = userController.getCallsBetweenDates(from, to, currentUser.getId());
        return (callsBetweenDates.size() > 0) ? ResponseEntity.ok(callsBetweenDates) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -53,11 +49,6 @@ public class CustomerWebController {
     public ResponseEntity<List<InvoicesBetweenDates>> getInvoicesBetweenDates(@RequestHeader("Authorization")String sessionToken, @PathVariable Date from, @PathVariable Date to, Integer idLoggedUser)
     {
         User currentUser = sessionManager.getLoggedUser(sessionToken);
-
-        if(currentUser == null)
-        {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
 
         List<InvoicesBetweenDates> invoicesBetweenDates = userController.getInvoicesBetweenDates(from, to, currentUser.getId());
         return (invoicesBetweenDates.size() > 0) ? ResponseEntity.ok(invoicesBetweenDates) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -68,10 +59,6 @@ public class CustomerWebController {
     {
         User currentUser = sessionManager.getLoggedUser(sessionToken);
 
-        if(currentUser == null)
-        {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
         List<TopMostCalledDestinations> topMostCalledDestinations = userController.getTopMostCalledDestinatons(currentUser.getId());
         return (topMostCalledDestinations.size() > 0) ? ResponseEntity.ok(topMostCalledDestinations) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
