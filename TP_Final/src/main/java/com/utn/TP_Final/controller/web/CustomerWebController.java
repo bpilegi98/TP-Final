@@ -6,7 +6,7 @@ import com.utn.TP_Final.controller.InvoiceController;
 import com.utn.TP_Final.controller.UserController;
 import com.utn.TP_Final.model.User;
 import com.utn.TP_Final.projections.CallsBetweenDates;
-import com.utn.TP_Final.projections.InvoicesBetweenDates;
+import com.utn.TP_Final.projections.InvoicesBetweenDatesUser;
 import com.utn.TP_Final.projections.TopMostCalledDestinations;
 import com.utn.TP_Final.session.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.Date;
 import java.util.List;
@@ -46,12 +45,12 @@ public class CustomerWebController {
     }
 
     @GetMapping("/getInvoicesBetweenDates")
-    public ResponseEntity<List<InvoicesBetweenDates>> getInvoicesBetweenDates(@RequestHeader("Authorization")String sessionToken, @PathVariable Date from, @PathVariable Date to, Integer idLoggedUser)
+    public ResponseEntity<List<InvoicesBetweenDatesUser>> getInvoicesBetweenDates(@RequestHeader("Authorization")String sessionToken, @PathVariable Date from, @PathVariable Date to, Integer idLoggedUser)
     {
         User currentUser = sessionManager.getLoggedUser(sessionToken);
 
-        List<InvoicesBetweenDates> invoicesBetweenDates = userController.getInvoicesBetweenDates(from, to, currentUser.getId());
-        return (invoicesBetweenDates.size() > 0) ? ResponseEntity.ok(invoicesBetweenDates) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        List<InvoicesBetweenDatesUser> invoicesBetweenDateUsers = userController.getInvoicesBetweenDates(from, to, currentUser.getId());
+        return (invoicesBetweenDateUsers.size() > 0) ? ResponseEntity.ok(invoicesBetweenDateUsers) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/getTopMostCalledDestinations")

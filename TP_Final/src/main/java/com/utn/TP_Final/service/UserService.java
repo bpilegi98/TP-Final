@@ -3,7 +3,7 @@ package com.utn.TP_Final.service;
 import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.model.User;
 import com.utn.TP_Final.projections.CallsBetweenDates;
-import com.utn.TP_Final.projections.InvoicesBetweenDates;
+import com.utn.TP_Final.projections.InvoicesBetweenDatesUser;
 import com.utn.TP_Final.projections.TopMostCalledDestinations;
 import com.utn.TP_Final.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +75,7 @@ public class UserService {
         return userRepository.getCallsBetweenDates(from, to, idLoggedUser);
     }
 
-    public List<InvoicesBetweenDates> getInvoicesBetweenDates(Date from, Date to, Integer idLoggedUser)
+    public List<InvoicesBetweenDatesUser> getInvoicesBetweenDates(Date from, Date to, Integer idLoggedUser)
     {
         return userRepository.getInvoicesBetweenDates(from, to, idLoggedUser);
     }

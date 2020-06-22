@@ -2,6 +2,7 @@ package com.utn.TP_Final.controller;
 
 
 import com.utn.TP_Final.model.Fee;
+import com.utn.TP_Final.projections.FeeRequest;
 import com.utn.TP_Final.service.FeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -49,12 +50,16 @@ public class FeeController {
     {
         return feeService.getByDestinationCity(cityName);
     }
-/*
-    @GetMapping("/getByPrefix/{prefixNumber}")
-    public Fee getByPrefix(@RequestParam(required = true)Integer prefixNumber)
+
+    @GetMapping("/getFeeByIdCities/{idCityFrom}/{idCityTo}")
+    public FeeRequest getFeeByIdCities(@PathVariable Integer idCityFrom, @PathVariable Integer idCityTo)
     {
-        return feeService.getByPrefix(prefixNumber);
+        return feeService.getFeeByIdCities(idCityFrom, idCityTo);
     }
 
- */
+    @GetMapping("/getFeeByNameCities/{cityFrom}/{cityTo}")
+    public FeeRequest getFeeByNameCities(@PathVariable String cityFrom, @PathVariable String cityTo)
+    {
+        return feeService.getFeeByNameCities(cityFrom, cityTo);
+    }
 }

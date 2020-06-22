@@ -1,6 +1,7 @@
 package com.utn.TP_Final.service;
 
 import com.utn.TP_Final.model.Fee;
+import com.utn.TP_Final.projections.FeeRequest;
 import com.utn.TP_Final.repository.FeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,11 +48,14 @@ public class FeeService {
     {
         return feeRepository.findByDestinationCity(cityName);
     }
-/*
-    public Fee getByPrefix(Integer prefixNumber)
+
+    public FeeRequest getFeeByIdCities(Integer idCityFrom, Integer idCityTo)
     {
-        return feeRepository.findByPrefix(prefixNumber);
+        return feeRepository.getFeeByIdCities(idCityFrom, idCityTo);
     }
 
- */
+    public FeeRequest getFeeByNameCities(String cityFrom, String cityTo)
+    {
+        return feeRepository.getFeeByNameCities(cityFrom, cityTo);
+    }
 }

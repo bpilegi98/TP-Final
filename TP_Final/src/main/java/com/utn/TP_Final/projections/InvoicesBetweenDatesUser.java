@@ -2,7 +2,7 @@ package com.utn.TP_Final.projections;
 
 import java.sql.Date;
 
-public interface InvoicesBetweenDates {
+public interface InvoicesBetweenDatesUser {
 
     Date getPeriod_from();
     Date getPeriod_to();

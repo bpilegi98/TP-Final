@@ -1,17 +1,15 @@
 package com.utn.TP_Final.controller.web;
 
 
-import com.utn.TP_Final.controller.CallController;
-import com.utn.TP_Final.controller.TelephoneLineController;
-import com.utn.TP_Final.controller.UserController;
+import com.utn.TP_Final.controller.*;
 import com.utn.TP_Final.exceptions.TelephoneLineAlreadyExistsException;
 import com.utn.TP_Final.exceptions.TelephoneLineNotExistsException;
 import com.utn.TP_Final.exceptions.UserAlreadyExistsException;
 import com.utn.TP_Final.exceptions.UserNotExistsException;
+import com.utn.TP_Final.model.Fee;
 import com.utn.TP_Final.model.TelephoneLine;
 import com.utn.TP_Final.model.User;
-import com.utn.TP_Final.projections.CallsFromUser;
-import com.utn.TP_Final.projections.CallsFromUserSimple;
+import com.utn.TP_Final.projections.*;
 import com.utn.TP_Final.session.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -20,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.sql.Date;
 import java.util.List;
 
 @RestController
@@ -29,13 +28,17 @@ public class EmployeeWebController {
     private final UserController userController;
     private final TelephoneLineController telephoneLineController;
     private final CallController callController;
+    private final FeeController feeController;
+    private final InvoiceController invoiceController;
     private final SessionManager sessionManager;
 
     @Autowired
-    public EmployeeWebController(UserController userController, TelephoneLineController telephoneLineController, CallController callController, SessionManager sessionManager) {
+    public EmployeeWebController(UserController userController, TelephoneLineController telephoneLineController, CallController callController, FeeController feeController, InvoiceController invoiceController, SessionManager sessionManager) {
         this.userController = userController;
         this.telephoneLineController = telephoneLineController;
         this.callController = callController;
+        this.feeController = feeController;
+        this.invoiceController = invoiceController;
         this.sessionManager = sessionManager;
     }
 
@@ -162,6 +165,135 @@ public class EmployeeWebController {
         return (callsFromUsers.size() > 0) ? ResponseEntity.ok(callsFromUsers) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    
+    @GetMapping("/getFeeByIdCities/{idCityFrom}/{idCityTo}")
+    public ResponseEntity<FeeRequest> getFeeByIdCities(@RequestHeader("Authorization")String sessionToken, @PathVariable Integer idCityFrom, @PathVariable Integer idCityTo)
+    {
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
+        if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        FeeRequest feeRequest = feeController.getFeeByIdCities(idCityFrom, idCityTo);
+        return (feeRequest != null) ? ResponseEntity.ok(feeRequest) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 
+    @GetMapping("/getFeeByNameCities/{cityFrom}/{cityTo}")
+    public ResponseEntity<FeeRequest> getFeeByNameCities(@RequestHeader("Authorization")String sessionToken, @PathVariable String cityFrom, @PathVariable String cityTo)
+    {
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
+        if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        FeeRequest feeRequest = feeController.getFeeByNameCities(cityFrom, cityTo);
+        return (feeRequest != null) ? ResponseEntity.ok(feeRequest) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/getInvoicesFromUser/{dni}")
+    public ResponseEntity<List<InvoicesFromUser>> getInvoicesFromUser(@RequestHeader("Authorization")String sessionToken, @PathVariable String dni)
+    {
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
+        if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        List<InvoicesFromUser> invoicesFromUsers = invoiceController.getInvoicesFromUser(dni);
+        return (invoicesFromUsers.size() > 0) ? ResponseEntity.ok(invoicesFromUsers) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/getInvoicesPaidFromUser/{dni}")
+    public ResponseEntity<List<InvoicesFromUser>> getInvoicesPaidFromUser(@RequestHeader("Authorization")String sessionToken, @PathVariable String dni)
+    {
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
+        if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        List<InvoicesFromUser> invoicesFromUsers = invoiceController.getInvoicesPaidFromUser(dni);
+        return (invoicesFromUsers.size() > 0) ? ResponseEntity.ok(invoicesFromUsers) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/getInvoicesNotPaidFromUser/{dni}")
+    public ResponseEntity<List<InvoicesFromUser>> getInvoicesNotPaidFromUser(@RequestHeader("Authorization")String sessionToken, @PathVariable String dni)
+    {
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
+        if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        List<InvoicesFromUser> invoicesFromUsers = invoiceController.getInvoicesNotPaidFromUser(dni);
+        return (invoicesFromUsers.size() > 0) ? ResponseEntity.ok(invoicesFromUsers) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/getInvoicesFromMonth/{monthI}")
+    public ResponseEntity<List<InvoicesRequestFromPeriods>> getInvoicesFromMonth(@RequestHeader("Authorization")String sessionToken, @PathVariable String monthI)
+    {
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
+        if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        List<InvoicesRequestFromPeriods> invoicesRequestFromPeriods = invoiceController.getInvoicesFromMonth(monthI);
+        return (invoicesRequestFromPeriods.size() > 0) ? ResponseEntity.ok(invoicesRequestFromPeriods) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/getInvoicesFromYear/{yearI}")
+    public ResponseEntity<List<InvoicesRequestFromPeriods>> getInvoicesFromYear(@RequestHeader("Authorization")String sessionToken, @PathVariable String yearI)
+    {
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
+        if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        List<InvoicesRequestFromPeriods> invoicesRequestFromPeriods = invoiceController.getInvoicesFromYear(yearI);
+        return (invoicesRequestFromPeriods.size() > 0) ? ResponseEntity.ok(invoicesRequestFromPeriods) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/getInvoicesBetweenDates/{fromI}/{toI}")
+    public ResponseEntity<List<InvoicesRequestFromPeriods>> getInvoicesBetweenDates(@RequestHeader("Authorization")String sessionToken, @PathVariable Date fromI, @PathVariable Date toI)
+    {
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
+        if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        List<InvoicesRequestFromPeriods> invoicesRequestFromPeriods = invoiceController.getInvoicesBetweenDates(fromI, toI);
+        return (invoicesRequestFromPeriods.size() > 0) ? ResponseEntity.ok(invoicesRequestFromPeriods) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/getIncome")
+    public ResponseEntity<InvoiceIncome> getIncome(@RequestHeader("Authorization")String sessionToken)
+    {
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
+        if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        InvoiceIncome invoiceIncome = invoiceController.getIncome();
+        return (invoiceIncome != null) ? ResponseEntity.ok(invoiceIncome) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/getIncomeMonth/{monthI}")
+    public ResponseEntity<InvoiceIncome> getIncomeMonth(@RequestHeader("Authorization")String sessionToken, @PathVariable String monthI)
+    {
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
+        if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        InvoiceIncome invoiceIncome = invoiceController.getIncomeMonth(monthI);
+        return (invoiceIncome != null) ? ResponseEntity.ok(invoiceIncome) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/getIncomeYear/{yearI}")
+    public ResponseEntity<InvoiceIncome> getIncomeYear(@RequestHeader("Authorization")String sessionToken, @PathVariable String yearI)
+    {
+        User currentUser = sessionManager.getLoggedUser(sessionToken);
+        if(currentUser == null || currentUser.getUserType().equals("CUSTOMER"))
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        InvoiceIncome invoiceIncome = invoiceController.getIncomeYear(yearI);
+        return (invoiceIncome != null) ? ResponseEntity.ok(invoiceIncome) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }

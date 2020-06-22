@@ -1,4 +1,4 @@
-﻿SET GLOBAL time_zone = '-3:00';
+SET GLOBAL time_zone = '-3:00';
 drop database tpfinal;
 create database tpfinal;
 use tpfinal;
@@ -336,7 +336,7 @@ call backoffice_request_calls_user('41307541');
 delimiter //
 create procedure backoffice_invoices_from_user(IN dni varchar(50))
 begin
-select u.dni, u.lastname, u.firstname, t.line_number, i.date_creation, i.date_expiration, i.total_cost, i.total_price
+select u.dni, u.lastname, u.firstname, t.line_number, i.date_creation, i.date_expiration, i.total_cost, i.total_price, i.paid
 from users u
 inner join telephone_lines t
 on u.id = t.id_user
@@ -345,11 +345,12 @@ on t.id = i.id_telephone_line
 where u.dni = dni;
 end //
 
+
 -- ver facturas pagadas/sin pagar de un usuario
 delimiter //
 create procedure backoffice_invoices_from_user_paid(IN dni varchar(50))
 begin
-select u.dni, u.lastname, u.firstname, t.line_number, i.date_creation, i.date_expiration, i.total_cost, i.total_price
+select u.dni, u.lastname, u.firstname, t.line_number, i.date_creation, i.date_expiration, i.total_cost, i.total_price, i.paid
 from users u
 inner join telephone_lines t
 on u.id = t.id_user
@@ -358,12 +359,11 @@ on t.id = i.id_telephone_line
 where u.dni = dni and i.paid = 1;
 end //
 
-call backoffice_invoices_from_user_paid('41307541');
 
 delimiter //
 create procedure backoffice_invoices_from_user_not_paid(IN dni varchar(50))
 begin
-select u.dni, u.lastname, u.firstname, t.line_number, i.date_creation, i.date_expiration, i.total_cost, i.total_price
+select u.dni, u.lastname, u.firstname, t.line_number, i.date_creation, i.date_expiration, i.total_cost, i.total_price, i.paid
 from users u
 inner join telephone_lines t
 on u.id = t.id_user
@@ -372,25 +372,25 @@ on t.id = i.id_telephone_line
 where u.dni = dni and i.paid = 0;
 end //
 
-call backoffice_invoices_from_user_not_paid('41307541');
 
 -- ver facturas de un mes
 delimiter //
 create procedure backoffice_invoices_from_month(IN monthI varchar(50))
 begin
-select t.line_number, i.date_creation, i.date_expiration, i.total_cost, i.total_price
+select t.line_number, i.date_creation, i.date_expiration, i.total_cost, i.total_price, i.paid
 from telephone_lines t
 inner join invoices i
 on t.id = i.id_telephone_line
 where month(i.date_creation) = monthI;
 end //
 
+
 -- ver facturas de un año
 
 delimiter //
 create procedure backoffice_invoices_from_year(IN yearI varchar(50))
 begin
-select t.line_number, i.date_creation, i.date_expiration, i.total_cost, i.total_price
+select t.line_number, i.date_creation, i.date_expiration, i.total_cost, i.total_price, i.paid
 from telephone_lines t
 inner join invoices i
 on t.id = i.id_telephone_line
@@ -403,12 +403,13 @@ end //
 delimiter //
 create procedure backoffice_invoices_between_dates(IN fromI varchar(50), IN toI varchar(50))
 begin
-select t.line_number, i.date_creation, i.date_expiration, i.total_cost, i.total_price
+select t.line_number, i.date_creation, i.date_expiration, i.total_cost, i.total_price, i.paid
 from telephone_lines t
 inner join invoices i
 on t.id = i.id_telephone_line
 where i.date_creation between fromI and toI;
 end //
+
 
 -- ver ganancias 
 
