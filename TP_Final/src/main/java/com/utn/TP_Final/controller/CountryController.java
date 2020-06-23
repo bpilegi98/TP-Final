@@ -1,6 +1,8 @@
 package com.utn.TP_Final.controller;
 
 
+import com.utn.TP_Final.exceptions.CountryNotExistsException;
+import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.Country;
 import com.utn.TP_Final.service.CountryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +36,7 @@ public class CountryController {
     }
 
     @GetMapping("/{id}")
-    public Optional<Country> getById(@RequestParam(required = true)Integer id)
+    public Optional<Country> getById(@RequestParam(required = true)Integer id) throws CountryNotExistsException, ValidationException
     {
         return countryService.findById(id);
     }

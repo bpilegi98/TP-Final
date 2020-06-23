@@ -5,6 +5,7 @@ import com.utn.TP_Final.controller.CallController;
 import com.utn.TP_Final.controller.InvoiceController;
 import com.utn.TP_Final.controller.UserController;
 import com.utn.TP_Final.exceptions.DateNotExistsException;
+import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.User;
 import com.utn.TP_Final.projections.CallsBetweenDates;
@@ -77,12 +78,19 @@ public class CustomerWebController {
         }
 
     @GetMapping("/getTopMostCalledDestinations")
-    public ResponseEntity<List<TopMostCalledDestinations>> getTopMostCalledDestinations(@RequestHeader("Authorization") String sessionToken, Integer idLoggedUser)
+    public ResponseEntity<List<TopMostCalledDestinations>> getTopMostCalledDestinations(@RequestHeader("Authorization") String sessionToken, Integer idLoggedUser) throws ValidationException
     {
-        User currentUser = sessionManager.getLoggedUser(sessionToken);
+        try
+        {
+            User currentUser = sessionManager.getLoggedUser(sessionToken);
 
-        List<TopMostCalledDestinations> topMostCalledDestinations = userController.getTopMostCalledDestinatons(currentUser.getId());
-        return (topMostCalledDestinations.size() > 0) ? ResponseEntity.ok(topMostCalledDestinations) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            List<TopMostCalledDestinations> topMostCalledDestinations = userController.getTopMostCalledDestinatons(currentUser.getId());
+            return (topMostCalledDestinations.size() > 0) ? ResponseEntity.ok(topMostCalledDestinations) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        catch (UserNotExistsException e)
+        {
+            throw new ValidationException(e.getMessage());
+        }
     }
 
 }

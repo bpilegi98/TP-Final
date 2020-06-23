@@ -68,8 +68,6 @@ public class UserService {
         return Optional.ofNullable(user).orElseThrow(()-> new UserNotExistsException());
     }
 
-    //ver como hacer el logout
-
     public List<CallsBetweenDates> getCallsBetweenDates(Date from, Date to, Integer idLoggedUser)
     {
         return userRepository.getCallsBetweenDates(from, to, idLoggedUser);

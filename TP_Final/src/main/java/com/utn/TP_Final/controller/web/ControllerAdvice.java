@@ -73,4 +73,11 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler {
     {
         return new ErrorDto(9, "City already exists");
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(CountryNotExistsException.class)
+    public ErrorDto handlerCountryNotExists()
+    {
+        return new ErrorDto(10, "Country doesn't exists");
+    }
 }
