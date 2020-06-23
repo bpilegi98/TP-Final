@@ -1,6 +1,8 @@
 package com.utn.TP_Final.controller;
 
 
+import com.utn.TP_Final.exceptions.CityNotExistsException;
+import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.Fee;
 import com.utn.TP_Final.projections.FeeRequest;
 import com.utn.TP_Final.service.FeeService;
@@ -40,25 +42,25 @@ public class FeeController {
     }
 
     @GetMapping("/getBySourceCity/{sourceCityName}")
-    public List<Fee> getBySourceCity(@RequestParam(required = true)String cityName)
+    public List<Fee> getBySourceCity(@RequestParam(required = true)String cityName) throws CityNotExistsException, ValidationException
     {
         return feeService.getBySourceCity(cityName);
     }
 
     @GetMapping("/getByDestinationCity/{destinationCityName}")
-    public List<Fee> getByDestinationCity(@RequestParam(required = true)String cityName)
+    public List<Fee> getByDestinationCity(@RequestParam(required = true)String cityName)throws CityNotExistsException, ValidationException
     {
         return feeService.getByDestinationCity(cityName);
     }
 
     @GetMapping("/getFeeByIdCities/{idCityFrom}/{idCityTo}")
-    public FeeRequest getFeeByIdCities(@PathVariable Integer idCityFrom, @PathVariable Integer idCityTo)
+    public FeeRequest getFeeByIdCities(@PathVariable Integer idCityFrom, @PathVariable Integer idCityTo)throws CityNotExistsException, ValidationException
     {
         return feeService.getFeeByIdCities(idCityFrom, idCityTo);
     }
 
     @GetMapping("/getFeeByNameCities/{cityFrom}/{cityTo}")
-    public FeeRequest getFeeByNameCities(@PathVariable String cityFrom, @PathVariable String cityTo)
+    public FeeRequest getFeeByNameCities(@PathVariable String cityFrom, @PathVariable String cityTo)throws CityNotExistsException, ValidationException
     {
         return feeService.getFeeByNameCities(cityFrom, cityTo);
     }

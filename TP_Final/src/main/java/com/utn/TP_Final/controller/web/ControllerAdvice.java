@@ -1,9 +1,7 @@
 package com.utn.TP_Final.controller.web;
 
 import com.utn.TP_Final.dto.ErrorDto;
-import com.utn.TP_Final.exceptions.InvalidLoginException;
-import com.utn.TP_Final.exceptions.UserNotExistsException;
-import com.utn.TP_Final.exceptions.ValidationException;
+import com.utn.TP_Final.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -29,8 +27,50 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(UserNotExistsException.class)
-    public ErrorDto handlePersonNotExists()
+    public ErrorDto handleUserNotExists()
     {
-        return new ErrorDto(3, "Person doesn't exists");
+        return new ErrorDto(3, "User doesn't exists");
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ErrorDto handlerUserAlreadyExists()
+    {
+        return new ErrorDto(4, "User already exists");
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(TelephoneLineNotExistsException.class)
+    public ErrorDto handlerTelephoneLineNotExists()
+    {
+        return new ErrorDto(5, "Telephone line doesn't exists");
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(TelephoneLineAlreadyExistsException.class)
+    public ErrorDto hanlderTelephoneLineAlreadyExists()
+    {
+        return new ErrorDto(6, "Telephone line already exists");
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(DateNotExistsException.class)
+    public ErrorDto handlerDateNotExists()
+    {
+        return new ErrorDto(7, "Date doesn't exists");
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(CityNotExistsException.class)
+    public ErrorDto handlerCityNotExists()
+    {
+        return new ErrorDto(8, "City doesn't exists");
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(CityAlreadyExistsException.class)
+    public ErrorDto handlerCityAlreadyExists()
+    {
+        return new ErrorDto(9, "City already exists");
     }
 }

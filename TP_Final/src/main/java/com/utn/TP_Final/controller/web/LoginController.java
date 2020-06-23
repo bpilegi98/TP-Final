@@ -29,7 +29,6 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginDto loginDto) throws InvalidLoginException, ValidationException
-    //fijarse si hay mas exceptions para agregar
     {
         ResponseEntity responseEntity;
         try

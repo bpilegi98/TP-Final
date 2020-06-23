@@ -1,6 +1,7 @@
 package com.utn.TP_Final.controller;
 
 
+import com.utn.TP_Final.exceptions.DateNotExistsException;
 import com.utn.TP_Final.exceptions.UserAlreadyExistsException;
 import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.exceptions.ValidationException;
@@ -30,13 +31,13 @@ public class UserController {
 
 
     @PostMapping("/")
-    public void addUser(@RequestBody User newUser) throws UserAlreadyExistsException
+    public void addUser(@RequestBody User newUser) throws UserAlreadyExistsException, ValidationException
     {
         userService.addUser(newUser);
     }
 
     @PostMapping("/delete/{dni}")
-    public void removeUser(@RequestBody(required = true)String dni)
+    public void removeUser(@RequestBody(required = true)String dni)throws UserNotExistsException, ValidationException
     {
         userService.deleteUser(dni);
     }
@@ -49,25 +50,26 @@ public class UserController {
     }
 
     @GetMapping("/getByDni/{dni}")
-    public User getByDni(@RequestParam(required = true)String dni)
+    public User getByDni(@RequestParam(required = true)String dni) throws UserNotExistsException, ValidationException
     {
         return userService.getByDni(dni);
     }
 
     @GetMapping("/getByLineNumber/{lineNumber}")
-    public User getByLineNumber(@RequestParam(required = true)String lineNumber)
+    public User getByLineNumber(@RequestParam(required = true)String lineNumber)throws UserNotExistsException, ValidationException
     {
         return userService.getByLineNumber(lineNumber);
     }
 
     @GetMapping("/getById/{id}")
-    public Optional<User> getById(@RequestParam(required = true)Integer id)
+    public Optional<User> getById(@RequestParam(required = true)Integer id)throws UserNotExistsException, ValidationException
     {
         return userService.getById(id);
     }
 
     @GetMapping("/getByUsername/{username}")
-    public User getByUsername(@RequestParam(required = true)String username, @RequestParam(required = true)String password){
+    public User getByUsername(@RequestParam(required = true)String username, @RequestParam(required = true)String password) throws UserNotExistsException, ValidationException
+    {
         return userService.getByUsername(username, password);
     }
 
@@ -83,20 +85,20 @@ public class UserController {
     }
 
     @GetMapping("/getCallsBetweenDates")
-    public List<CallsBetweenDates> getCallsBetweenDates(@PathVariable Date from, @PathVariable Date to, Integer idLoggedUser)
+    public List<CallsBetweenDates> getCallsBetweenDates(@PathVariable Date from, @PathVariable Date to, Integer idLoggedUser) throws DateNotExistsException, ValidationException
     {
         return userService.getCallsBetweenDates(from, to, idLoggedUser);
     }
 
     @GetMapping("/getInvoicesBetweenDates")
-    public List<InvoicesBetweenDatesUser> getInvoicesBetweenDates(@PathVariable Date from, @PathVariable Date to, Integer idLoggedUser)
+    public List<InvoicesBetweenDatesUser> getInvoicesBetweenDates(@PathVariable Date from, @PathVariable Date to, Integer idLoggedUser)throws DateNotExistsException, ValidationException
     {
         return userService.getInvoicesBetweenDates(from, to, idLoggedUser);
     }
 
 
     @GetMapping("/getTopMostCalledDestinations")
-    public List<TopMostCalledDestinations> getTopMostCalledDestinatons(Integer idLoggedUser)
+    public List<TopMostCalledDestinations> getTopMostCalledDestinatons(Integer idLoggedUser)throws UserNotExistsException, ValidationException
     {
         return userService.getTopMostCalledDestinationds(idLoggedUser);
     }

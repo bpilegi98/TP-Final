@@ -1,6 +1,8 @@
 package com.utn.TP_Final.controller;
 
 
+import com.utn.TP_Final.exceptions.UserNotExistsException;
+import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.Call;
 import com.utn.TP_Final.projections.CallsFromUser;
 import com.utn.TP_Final.projections.CallsFromUserSimple;
@@ -76,13 +78,13 @@ public class CallController {
     }
 
     @GetMapping("/getCallsFromUserSimple")
-    public CallsFromUserSimple getCallsFromUserSimple(@PathVariable String dni)
+    public CallsFromUserSimple getCallsFromUserSimple(@PathVariable String dni) throws UserNotExistsException, ValidationException
     {
         return callService.getCallsFromUserSimple(dni);
     }
 
     @GetMapping("/getCallsFromUser")
-    public List<CallsFromUser> getCallsFromUser(@PathVariable String dni)
+    public List<CallsFromUser> getCallsFromUser(@PathVariable String dni) throws UserNotExistsException, ValidationException
     {
         return callService.getCallsFromUser(dni);
     }

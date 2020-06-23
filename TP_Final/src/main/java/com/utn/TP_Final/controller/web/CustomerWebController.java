@@ -4,6 +4,8 @@ package com.utn.TP_Final.controller.web;
 import com.utn.TP_Final.controller.CallController;
 import com.utn.TP_Final.controller.InvoiceController;
 import com.utn.TP_Final.controller.UserController;
+import com.utn.TP_Final.exceptions.DateNotExistsException;
+import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.User;
 import com.utn.TP_Final.projections.CallsBetweenDates;
 import com.utn.TP_Final.projections.InvoicesBetweenDatesUser;
@@ -35,23 +37,44 @@ public class CustomerWebController {
         this.sessionManager = sessionManager;
     }
 
-    @GetMapping("/getCallsBetweenDates")
-    public ResponseEntity<List<CallsBetweenDates>> getCallsBetweenDates(@RequestHeader("Authorization") String sessionToken, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date from, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date to, Integer idLoggedUser)
-    {
-       User currentUser = sessionManager.getLoggedUser(sessionToken);
 
-       List<CallsBetweenDates> callsBetweenDates = userController.getCallsBetweenDates(from, to, currentUser.getId());
-       return (callsBetweenDates.size() > 0) ? ResponseEntity.ok(callsBetweenDates) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
+
+    @GetMapping("/getCallsBetweenDates")
+    public ResponseEntity<List<CallsBetweenDates>> getCallsBetweenDates(@RequestHeader("Authorization") String sessionToken,
+                                                                        @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date from,
+                                                                        @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date to,
+                                                                        Integer idLoggedUser) throws ValidationException
+    {
+        try
+        {
+            User currentUser = sessionManager.getLoggedUser(sessionToken);
+
+            List<CallsBetweenDates> callsBetweenDates = userController.getCallsBetweenDates(from, to, currentUser.getId());
+            return (callsBetweenDates.size() > 0) ? ResponseEntity.ok(callsBetweenDates) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        catch (DateNotExistsException e)
+        {
+            throw new ValidationException(e.getMessage());
+        }
+       }
 
     @GetMapping("/getInvoicesBetweenDates")
-    public ResponseEntity<List<InvoicesBetweenDatesUser>> getInvoicesBetweenDates(@RequestHeader("Authorization")String sessionToken, @PathVariable Date from, @PathVariable Date to, Integer idLoggedUser)
+    public ResponseEntity<List<InvoicesBetweenDatesUser>> getInvoicesBetweenDates(@RequestHeader("Authorization")String sessionToken,
+                                                                                  @PathVariable Date from,
+                                                                                  @PathVariable Date to, Integer idLoggedUser) throws ValidationException
     {
-        User currentUser = sessionManager.getLoggedUser(sessionToken);
+        try
+        {
+            User currentUser = sessionManager.getLoggedUser(sessionToken);
 
-        List<InvoicesBetweenDatesUser> invoicesBetweenDateUsers = userController.getInvoicesBetweenDates(from, to, currentUser.getId());
-        return (invoicesBetweenDateUsers.size() > 0) ? ResponseEntity.ok(invoicesBetweenDateUsers) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
+            List<InvoicesBetweenDatesUser> invoicesBetweenDateUsers = userController.getInvoicesBetweenDates(from, to, currentUser.getId());
+            return (invoicesBetweenDateUsers.size() > 0) ? ResponseEntity.ok(invoicesBetweenDateUsers) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        catch (DateNotExistsException e)
+        {
+            throw new ValidationException(e.getMessage());
+        }
+        }
 
     @GetMapping("/getTopMostCalledDestinations")
     public ResponseEntity<List<TopMostCalledDestinations>> getTopMostCalledDestinations(@RequestHeader("Authorization") String sessionToken, Integer idLoggedUser)
@@ -62,5 +85,4 @@ public class CustomerWebController {
         return (topMostCalledDestinations.size() > 0) ? ResponseEntity.ok(topMostCalledDestinations) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    //Métodos de projections con sus respectivas urls :D
 }
