@@ -1,14 +1,14 @@
-﻿SET GLOBAL time_zone = '-3:00';
+﻿﻿SET GLOBAL time_zone = '-3:00';
 drop database tpfinal;
 create database tpfinal;
 use tpfinal;
 
+-- TABLAS
 
 create table countries(
 id int auto_increment primary key,
 name varchar(50) unique
 );
-
 
 create table provinces(
 id int auto_increment primary key,
@@ -97,11 +97,81 @@ constraint fk_invoice_ic foreign key(id_invoice) references invoices(id),
 constraint fk_call_ic foreign key(id_call) references calls(id)
 )
 
+-- TRIGGERS
 
+-- TRIGGER de calls
+DELIMITER // 
+CREATE TRIGGER tbi_call_complete_and_check BEFORE INSERT ON calls FOR EACH ROW
+BEGIN 
 
+declare ppp float;
+declare cpp float;
+declare cost float;
+declare price float;
+declare id_source int;
+declare id_dest int;
+declare duration_minutes int;
 
+IF not EXISTS (select * 
+FROM telephone_lines t
+WHERE NEW.source_number = t.line_number) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'El numero origen no existe', mysql_errno = 1000;
+END if;
 
--- STORED PROCEDURES
+if not exists (select * 
+FROM telephone_lines t
+WHERE NEW.destination_number = t.line_number) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'El numero destino no existe', mysql_errno = 1000;
+END IF;
+
+if (NEW.destination_number = NEW.source_number) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'Los numeros son iguales', mysql_errno = 1000;
+END IF;
+
+IF
+(NEW.duration_secs <= 0) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'Los duracion debe ser mayor q cero', mysql_errno = 1000;
+END IF;
+
+IF (NEW.date_call > now()) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'La fecha no puede ser futura', mysql_errno = 1000;
+END IF;
+
+IF (NEW.date_call < (NOW() - INTERVAL 10 DAY)) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'La fecha tiene no puede ser anterior a 10 dias', mysql_errno = 1000;
+END IF;
+
+select u.id_city from users u join telephone_lines t on u.id=t.id_user  where t.line_number = NEW.source_number into id_source;
+select u.id_city from users u join telephone_lines t on u.id=t.id_user  where t.line_number = NEW.destination_number into id_source;
+
+select f.price_per_minute, f.cost_per_minute
+from fees f
+where (f.id_source_city = id_source) and (f.id_destination_city = id_dest) into ppp,cpp;
+
+select CEIL(new.duration_secs / 60) into duration_minutes;
+select ppp * duration_minutes , cpp * duration_minutes into price,cost;
+
+-- Este metodo buscaba la ciudad por el prefijo, pero como hay prefijos repetidos entre ciudades no sabia si esta bien
+-- SET NEW.id_source_number = (SELECT c.id FROM cities c WHERE new.source_number LIKE CONCAT(c.prefix_number, '%') ORDER BY LENGTH(c.prefix_number) DESC LIMIT 1)
+SET NEW.id_source_number = (select t.id from telephone_lines t where t.line_number = NEW.source_number  limit 1);
+SET NEW.id_destination_number = (select t.id from telephone_lines t where t.line_number = NEW.destination_number  limit 1);
+SET NEW.price_per_minute = ppp;
+SET NEW.total_cost = cost;
+SET NEW.total_price = price;
+SET NEW.id_source_city = id_source;
+SET NEW.id_destination_city = id_dest;
+END//
+
+DELIMITER // 
+CREATE TRIGGER tbi_new_city BEFORE INSERT ON cities FOR EACH ROW
+BEGIN 
+IF EXISTS (select * 
+FROM cities c
+WHERE NEW.name = c.name) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'La ciudad que desea ingresar ya existe', mysql_errno = 1000;
+END if;
+END//
+
+-- ///STORED PROCEDURES///
+
+delimiter // 
+create procedure add_country()
+begin
+insert into countries (name) values ('Argentina');
+end //
 
 delimiter //
 create procedure create_provinces()
@@ -133,6 +203,11 @@ values
 ("Tucuman",1);              
 end //     
 
+-- /////////////////////////////////////////////////
+-- STOP STOP STOP //////////////////////////////////
+-- /////////////////////////////////////////////////
+-- tenemos un script en java que carga las ciudades, aca deberias ir y ejecutarlo
+
 delimiter //
 create procedure add_users()
 begin
@@ -143,7 +218,8 @@ insert into users(firstname, lastname, dni, username, password, id_city, user_ty
 insert into users(firstname, lastname, dni, username, password, id_city, user_type,is_active) values ('fisrtname3', 'lastname3', '3333333', 'username3', 'password3', 4, 'CUSTOMER',true);
 insert into users(firstname, lastname, dni, username, password, id_city, user_type,is_active) values ('fisrtname4', 'lastname4', '4444444', 'username4', 'password4', 2, 'CUSTOMER',true);
 end //
-drop procedure add_fees
+
+-- Script de fees (tarda 15 minutos)
 delimiter //
 create procedure add_fees()
 begin
@@ -179,10 +255,6 @@ end while;
 end //
 call add_fees()
 
-select * from fees
-50 250
-select count(id) from cities
-
 delimiter //
 create procedure add_telephone_lines()
 begin
@@ -195,9 +267,7 @@ insert into telephone_lines (line_number, line_type, id_user, status) values ('1
 insert into telephone_lines (line_number, line_type, id_user, status) values ('2234678564', 'RESIDENTIAL', 1, 'ACTIVE');
 insert into telephone_lines (line_number, line_type, id_user, status) values ('2914738495', 'RESIDENTIAL', 4, 'ACTIVE');
 end //
-select * from telephone_lines
-select * from cities where id = 190
-select * from calls
+
 delimiter //
 create procedure add_calls()
 begin
@@ -208,17 +278,11 @@ insert into calls (source_number, destination_number, duration_secs, date_call) 
 insert into calls (source_number, destination_number, duration_secs, date_call) values ('2236784509', '115098521', 180,'2020-06-22');
 insert into calls (source_number, destination_number, duration_secs, date_call) values ('2236784509', '115098521', 30,'2020-06-22');
 end //
-183 146 1
+
 delimiter //
 create procedure add_invoices()
 begin
 insert into invoices (total_price, total_cost, date_creation, date_expiration, id_telephone_line, id_user, paid) values (23.3, 7.68, '2020-05-30', '2020-06-15', 1, 1, false);
-end //
-
-delimiter // 
-create procedure add_country_provinces_cities()
-begin
-insert into countries (name) values ('Argentina');
 end //
 
 
@@ -226,19 +290,15 @@ end //
 
 call add_country_provinces_cities();
 call create_provinces();
-
+-- script de java 
 call add_users();
 call add_telephone_lines();
 call add_fees();
-call add_invoices();
 call add_calls();
-
-select * from cities where name = "mar del plata"
-
+call add_invoices();
 
 
 -- Devolver el numero al que más llamó un usuario
-
 select u.firstname, u.lastname, c.destination_number as dest from users u 
 inner join telephone_lines t 
 on t.id_user = u.id 
@@ -249,15 +309,12 @@ group by c.destination_number
 order by  count(c.destination_number) desc 
 limit 1;
 
-
 -- Endpoint que devuelva la cantidad de llamados que recibio la linea X
-
 select t.line_number as LineNumber, count(c.id) as CallsReceived from calls c
 inner join telephone_lines t
 on c.destination_number = t.line_number
 where c.destination_number = '115098521';
 
-select * from calls 
 
 -- API 
 -- 2) Consulta de llamadas del usuario logueado por rango de fechas
@@ -288,7 +345,6 @@ on t.id_user = u.id
 where u.id = idLoggedUser and i.date_creation between fromD and toD;
 end //
 
-
 -- 4) Consulta de TOP 10 destinos más llamados por el usuario
 
 delimiter //
@@ -304,7 +360,6 @@ where u.id = idLoggedUser
 group by number_called
 limit 10;
 end //
-
 
 -- BACK OFFICE
 -- 2) Manejo de clientes
@@ -323,9 +378,6 @@ on f.id_destination_city = ct.id
 where f.id_source_city = idCityFrom and f.id_destination_city = idCityTo;
 end // 
 
-drop procedure backoffice_request_fee_by_id;
-call backoffice_request_fee_by_id(1, 2);
-
 delimiter //
 create procedure backoffice_request_fee(IN cityFrom varchar(50), IN cityTo varchar(50))
 begin
@@ -337,10 +389,6 @@ select cityFrom, cityTo, f.price_per_minute as fee
 from fees f 
 where f.id_source_city = idCityFrom and f.id_destination_city = idCityTo;
 end // 
-
-drop procedure backoffice_request_fee;
-call backoffice_request_fee("Mar del Plata", "Buenos Aires");
-
 
 -- 5) Consulta de llamadas por usuario.
 
@@ -370,9 +418,6 @@ on t.id_user = u.id
 where u.dni = dni;
 end //
 
-drop procedure backoffice_request_calls_user;
-call backoffice_request_calls_user('41307541');
-
 -- 6) Consulta de facturación. La facturación se hará directamente por un proceso interno en la base datos.
 
 -- ver facturas de un usuario
@@ -388,7 +433,6 @@ on t.id = i.id_telephone_line
 where u.dni = dni;
 end //
 
-
 -- ver facturas pagadas/sin pagar de un usuario
 delimiter //
 create procedure backoffice_invoices_from_user_paid(IN dni varchar(50))
@@ -402,7 +446,6 @@ on t.id = i.id_telephone_line
 where u.dni = dni and i.paid = 1;
 end //
 
-
 delimiter //
 create procedure backoffice_invoices_from_user_not_paid(IN dni varchar(50))
 begin
@@ -415,7 +458,6 @@ on t.id = i.id_telephone_line
 where u.dni = dni and i.paid = 0;
 end //
 
-
 -- ver facturas de un mes
 delimiter //
 create procedure backoffice_invoices_from_month(IN monthI varchar(50))
@@ -426,7 +468,6 @@ inner join invoices i
 on t.id = i.id_telephone_line
 where month(i.date_creation) = monthI;
 end //
-
 
 -- ver facturas de un año
 
@@ -440,7 +481,6 @@ on t.id = i.id_telephone_line
 where year(i.date_creation) = yearI;
 end //
 
-
 -- ver facturas de un periodo
 
 delimiter //
@@ -452,7 +492,6 @@ inner join invoices i
 on t.id = i.id_telephone_line
 where i.date_creation between fromI and toI;
 end //
-
 
 -- ver ganancias 
 
@@ -496,65 +535,6 @@ end //
 -- llamada y no será recibido por la API REST.
 
 
--- TRIGGER de calls
-drop trigger tbi_call_complete_and_check
-DELIMITER // 
-CREATE TRIGGER tbi_call_complete_and_check BEFORE INSERT ON calls FOR EACH ROW
-BEGIN 
-declare ppp float;
-declare cpp float;
-declare cost float;
-declare price float;
-declare id_source int;
-declare id_dest int;
-declare duration_minutes int;
-
-IF not EXISTS (select * 
-FROM telephone_lines t
-WHERE NEW.source_number = t.line_number) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'El numero origen no existe', mysql_errno = 1000;
-END if;
-
-if not exists (select * 
-FROM telephone_lines t
-WHERE NEW.destination_number = t.line_number) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'El numero destino no existe', mysql_errno = 1000;
-END IF;
-
-if (NEW.destination_number = NEW.source_number) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'Los numeros son iguales', mysql_errno = 1000;
-END IF;
-
-IF
-(NEW.duration_secs <= 0) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'Los duracion debe ser mayor q cero', mysql_errno = 1000;
-END IF;
-
-IF (NEW.date_call > now()) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'La fecha no puede ser futura', mysql_errno = 1000;
-END IF;
-
-IF (NEW.date_call < (NOW() - INTERVAL 10 DAY)) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'La fecha tiene no puede ser anterior a 10 dias', mysql_errno = 1000;
-END IF;
-
-select u.id_city from users u join telephone_lines t on u.id=t.id_user  where t.line_number = NEW.source_number into id_source;
-select u.id_city from users u join telephone_lines t on u.id=t.id_user  where t.line_number = NEW.destination_number into id_source;
-
-select f.price_per_minute, f.cost_per_minute
-from fees f
-where (f.id_source_city = id_source) and (f.id_destination_city = id_dest) into ppp,cpp;
-
-select CEIL(new.duration_secs / 60) into duration_minutes;
-
-select ppp * duration_minutes , cpp * duration_minutes into price,cost;
-
-SET NEW.id_source_number = (select t.id from telephone_lines t where t.line_number = NEW.source_number  limit 1);
-SET NEW.id_destination_number = (select t.id from telephone_lines t where t.line_number = NEW.destination_number  limit 1);
-SET NEW.price_per_minute = ppp;
-SET NEW.total_cost = cost;
-SET NEW.total_price = price;
-SET NEW.id_source_city = id_source;
-SET NEW.id_destination_city = id_dest;
-END//
-
-insert into calls (source_number, destination_number,duration_secs,date_call) value ("2236784509","2235436785",120,"2020-06-20");
-insert into calls (total_price) value (200);
-
 -- STORED PROCEDURE ADD CALL
 
 delimiter //
@@ -563,18 +543,6 @@ begin
 insert into calls(source_number, destination_number, duration_secs, date_call) values (sourceNumber, destinationNumber, duration, dateCall);
 end //
 
-call add_call_aerial("2236784509", "2235436785", 120, "2020-06-20");
-
-drop trigger tbi_new_city
-DELIMITER // 
-CREATE TRIGGER tbi_new_city BEFORE INSERT ON cities FOR EACH ROW
-BEGIN 
-IF EXISTS (select * 
-FROM cities c
-WHERE NEW.name = c.name) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'La ciudad que desea ingresar ya existe', mysql_errno = 1000;
-END if;
-END//
-
 delimiter // 
 create procedure insert_city(IN name_var varchar(50),IN prefix_var varchar (10), IN province_name_var varchar (50))
 begin
@@ -582,4 +550,3 @@ declare id_province int;
 SELECT p.id FROM provinces p WHERE p.name = province_name_var   LIMIT 1 into id_province;
 insert into cities(name, prefix_number,id_province) values (name_var,prefix_var, id_province);
 end // 
-
