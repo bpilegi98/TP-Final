@@ -1,4 +1,5 @@
-﻿﻿SET GLOBAL time_zone = '-3:00';
+﻿﻿﻿SET GLOBAL time_zone = '-3:00';
+SET GLOBAL event_scheduler = ON;
 drop database tpfinal;
 create database tpfinal;
 use tpfinal;
@@ -40,8 +41,8 @@ constraint fk_city_user foreign key (id_city) references cities(id)
 
 create table fees(
 id int auto_increment primary key,
-price_per_minute float,
-cost_per_minute float,
+price_per_minute float default 0,
+cost_per_minute float default 0,
 id_source_city int,
 id_destination_city int,
 constraint fk_source_city_fee foreign key (id_source_city) references cities(id),
@@ -72,10 +73,10 @@ constraint fk_person_invoice foreign key (id_user) references users(id)
 
 create table calls(
 id int auto_increment primary key,
-price_per_minute float,
-duration_secs int,
-total_cost float,
-total_price float,
+price_per_minute float default 0,
+duration_secs int default 0,
+total_cost float default 0,
+total_price float default 0,
 source_number varchar(50),
 id_source_number int,
 destination_number varchar(50),
@@ -100,6 +101,7 @@ constraint fk_call_ic foreign key(id_call) references calls(id)
 -- TRIGGERS
 
 -- TRIGGER de calls
+drop trigger tbi_call_complete_and_check
 DELIMITER // 
 CREATE TRIGGER tbi_call_complete_and_check BEFORE INSERT ON calls FOR EACH ROW
 BEGIN 
@@ -136,9 +138,9 @@ IF (NEW.date_call < (NOW() - INTERVAL 10 DAY)) THEN SIGNAL SQLSTATE '45000' set 
 END IF;
 
 select u.id_city from users u join telephone_lines t on u.id=t.id_user  where t.line_number = NEW.source_number into id_source;
-select u.id_city from users u join telephone_lines t on u.id=t.id_user  where t.line_number = NEW.destination_number into id_source;
+select u.id_city from users u join telephone_lines t on u.id=t.id_user  where t.line_number = NEW.destination_number into id_dest;
 
-select f.price_per_minute, f.cost_per_minute
+select IFNULL(f.price_per_minute,2), IFNULL(f.cost_per_minute,1)
 from fees f
 where (f.id_source_city = id_source) and (f.id_destination_city = id_dest) into ppp,cpp;
 
@@ -268,33 +270,53 @@ insert into telephone_lines (line_number, line_type, id_user, status) values ('2
 insert into telephone_lines (line_number, line_type, id_user, status) values ('2914738495', 'RESIDENTIAL', 4, 'ACTIVE');
 end //
 
+-- Script de cargar llamadas 
 delimiter //
-create procedure add_calls()
+create procedure add_x_calls(in x_calls int)
 begin
-insert into calls (source_number, destination_number, duration_secs, date_call) values ('2236784509', '2235436785', 160,'2020-06-23');
-insert into calls (source_number, destination_number, duration_secs, date_call) values ('2236784509', '2215908654', 60,'2020-06-20');
-insert into calls (source_number, destination_number, duration_secs, date_call) values ('2236784509', '2235436785', 60,'2020-06-20');
-insert into calls (source_number, destination_number, duration_secs, date_call) values ('2236784509', '115098521', 120,'2020-06-21');
-insert into calls (source_number, destination_number, duration_secs, date_call) values ('2236784509', '115098521', 180,'2020-06-22');
-insert into calls (source_number, destination_number, duration_secs, date_call) values ('2236784509', '115098521', 30,'2020-06-22');
+declare total_lines int;
+declare i int default 0;
+declare total_cities int;
+declare actual_date date;
+declare source_number_var varchar(30);
+declare destination_number_var varchar(30) default 0;
+declare duration_var int default 0;
+
+SET actual_date = (select DATE(now()));
+SET total_lines = (select count(id) from telephone_lines);
+
+start transaction;
+	while i < x_calls do
+		set source_number_var = (SELECT line_number from telephone_lines order by rand() limit 1);
+	
+		while(source_number_var = destination_number_var or destination_number = 0 ) DO
+			set destination_number_var = (SELECT line_number from telephone_lines order by rand() limit 1);
+		end while;
+	
+		set duration_var = (select ROUND((50+ rand()*4000),0));
+		insert into calls (source_number, destination_number, duration_secs, date_call) values (source_number_var, destination_number_var, duration_var, actual_date);
+		set i=i+1;
+      set destination_number_var = 0;
+	end while;
+commit;
 end //
 
 delimiter //
 create procedure add_invoices()
 begin
-insert into invoices (total_price, total_cost, date_creation, date_expiration, id_telephone_line, id_user, paid) values (23.3, 7.68, '2020-05-30', '2020-06-15', 1, 1, false);
+insert into invoices (total_price, total_cost, date_creation, date_expiration, id_telephone_line, id_user, paid) values (23.3, 7.68, '2020-05-30', '2020-06-15', 2, 1, false);
 end //
-
 
 -- CALL STORED PROCEDURES
 
 call add_country_provinces_cities();
 call create_provinces();
+-- ////////////////////////////////////////////////////////
 -- script de java 
 call add_users();
 call add_telephone_lines();
 call add_fees();
-call add_calls();
+call add_x_calls(50);
 call add_invoices();
 
 
@@ -550,3 +572,135 @@ declare id_province int;
 SELECT p.id FROM provinces p WHERE p.name = province_name_var   LIMIT 1 into id_province;
 insert into cities(name, prefix_number,id_province) values (name_var,prefix_var, id_province);
 end // 
+i) Número de origen
+ii) Ciudad de origen
+iii) Número de destino
+iv) Ciudad de destino
+v) Precio total
+vi) Duración
+vii) Fecha y hora de llamada.
+delimiter // 
+create procedure show_calls_user(IN id_user int)
+begin
+select c.source_number as "Numero de origen" , (select name from cities where id=c.id_source_number) as "Ciudad de origen" , c.destination_number as "Numero de destino" , (select name from cities where id=c.id_destination_number) as "Ciudad de destino" , c.total_price as "Precio total", c.date_call as "Fecha y hora" 
+from calls c
+join telephone_lines t 
+on c.source_number = t.line_number
+where  t.id_user = id_user;
+end //	
+drop procedure show_calls_user;
+
+delimiter // 
+create procedure show_calls_telephone(IN telephone varchar(30))
+begin
+select c.source_number as "Numero de origen" , (select name from cities where id=c.id_source_number) as "Ciudad de origen" , c.destination_number as "Numero de destino" , (select name from cities where id=c.id_destination_number) as "Ciudad de destino" , c.total_price as "Precio total", c.date_call as "Fecha y hora" 
+from calls c
+where c.source_number = telephone;
+end //	
+
+call show_calls_user(1);
+call show_calls_telephone("2236784509");
+
+insert into invoices (total_price, total_cost, date_creation, date_expiration, id_telephone_line, id_user, paid) values (23.3, 7.68, '2020-05-30', '2020-06-15', 2, 1, false);
+
+DROP  PROCEDURE listar_jugadores;
+DELIMITER //
+CREATE PROCEDURE listar_jugadores()
+BEGIN
+DECLARE vId_Jugador int;
+DECLARE vEquipo varchar(50);
+DECLARE vNombre varchar(50);
+DECLARE vApellido varchar(50);
+DECLARE vFinished INTEGER DEFAULT 0;
+DECLARE output varchar(5000);
+
+DECLARE cur_jugadores CURSOR FOR 
+SELECT j.id_jugador, j.nombre, j.apellido, e.nombre_equipo as "equipo"
+FROM jugadores j
+JOIN equipos e
+ON j.id_equipo =e.id_equipo
+GROUP BY j.id_jugador;
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET vfinished=1;
+OPEN cur_jugadores;
+
+get_jugadores : LOOP
+FETCH cur_jugadores INTO vId_jugador,vNombre,vApellido,vEquipo;
+IF vFinished =1 THEN 
+	LEAVE get_jugadores;
+ELSE 
+	IF (ISNULL(output)) THEN 
+		SELECT CONCAT(vId_jugador,", jugador: ",vNombre," ",vApellido,". Equipo: ",vEquipo) INTO output;
+	ELSE
+		SELECT CONCAT(output,vId_jugador,", jugador: ",vNombre," ",vApellido,". Equipo: ",vEquipo) INTO output ;
+	END IF;
+END IF;
+
+END LOOP get_jugadores;
+CLOSE cur_jugadores;
+SELECT output;
+END//
+
+call facturation()
+drop procedure facturation
+DELIMITER //
+CREATE PROCEDURE facturation()
+begin
+DECLARE total_price_var float;
+DECLARE total_price_sum float DEFAULT 0;
+DECLARE total_cost_var float;
+DECLARE total_cost_sum float DEFAULT 0;
+DECLARE date_creation_var date;
+DECLARE date_expiration_var date;
+DECLARE id_telephone_line_var int;
+DECLARE id_user_var int;
+DECLARE id_source_number_call int;
+DECLARE vFinished INTEGER DEFAULT 0;
+
+DECLARE cur_telephone_lines CURSOR FOR 
+SELECT id, id_user
+FROM telephone_lines;
+DECLARE cur_calls CURSOR FOR 
+SELECT total_cost, total_price,id_source_number
+FROM calls
+WHERE date_call > (DATE(now()) - INTERVAL 1 MONTH);
+
+DECLARE CONTINUE HANDLER FOR NOT FOUND 
+SET vfinished=1;
+
+SET date_creation_var = (select DATE(now()));
+SET date_expiration_var =(select (DATE(now()) + INTERVAL 1 MONTH));
+
+OPEN cur_telephone_lines;
+  LOOP1: LOOP
+    FETCH cur_telephone_lines INTO id_telephone_line_var, id_user_var;
+    IF vfinished =1 THEN
+      LEAVE LOOP1;
+    END IF;
+    OPEN cur_calls;
+    LOOP2: LOOP
+      FETCH cur_calls INTO total_cost_var, total_price_var,id_source_number_call;
+        IF vfinished = 1 THEN
+			SET vfinished =0;
+          LEAVE LOOP2;
+		ELSE 
+			IF (id_source_number_call = id_telephone_line_var) THEN
+				SET total_cost_sum = total_cost_sum + total_cost_var;
+                SET total_price_sum = total_price_sum + total_price_var;
+			END IF;
+        END IF;
+	SET vfinished =0;
+    END LOOP LOOP2;
+    IF (total_price_sum >0) THEN
+		INSERT INTO invoices (total_price, total_cost, date_creation, date_expiration, paid, id_telephone_line, id_user)
+        values (total_price_sum, total_cost_sum, date_creation_var, date_expiration_var, 0, id_telephone_line_var, id_user_var);
+        SET total_price_sum =0;
+		SET total_cost_sum =0;
+	END IF;
+	CLOSE cur_calls;
+  END LOOP LOOP1;
+  CLOSE cur_telephone_lines;
+end //
+
+CREATE EVENT facturation_event
+ON SCHEDULE EVERY 1 MONTH STARTS '2020-07-01 00:00:00'
+DO CALL facturation();
