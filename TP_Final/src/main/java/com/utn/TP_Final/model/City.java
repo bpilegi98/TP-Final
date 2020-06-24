@@ -46,4 +46,11 @@ public class City {
         this.name = name;
         this.prefixNumber = prefixNumber;
     }
+
+    public City(String name, String prefixNumber, Province province){
+        this.name = name;
+        this.prefixNumber = prefixNumber;
+        this.province = province;
+
+    }
 }

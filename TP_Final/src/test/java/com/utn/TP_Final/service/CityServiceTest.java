@@ -20,6 +20,8 @@ public class CityServiceTest {
 
     @Autowired
     CityService cityService;
+    @Mock
+    ProvinceRepository provinceRepository;
 
     @Mock
     CityRepository cityRepository;
@@ -28,7 +30,7 @@ public class CityServiceTest {
     public void setUp()
     {
         initMocks(this);
-        cityService = new CityService(cityRepository);
+        cityService = new CityService(cityRepository,provinceRepository);
     }
 
     @Test

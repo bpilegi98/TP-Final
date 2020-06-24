@@ -5,6 +5,7 @@ import com.utn.TP_Final.service.CityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,5 +43,10 @@ public class CityController {
     public City getByPrefix(@RequestParam(required = true)String prefix)
     {
         return cityService.getByPrefix(prefix);
+    }
+
+    @GetMapping("/script")
+    public void uploadCities() throws IOException {
+        cityService.uploadCites();
     }
 }

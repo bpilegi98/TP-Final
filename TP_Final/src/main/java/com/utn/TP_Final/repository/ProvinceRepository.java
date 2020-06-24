@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface ProvinceRepository extends JpaRepository<Province, Integer> {
 
-    @Query(value = "select * from provinces where name = ?1", nativeQuery = true)
+   // @Query(value = "select * from provinces where name = ?1", nativeQuery = true)
     List<Province> findByName(String name);
 }

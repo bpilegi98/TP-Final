@@ -1,4 +1,4 @@
-SET GLOBAL time_zone = '-3:00';
+﻿SET GLOBAL time_zone = '-3:00';
 drop database tpfinal;
 create database tpfinal;
 use tpfinal;
@@ -57,7 +57,6 @@ id_user int,
 constraint fk_person_telephone_line foreign key (id_user) references users(id)
 );
 
-
 create table invoices(
 id int auto_increment primary key,
 total_price float,
@@ -105,6 +104,36 @@ constraint fk_call_ic foreign key(id_call) references calls(id)
 -- STORED PROCEDURES
 
 delimiter //
+create procedure create_provinces()
+begin
+insert into provinces (name,id_country) 
+values 
+("Buenos Aires",1),
+("Catamarca",1) ,
+("Chaco",1) , 
+("Chubut",1) ,
+("Cordoba",1) ,
+("Corrientes",1) ,
+("Entre Rios",1) , 
+("Formosa",1) , 
+("Jujuy",1) ,   
+("La Pampa",1) , 
+("La Rioja",1) ,
+("Mendoza",1) ,    
+("Misiones",1) ,
+("Neuquen",1) , 
+("Rio Negro",1) ,
+("Salta",1) ,  
+("San Juan",1) , 
+("San Luis",1) ,
+("Santa Cruz",1) ,   
+("Santa Fe",1) , 
+("Santiago del Estero",1) ,      
+("Tierra del Fuego",1) , 
+("Tucuman",1);              
+end //     
+
+delimiter //
 create procedure add_users()
 begin
 insert into users(firstname, lastname, dni, username, password, id_city, user_type,is_active) values ('bianca', 'pilegi', '41307541', 'bpilegi98','1234', 1, 'CUSTOMER',true);
@@ -114,28 +143,45 @@ insert into users(firstname, lastname, dni, username, password, id_city, user_ty
 insert into users(firstname, lastname, dni, username, password, id_city, user_type,is_active) values ('fisrtname3', 'lastname3', '3333333', 'username3', 'password3', 4, 'CUSTOMER',true);
 insert into users(firstname, lastname, dni, username, password, id_city, user_type,is_active) values ('fisrtname4', 'lastname4', '4444444', 'username4', 'password4', 2, 'CUSTOMER',true);
 end //
-
+drop procedure add_fees
 delimiter //
 create procedure add_fees()
 begin
-insert into fees (id_source_city, id_destination_city, price_per_minute, cost_per_minute) values (1, 2, 3, 1);
-insert into fees (id_source_city, id_destination_city, price_per_minute, cost_per_minute) values (2, 1, 3, 1);
-insert into fees (id_source_city, id_destination_city, price_per_minute, cost_per_minute) values (1, 3, 5, 2);
-insert into fees (id_source_city, id_destination_city, price_per_minute, cost_per_minute) values (3, 1, 5, 2);
-insert into fees (id_source_city, id_destination_city, price_per_minute, cost_per_minute) values (1, 4, 1, 0.25);
-insert into fees (id_source_city, id_destination_city, price_per_minute, cost_per_minute) values (4, 1, 1, 0.25);
-insert into fees (id_source_city, id_destination_city, price_per_minute, cost_per_minute) values (2, 3, 2, 1);
-insert into fees (id_source_city, id_destination_city, price_per_minute, cost_per_minute) values (3, 2, 2, 1);
-insert into fees (id_source_city, id_destination_city, price_per_minute, cost_per_minute) values (2, 4, 4.5, 2);
-insert into fees (id_source_city, id_destination_city, price_per_minute, cost_per_minute) values (4, 2, 4.5, 2);
-insert into fees (id_source_city, id_destination_city, price_per_minute, cost_per_minute) values (3, 4, 6, 2.5);
-insert into fees (id_source_city, id_destination_city, price_per_minute, cost_per_minute) values (4, 3, 6, 2.5);
-insert into fees (id_source_city, id_destination_city, price_per_minute, cost_per_minute) values (1, 1, 0.5, 0.05);
-insert into fees (id_source_city, id_destination_city, price_per_minute, cost_per_minute) values (2, 2, 0.5, 0.05);
-insert into fees (id_source_city, id_destination_city, price_per_minute, cost_per_minute) values (3, 3, 0.5, 0.05);
-insert into fees (id_source_city, id_destination_city, price_per_minute, cost_per_minute) values (4, 4, 0.5, 0.05);
-end //
 
+declare i int;
+declare j int;
+declare total_cities int;
+declare aux_ppm float;
+declare aux_cpm float;
+
+-- SET total_cities = (select count(id) from cities);
+SET total_cities = 250;
+SET i = 1;
+set j=1;
+set aux_ppm = 0;
+set aux_cpm = 0;
+
+truncate table fees;
+    start transaction;
+
+while i < total_cities do
+		while j < total_cities do
+			set aux_ppm = (select TRUNCATE (((50 + (rand() * 250))/100), 2));	
+			set aux_cpm = (select TRUNCATE (aux_ppm * TRUNCATE (((20 + (rand() * 80))/100), 2),2));
+			insert into fees (price_per_minute,cost_per_minute,id_source_city,id_destination_city) values ( aux_ppm, aux_cpm,i,j);
+			set j=j+1;
+		end while;
+
+	set i=i+1;
+	set j=1;
+end while;
+	commit;
+end //
+call add_fees()
+
+select * from fees
+50 250
+select count(id) from cities
 
 delimiter //
 create procedure add_telephone_lines()
@@ -149,21 +195,20 @@ insert into telephone_lines (line_number, line_type, id_user, status) values ('1
 insert into telephone_lines (line_number, line_type, id_user, status) values ('2234678564', 'RESIDENTIAL', 1, 'ACTIVE');
 insert into telephone_lines (line_number, line_type, id_user, status) values ('2914738495', 'RESIDENTIAL', 4, 'ACTIVE');
 end //
-
+select * from telephone_lines
+select * from cities where id = 190
+select * from calls
 delimiter //
 create procedure add_calls()
 begin
-insert into calls (source_number, id_source_number, destination_number, id_destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', 1, '2235436785', 2, 0.5, 160, 0.13, 1.3,'2020-06-01' , 1, 1);
-insert into calls (source_number, id_source_number, destination_number, id_destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', 1, '2215908654', 3, 5, 60, 2, 5, '2020-06-05', 1, 3);
-insert into calls (source_number, id_source_number, destination_number, id_destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', 1, '2235436785', 2, 0.5, 60, 0.05, 0.5, '2020-06-09', 1, 1);
-insert into calls (source_number, id_source_number, destination_number, id_destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', 1, '115098521', 3, 3,120, 2, 6, '2020-06-09', 1, 2);
-insert into calls (source_number, id_source_number, destination_number, id_destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', 1, '115098521', 3, 3,180, 3, 9, '2020-06-11', 1, 2);
-insert into calls (source_number, id_source_number, destination_number, id_destination_number, price_per_minute, duration_secs, total_cost, total_price, date_call, id_source_city, id_destination_city) values ('2236784509', 1, '115098521', 3, 1.5,30, 0.5, 1.5, '2020-06-13', 1, 2);
+insert into calls (source_number, destination_number, duration_secs, date_call) values ('2236784509', '2235436785', 160,'2020-06-23');
+insert into calls (source_number, destination_number, duration_secs, date_call) values ('2236784509', '2215908654', 60,'2020-06-20');
+insert into calls (source_number, destination_number, duration_secs, date_call) values ('2236784509', '2235436785', 60,'2020-06-20');
+insert into calls (source_number, destination_number, duration_secs, date_call) values ('2236784509', '115098521', 120,'2020-06-21');
+insert into calls (source_number, destination_number, duration_secs, date_call) values ('2236784509', '115098521', 180,'2020-06-22');
+insert into calls (source_number, destination_number, duration_secs, date_call) values ('2236784509', '115098521', 30,'2020-06-22');
 end //
-
-select * from calls
-select * from telephone_lines
-select * from users
+183 146 1
 delimiter //
 create procedure add_invoices()
 begin
@@ -174,23 +219,21 @@ delimiter //
 create procedure add_country_provinces_cities()
 begin
 insert into countries (name) values ('Argentina');
-
-insert into provinces(name,id_country) values('Buenos Aires',1);
-
-insert into cities(name, prefix_number, id_province) values ('Mar del plata', '223',1),('Buenos Aires','11',1),('La Plata','221',1),('Bahia Blanca','291',1);
 end //
 
 
 -- CALL STORED PROCEDURES
 
 call add_country_provinces_cities();
+call create_provinces();
+
 call add_users();
 call add_telephone_lines();
 call add_fees();
 call add_invoices();
 call add_calls();
 
-
+select * from cities where name = "mar del plata"
 
 
 
@@ -452,7 +495,6 @@ end //
 -- La tarifa y las localidades de destino deberán calcularse al momento de guardar la
 -- llamada y no será recibido por la API REST.
 
-select * from calls
 
 -- TRIGGER de calls
 drop trigger tbi_call_complete_and_check
@@ -490,11 +532,8 @@ END IF;
 IF (NEW.date_call < (NOW() - INTERVAL 10 DAY)) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'La fecha tiene no puede ser anterior a 10 dias', mysql_errno = 1000;
 END IF;
 
-
-SELECT c.id FROM cities c WHERE new.source_number LIKE CONCAT(c.prefix_number, '%') ORDER BY LENGTH(c.prefix_number) DESC LIMIT 1 into id_source;
-
-SELECT c.id FROM cities c WHERE new.destination_number LIKE CONCAT(c.prefix_number, '%') ORDER BY LENGTH(c.prefix_number) DESC LIMIT 1 into id_dest;
-
+select u.id_city from users u join telephone_lines t on u.id=t.id_user  where t.line_number = NEW.source_number into id_source;
+select u.id_city from users u join telephone_lines t on u.id=t.id_user  where t.line_number = NEW.destination_number into id_source;
 
 select f.price_per_minute, f.cost_per_minute
 from fees f
@@ -526,8 +565,21 @@ end //
 
 call add_call_aerial("2236784509", "2235436785", 120, "2020-06-20");
 
-select * from calls
+drop trigger tbi_new_city
+DELIMITER // 
+CREATE TRIGGER tbi_new_city BEFORE INSERT ON cities FOR EACH ROW
+BEGIN 
+IF EXISTS (select * 
+FROM cities c
+WHERE NEW.name = c.name) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'La ciudad que desea ingresar ya existe', mysql_errno = 1000;
+END if;
+END//
 
-delete from calls where id = 9
-
+delimiter // 
+create procedure insert_city(IN name_var varchar(50),IN prefix_var varchar (10), IN province_name_var varchar (50))
+begin
+declare id_province int;
+SELECT p.id FROM provinces p WHERE p.name = province_name_var   LIMIT 1 into id_province;
+insert into cities(name, prefix_number,id_province) values (name_var,prefix_var, id_province);
+end // 
 
