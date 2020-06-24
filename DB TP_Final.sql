@@ -1,5 +1,5 @@
-﻿﻿﻿SET GLOBAL time_zone = '-3:00';
-SET GLOBAL event_scheduler = ON;
+﻿﻿﻿SET GLOBAL event_scheduler = ON;
+SET GLOBAL time_zone = '-3:00';
 drop database tpfinal;
 create database tpfinal;
 use tpfinal;
@@ -90,18 +90,9 @@ constraint fk_id_source_city_call foreign key (id_source_city) references cities
 constraint fk_id_destination_city_call foreign key (id_destination_city) references cities(id)
 );
 
-create table invoice_calls(
-id int auto_increment primary key,
-id_invoice int,
-id_call int,
-constraint fk_invoice_ic foreign key(id_invoice) references invoices(id),
-constraint fk_call_ic foreign key(id_call) references calls(id)
-)
-
 -- TRIGGERS
 
 -- TRIGGER de calls
-drop trigger tbi_call_complete_and_check
 DELIMITER // 
 CREATE TRIGGER tbi_call_complete_and_check BEFORE INSERT ON calls FOR EACH ROW
 BEGIN 
@@ -158,14 +149,7 @@ SET NEW.id_source_city = id_source;
 SET NEW.id_destination_city = id_dest;
 END//
 
-DELIMITER // 
-CREATE TRIGGER tbi_new_city BEFORE INSERT ON cities FOR EACH ROW
-BEGIN 
-IF EXISTS (select * 
-FROM cities c
-WHERE NEW.name = c.name) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'La ciudad que desea ingresar ya existe', mysql_errno = 1000;
-END if;
-END//
+
 
 -- ///STORED PROCEDURES///
 
@@ -174,6 +158,7 @@ create procedure add_country()
 begin
 insert into countries (name) values ('Argentina');
 end //
+
 
 delimiter //
 create procedure create_provinces()
@@ -255,7 +240,6 @@ while i < total_cities do
 end while;
 	commit;
 end //
-call add_fees()
 
 delimiter //
 create procedure add_telephone_lines()
@@ -289,7 +273,7 @@ start transaction;
 	while i < x_calls do
 		set source_number_var = (SELECT line_number from telephone_lines order by rand() limit 1);
 	
-		while(source_number_var = destination_number_var or destination_number = 0 ) DO
+		while(source_number_var = destination_number_var or destination_number_var = 0 ) DO
 			set destination_number_var = (SELECT line_number from telephone_lines order by rand() limit 1);
 		end while;
 	
@@ -309,7 +293,8 @@ end //
 
 -- CALL STORED PROCEDURES
 
-call add_country_provinces_cities();
+
+call add_country();
 call create_provinces();
 -- ////////////////////////////////////////////////////////
 -- script de java 
@@ -317,7 +302,16 @@ call add_users();
 call add_telephone_lines();
 call add_fees();
 call add_x_calls(50);
-call add_invoices();
+-- call add_invoices();
+
+DELIMITER // 
+CREATE TRIGGER tbi_new_city BEFORE INSERT ON cities FOR EACH ROW
+BEGIN 
+IF EXISTS (select * 
+FROM cities c
+WHERE NEW.name = c.name) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'La ciudad que desea ingresar ya existe', mysql_errno = 1000;
+END if;
+END//
 
 
 -- Devolver el numero al que más llamó un usuario
