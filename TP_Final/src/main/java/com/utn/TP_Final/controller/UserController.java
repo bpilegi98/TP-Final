@@ -98,9 +98,9 @@ public class UserController {
 
 
     @GetMapping("/getTopMostCalledDestinations")
-    public List<TopMostCalledDestinations> getTopMostCalledDestinatons(Integer idLoggedUser)throws UserNotExistsException, ValidationException
+    public List<TopMostCalledDestinations> getTopMostCalledDestinations(Integer idLoggedUser)throws UserNotExistsException, ValidationException
     {
-        return userService.getTopMostCalledDestinationds(idLoggedUser);
+        return userService.getTopMostCalledDestinations(idLoggedUser);
     }
 
 

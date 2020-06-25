@@ -45,8 +45,10 @@ public class CityController {
         return cityService.getByPrefix(prefix);
     }
 
+    /* Método cargar ciudades
     @GetMapping("/script")
     public void uploadCities() throws IOException {
         cityService.uploadCites();
     }
+     */
 }

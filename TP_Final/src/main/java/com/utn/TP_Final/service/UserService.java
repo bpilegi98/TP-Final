@@ -43,12 +43,12 @@ public class UserService {
         return userRepository.findByLastname(name);
     }
 
-    public User getByDni(String dni)
+    public User getByDni(String dni) throws UserNotExistsException
     {
         return userRepository.findByDni(dni);
     }
 
-    public User getByLineNumber(String lineNumber)
+    public User getByLineNumber(String lineNumber) throws UserNotExistsException
     {
         return userRepository.findByLineNumber(lineNumber);
     }
@@ -58,7 +58,7 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public User getByUsername(String username, String password)
+    public User getByUsername(String username, String password) throws UserNotExistsException
     {
         return userRepository.findByUsername(username, password);
     }
@@ -78,7 +78,7 @@ public class UserService {
         return userRepository.getInvoicesBetweenDates(from, to, idLoggedUser);
     }
 
-    public List<TopMostCalledDestinations> getTopMostCalledDestinationds(Integer idLoggedUser)
+    public List<TopMostCalledDestinations> getTopMostCalledDestinations(Integer idLoggedUser)
     {
         return userRepository.getTopMostCalledDestinations(idLoggedUser);
     }

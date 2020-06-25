@@ -1,6 +1,8 @@
 package com.utn.TP_Final.service;
 
 
+import com.utn.TP_Final.exceptions.CountryNotExistsException;
+import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.Country;
 import com.utn.TP_Final.repository.CountryRepository;
 import org.springframework.stereotype.Service;
@@ -40,9 +42,9 @@ public class CountryService {
         return countryRepository.findByName(name);
     }
 
-    public Optional<Country> findById(Integer id)
+    public Optional<Country> findById(Integer id) throws CountryNotExistsException, ValidationException
     {
         return countryRepository.findById(id);
-    }
 
+    }
 }

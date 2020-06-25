@@ -84,7 +84,7 @@ public class CustomerWebController {
         {
             User currentUser = sessionManager.getLoggedUser(sessionToken);
 
-            List<TopMostCalledDestinations> topMostCalledDestinations = userController.getTopMostCalledDestinatons(currentUser.getId());
+            List<TopMostCalledDestinations> topMostCalledDestinations = userController.getTopMostCalledDestinations(currentUser.getId());
             return (topMostCalledDestinations.size() > 0) ? ResponseEntity.ok(topMostCalledDestinations) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         catch (UserNotExistsException e)

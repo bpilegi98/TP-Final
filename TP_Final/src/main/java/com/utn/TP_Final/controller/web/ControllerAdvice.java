@@ -80,4 +80,12 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler {
     {
         return new ErrorDto(10, "Country doesn't exists");
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ProvinceNotExistsException.class)
+    public ErrorDto handlerProvinceNotExists()
+    {
+        return new ErrorDto(11, "Province doesn't exists");
+    }
+
 }

@@ -38,6 +38,12 @@ public class CountryController {
     @GetMapping("/{id}")
     public Optional<Country> getById(@RequestParam(required = true)Integer id) throws CountryNotExistsException, ValidationException
     {
-        return countryService.findById(id);
+        try {
+            return countryService.findById(id);
+        }
+        catch (CountryNotExistsException e)
+        {
+            throw new ValidationException(e.getMessage());
+        }
     }
 }

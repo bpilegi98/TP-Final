@@ -1,4 +1,4 @@
-﻿﻿﻿SET GLOBAL event_scheduler = ON;
+SET GLOBAL event_scheduler = ON;
 SET GLOBAL time_zone = '-3:00';
 drop database tpfinal;
 create database tpfinal;
@@ -596,43 +596,6 @@ call show_calls_user(1);
 call show_calls_telephone("2236784509");
 
 insert into invoices (total_price, total_cost, date_creation, date_expiration, id_telephone_line, id_user, paid) values (23.3, 7.68, '2020-05-30', '2020-06-15', 2, 1, false);
-
-DROP  PROCEDURE listar_jugadores;
-DELIMITER //
-CREATE PROCEDURE listar_jugadores()
-BEGIN
-DECLARE vId_Jugador int;
-DECLARE vEquipo varchar(50);
-DECLARE vNombre varchar(50);
-DECLARE vApellido varchar(50);
-DECLARE vFinished INTEGER DEFAULT 0;
-DECLARE output varchar(5000);
-
-DECLARE cur_jugadores CURSOR FOR 
-SELECT j.id_jugador, j.nombre, j.apellido, e.nombre_equipo as "equipo"
-FROM jugadores j
-JOIN equipos e
-ON j.id_equipo =e.id_equipo
-GROUP BY j.id_jugador;
-DECLARE CONTINUE HANDLER FOR NOT FOUND SET vfinished=1;
-OPEN cur_jugadores;
-
-get_jugadores : LOOP
-FETCH cur_jugadores INTO vId_jugador,vNombre,vApellido,vEquipo;
-IF vFinished =1 THEN 
-	LEAVE get_jugadores;
-ELSE 
-	IF (ISNULL(output)) THEN 
-		SELECT CONCAT(vId_jugador,", jugador: ",vNombre," ",vApellido,". Equipo: ",vEquipo) INTO output;
-	ELSE
-		SELECT CONCAT(output,vId_jugador,", jugador: ",vNombre," ",vApellido,". Equipo: ",vEquipo) INTO output ;
-	END IF;
-END IF;
-
-END LOOP get_jugadores;
-CLOSE cur_jugadores;
-SELECT output;
-END//
 
 call facturation()
 drop procedure facturation

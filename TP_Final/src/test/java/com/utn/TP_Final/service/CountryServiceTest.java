@@ -51,12 +51,28 @@ public class CountryServiceTest {
     }
 
     @Test
-    public void findByIdOk() throws CountryNotExistsException, ValidationException
+    public void getByIdOk() throws CountryNotExistsException, ValidationException
     {
         Country country = new Country(1, "Argentina", null);
-        when(countryRepository.findById(1)).thenReturn(Optional.of(country));
-        Optional<Country> resultCountry = countryService.findById(1);
-        // no me deja hacer el .getId() porque es Optional :C
-        // assertEquals(country.getId(), resultCountry.);
+        Country country2 = new Country(2, "Uruguay", null);
+        List<Country> countries = new ArrayList<Country>();
+        countries.add(country);
+        countries.add(country2);
+
+        Optional<Country> countryOptional = Optional.ofNullable(countries.get(0));
+
+        when(countryRepository.findById(1)).thenReturn(countryOptional);
+
+        Optional<Country> countryResult = countryService.findById(1);
+
+        assertEquals(countryOptional, countryResult);
+        verify(countryRepository, times(1)).findById(1);
+    }
+
+    @Test(expected = CountryNotExistsException.class)
+    public void getByIdCountryNotExists() throws CountryNotExistsException, ValidationException
+    {
+        when(countryRepository.findById(1)).thenReturn(null);
+        countryService.findById(1);
     }
 }

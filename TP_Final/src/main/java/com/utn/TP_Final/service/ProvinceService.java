@@ -1,5 +1,7 @@
 package com.utn.TP_Final.service;
 
+import com.utn.TP_Final.exceptions.ProvinceNotExistsException;
+import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.Province;
 import com.utn.TP_Final.repository.ProvinceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +41,7 @@ public class ProvinceService {
         return provinceRepository.findByName(name);
     }
 
-    public Optional<Province> getById(Integer id)
+    public Optional<Province> getById(Integer id) throws ProvinceNotExistsException, ValidationException
     {
         return provinceRepository.findById(id);
     }

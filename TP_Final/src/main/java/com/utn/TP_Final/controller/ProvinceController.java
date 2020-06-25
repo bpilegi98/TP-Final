@@ -1,6 +1,8 @@
 package com.utn.TP_Final.controller;
 
 
+import com.utn.TP_Final.exceptions.ProvinceNotExistsException;
+import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.Province;
 import com.utn.TP_Final.service.ProvinceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +35,15 @@ public class ProvinceController {
     }
 
     @GetMapping("/{id}")
-    public Optional<Province> getById(@RequestParam(required = true)Integer id)
+    public Optional<Province> getById(@RequestParam(required = true)Integer id) throws ProvinceNotExistsException, ValidationException
     {
-        return provinceService.getById(id);
+        try
+        {
+            return provinceService.getById(id);
+        }
+        catch (ProvinceNotExistsException e)
+        {
+            throw new ValidationException(e.getMessage());
+        }
     }
 }
