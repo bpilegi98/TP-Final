@@ -88,4 +88,31 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler {
         return new ErrorDto(11, "Province doesn't exists");
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(FeeNotExistsException.class)
+    public ErrorDto handlerFeeNotExists()
+    {
+        return new ErrorDto(12, "Fee doesn't exists");
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(FeeAlreadyExistsException.class)
+    public ErrorDto handlerFeeAlreadyExists()
+    {
+        return new ErrorDto(13, "Fee already exists");
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(CallNotExistsException.class)
+    public ErrorDto handlerCallNotExists()
+    {
+        return new ErrorDto(14, "Call doesn't exists");
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(InvoiceNotExistsException.class)
+    private ErrorDto handlerInvoiceNotExists()
+    {
+        return new ErrorDto(15, "Invoice doesn't exists");
+    }
 }

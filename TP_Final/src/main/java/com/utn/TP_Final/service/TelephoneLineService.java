@@ -1,11 +1,15 @@
 package com.utn.TP_Final.service;
 
+import com.utn.TP_Final.exceptions.TelephoneLineAlreadyExistsException;
+import com.utn.TP_Final.exceptions.TelephoneLineNotExistsException;
 import com.utn.TP_Final.model.TelephoneLine;
 import com.utn.TP_Final.repository.TelephoneLineRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Objects.isNull;
 
@@ -19,13 +23,16 @@ public class TelephoneLineService {
         this.telephoneLineRepository = telephoneLineRepository;
     }
 
-    public void addTelephoneLine(TelephoneLine newTelephoneLine){
-        telephoneLineRepository.save(newTelephoneLine);
+    public TelephoneLine addTelephoneLine(TelephoneLine newTelephoneLine) throws TelephoneLineAlreadyExistsException
+    {
+        TelephoneLine telephoneLine = telephoneLineRepository.save(newTelephoneLine);
+        return Optional.ofNullable(telephoneLine).orElseThrow(()-> new TelephoneLineAlreadyExistsException());
     }
 
-    public void deleteTelephoneLine(String lineNumber)
+    public TelephoneLine deleteTelephoneLine(String lineNumber) throws TelephoneLineNotExistsException
     {
-        telephoneLineRepository.delete(lineNumber);
+        TelephoneLine telephoneLine = telephoneLineRepository.delete(lineNumber);
+        return Optional.ofNullable(telephoneLine).orElseThrow(()-> new TelephoneLineNotExistsException());
     }
 
     public List<TelephoneLine> getAll(String lineNumber)
@@ -34,20 +41,26 @@ public class TelephoneLineService {
         {
             return telephoneLineRepository.findAll();
         }
-        return telephoneLineRepository.findByLineNumber(lineNumber);
+        List<TelephoneLine> telephoneLines = new ArrayList<TelephoneLine>();
+        telephoneLines.add(telephoneLineRepository.findByLineNumber(lineNumber));
+        return telephoneLines;
     }
 
-    public void suspendTelephoneLine(String lineNumber)
+    public TelephoneLine suspendTelephoneLine(String lineNumber) throws TelephoneLineNotExistsException
     {
-        telephoneLineRepository.suspendTelephoneLine(lineNumber);
+        TelephoneLine telephoneLine = telephoneLineRepository.suspendTelephoneLine(lineNumber);
+        return Optional.ofNullable(telephoneLine).orElseThrow(()-> new TelephoneLineNotExistsException());
     }
 
-    public void activeTelephoneLine(String lineNumber)
+    public TelephoneLine activeTelephoneLine(String lineNumber) throws TelephoneLineNotExistsException
     {
-        telephoneLineRepository.activeTelephoneLine(lineNumber);
+        TelephoneLine telephoneLine = telephoneLineRepository.activeTelephoneLine(lineNumber);
+        return Optional.ofNullable(telephoneLine).orElseThrow(()-> new TelephoneLineNotExistsException());
     }
 
-    public TelephoneLine findByNumber(String number){
-        return  telephoneLineRepository.findByLineNumber(number).get(0);
+    public TelephoneLine findByLineNumber(String number) throws TelephoneLineNotExistsException
+    {
+        TelephoneLine telephoneLine = telephoneLineRepository.findByLineNumber(number);
+        return Optional.ofNullable(telephoneLine).orElseThrow(()-> new TelephoneLineNotExistsException());
     }
 }

@@ -11,19 +11,15 @@ import java.util.List;
 public interface TelephoneLineRepository extends JpaRepository<TelephoneLine, Integer> {
 
     @Query(value = "select * from telephone_lines where line_number = ?1", nativeQuery = true)
-    List<TelephoneLine> findByLineNumber(String lineNumber);
+    TelephoneLine findByLineNumber(String lineNumber);
 
     @Query(value = "remove from telephone_lines where line_number = ?1", nativeQuery = true)
-    void delete(String lineNumber);
+    TelephoneLine delete(String lineNumber);
 
     @Query(value = "update telephone_lines set status = 'SUSPENDED' where line_number = ?1", nativeQuery = true)
-    void suspendTelephoneLine(String lineNumber);
+    TelephoneLine suspendTelephoneLine(String lineNumber);
 
     @Query(value = "update telephone_lines set status = 'ACTIVE' where line_number = ?1", nativeQuery = true)
-    void activeTelephoneLine(String lineNumber);
-
-    //si comentas la query es exactamente lo mismo
-    @Query(value = "select * from telephone_lines where line_number like ?1%",nativeQuery = true)
-    List<TelephoneLine> findByLineNumberStartsWith(String prefix);
+    TelephoneLine activeTelephoneLine(String lineNumber);
 
 }

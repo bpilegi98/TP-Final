@@ -1,5 +1,7 @@
 package com.utn.TP_Final.service;
 
+import com.utn.TP_Final.exceptions.CityAlreadyExistsException;
+import com.utn.TP_Final.exceptions.CityNotExistsException;
 import com.utn.TP_Final.model.City;
 import com.utn.TP_Final.model.Province;
 import com.utn.TP_Final.repository.CityRepository;
@@ -31,14 +33,16 @@ public class CityService {
         this.cityRepository = cityRepository;
     }
 
-    public void addCity(City newCity)
+    public City addCity(City newCity) throws CityAlreadyExistsException
     {
-        cityRepository.save(newCity);
+        City city = cityRepository.save(newCity);
+        return Optional.ofNullable(city).orElseThrow(()-> new CityAlreadyExistsException());
     }
 
-    public void deleteCity(City city)
+    public City deleteCity(Integer id) throws CityNotExistsException
     {
-        cityRepository.delete(city);
+        City city = cityRepository.delete(id);
+        return Optional.ofNullable(city).orElseThrow(()-> new CityNotExistsException());
     }
 
     public List<City> getAll(String name)
@@ -50,14 +54,16 @@ public class CityService {
         return cityRepository.findByName(name);
     }
 
-    public Optional<City> getById(Integer id)
+    public Optional<City> getById(Integer id)throws CityNotExistsException
     {
-        return cityRepository.findById(id);
+        Optional<City> city = cityRepository.findById(id);
+        return Optional.ofNullable(city).orElseThrow(()-> new CityNotExistsException());
     }
 
-    public City getByPrefix(String prefix)
+    public City getByPrefix(String prefix) throws CityNotExistsException
     {
-        return cityRepository.findByPrefix(prefix);
+        City city = cityRepository.findByPrefix(prefix);
+        return Optional.ofNullable(city).orElseThrow(()-> new CityNotExistsException());
     }
 
  /*

@@ -31,6 +31,39 @@ public class TelephoneLineServiceTest {
         telephoneLineService = new TelephoneLineService(telephoneLineRepository);
     }
 
+    @Test
+    public void addTelephoneLineTest() throws TelephoneLineAlreadyExistsException
+    {
+        TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
+        when(telephoneLineRepository.save(telephoneLine)).thenReturn(telephoneLine);
+        TelephoneLine telephoneLineResult = telephoneLineService.addTelephoneLine(telephoneLine);
+        assertEquals(telephoneLine.getLineNumber(), telephoneLineResult.getLineNumber());
+    }
+
+    @Test(expected = TelephoneLineAlreadyExistsException.class)
+    public void addTelephoneLineAlreadyExists() throws TelephoneLineAlreadyExistsException
+    {
+        TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
+        when(telephoneLineRepository.save(telephoneLine)).thenReturn(null);
+        telephoneLineService.addTelephoneLine(telephoneLine);
+    }
+
+    @Test
+    public void deleteTelephoneLineOk() throws TelephoneLineNotExistsException
+    {
+        TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
+        when(telephoneLineRepository.delete(telephoneLine.getLineNumber())).thenReturn(telephoneLine);
+        TelephoneLine telephoneLineResult = telephoneLineService.deleteTelephoneLine(telephoneLine.getLineNumber());
+        assertEquals(telephoneLine, telephoneLineResult);
+    }
+
+    @Test(expected = TelephoneLineNotExistsException.class)
+    public void deleteTelephoneLineNotExists() throws TelephoneLineNotExistsException
+    {
+        TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
+        when(telephoneLineRepository.delete(telephoneLine.getLineNumber())).thenReturn(null);
+        telephoneLineService.deleteTelephoneLine(telephoneLine.getLineNumber());
+    }
 
     @Test
     public void getAllTest()
@@ -47,35 +80,66 @@ public class TelephoneLineServiceTest {
         assertEquals(2, telephoneLineList.size());
         verify(telephoneLineRepository, times(1)).findAll();
     }
-/*
+
+    @Test
+    public void getAllEmptyTest()
+    {
+        List<TelephoneLine> telephoneLines = new ArrayList<TelephoneLine>();
+        when(telephoneLineRepository.findAll()).thenReturn(telephoneLines);
+        List<TelephoneLine> telephoneLinesResult = telephoneLineService.getAll(null);
+        assertEquals(telephoneLines, telephoneLinesResult);
+    }
+
     @Test
     public void suspendTelephoneLineOK() throws TelephoneLineNotExistsException
     {
         LineStatus lineStatus = LineStatus.ACTIVE;
         TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, lineStatus, null);
-
-        when(telephoneLineRepository.suspendTelephoneLine("2235388479")).thenReturn(telephoneLine.setStatus(LineStatus.SUSPENDED));
-
-        TelephoneLine telephoneLineResult = telephoneLineService.suspendTelephoneLine("2235388479");
-
+        when(telephoneLineRepository.suspendTelephoneLine(telephoneLine.getLineNumber())).thenReturn(telephoneLine);
+        TelephoneLine telephoneLineResult = telephoneLineService.suspendTelephoneLine(telephoneLine.getLineNumber());
+        assertEquals(telephoneLine.getStatus(), telephoneLineResult.getStatus());
     }
- */
+
+    @Test(expected = TelephoneLineNotExistsException.class)
+    public void suspendTelephoneLineNotExists() throws TelephoneLineNotExistsException
+    {
+        TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
+        when(telephoneLineRepository.suspendTelephoneLine(telephoneLine.getLineNumber())).thenReturn(null);
+        telephoneLineService.suspendTelephoneLine(telephoneLine.getLineNumber());
+    }
+
+    @Test
+    public void activeTelephoneLineOK() throws TelephoneLineNotExistsException
+    {
+        LineStatus lineStatus = LineStatus.ACTIVE;
+        TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, lineStatus, null);
+        when(telephoneLineRepository.activeTelephoneLine(telephoneLine.getLineNumber())).thenReturn(telephoneLine);
+        TelephoneLine telephoneLineResult = telephoneLineService.activeTelephoneLine(telephoneLine.getLineNumber());
+        assertEquals(telephoneLine.getStatus(), telephoneLineResult.getStatus());
+    }
+
+    @Test(expected = TelephoneLineNotExistsException.class)
+    public void activeTelephoneLineNotExists() throws TelephoneLineNotExistsException
+    {
+        TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
+        when(telephoneLineRepository.activeTelephoneLine(telephoneLine.getLineNumber())).thenReturn(null);
+        telephoneLineService.activeTelephoneLine(telephoneLine.getLineNumber());
+    }
+
 
     @Test
     public void getByNumberOk() throws TelephoneLineNotExistsException
     {
         TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
-
-        //por que castea esto???
-        when(telephoneLineRepository.findByLineNumber("2235388479")).thenReturn((List<TelephoneLine>) telephoneLine);
-        assertEquals(telephoneLineService.findByNumber("2235388479"), telephoneLine);
-        verify(telephoneLineRepository, times(1)).findByLineNumber("2235388479");
+        when(telephoneLineRepository.findByLineNumber(telephoneLine.getLineNumber())).thenReturn(telephoneLine);
+        assertEquals(telephoneLineService.findByLineNumber(telephoneLine.getLineNumber()), telephoneLine);
+        verify(telephoneLineRepository, times(1)).findByLineNumber(telephoneLine.getLineNumber());
     }
 
-    @Test(expected = TelephoneLineAlreadyExistsException.class)
+    @Test(expected = TelephoneLineNotExistsException.class)
     public void getByNumberTelephoneLineNotExists() throws TelephoneLineNotExistsException
     {
         when(telephoneLineRepository.findByLineNumber("2235388479")).thenReturn(null);
-        telephoneLineService.findByNumber("2235388479");
+        telephoneLineService.findByLineNumber("2235388479");
     }
 }

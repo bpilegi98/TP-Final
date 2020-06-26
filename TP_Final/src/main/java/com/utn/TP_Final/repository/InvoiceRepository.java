@@ -1,5 +1,6 @@
 package com.utn.TP_Final.repository;
 
+import com.utn.TP_Final.model.Call;
 import com.utn.TP_Final.model.Invoice;
 import com.utn.TP_Final.projections.InvoiceIncome;
 import com.utn.TP_Final.projections.InvoicesFromUser;
@@ -18,6 +19,9 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
 
     @Query(value = "call backoffice_invoices_from_user(:dni);", nativeQuery = true)
     List<InvoicesFromUser> getInvoicesFromUser(@Param("dni")String dni);
+
+    @Query(value = "remove from invoices where id = ?1", nativeQuery = true)
+    Invoice delete(Integer id);
 
     @Query(value = "call backoffice_invoices_from_user_paid(:dni);", nativeQuery = true)
     List<InvoicesFromUser> getInvoicesPaidFromUser(@Param("dni")String dni);

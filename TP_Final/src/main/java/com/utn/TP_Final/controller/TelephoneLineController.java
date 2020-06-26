@@ -23,38 +23,38 @@ public class TelephoneLineController {
     }
 
     @PostMapping("/")
-    public void addTelephoneLine(@RequestBody TelephoneLine newTelephoneLine) throws TelephoneLineAlreadyExistsException, ValidationException
+    public TelephoneLine addTelephoneLine(@RequestBody TelephoneLine newTelephoneLine) throws TelephoneLineAlreadyExistsException, ValidationException
     {
-        telephoneLineService.addTelephoneLine(newTelephoneLine);
+        return telephoneLineService.addTelephoneLine(newTelephoneLine);
     }
 
     @PostMapping("/delete/{lineNumber}")
-    public void removeTelephoneLine(@RequestBody(required = true)String lineNumber) throws TelephoneLineNotExistsException, ValidationException
+    public TelephoneLine removeTelephoneLine(@PathVariable String lineNumber) throws TelephoneLineNotExistsException, ValidationException
     {
-        telephoneLineService.deleteTelephoneLine(lineNumber);
+        return telephoneLineService.deleteTelephoneLine(lineNumber);
     }
 
     @GetMapping("/")
-    public List<TelephoneLine> getAll(@RequestBody(required = false)String lineNumber)
+    public List<TelephoneLine> getAll(@PathVariable String lineNumber)
     {
         return telephoneLineService.getAll(lineNumber);
     }
 
     @PutMapping("/suspend/{lineNumber}")
-    public void suspendTelephoneLine(@RequestBody(required = true)String lineNumber)throws TelephoneLineNotExistsException, ValidationException
+    public TelephoneLine suspendTelephoneLine(@PathVariable String lineNumber)throws TelephoneLineNotExistsException, ValidationException
     {
-        telephoneLineService.suspendTelephoneLine(lineNumber);
+        return telephoneLineService.suspendTelephoneLine(lineNumber);
     }
 
     @PutMapping("/active/{lineNumber}")
-    public void activeTelephoneLine(@RequestBody(required = true)String lineNumber)throws TelephoneLineNotExistsException, ValidationException
+    public TelephoneLine activeTelephoneLine(@PathVariable String lineNumber)throws TelephoneLineNotExistsException, ValidationException
     {
-        telephoneLineService.activeTelephoneLine(lineNumber);
+        return telephoneLineService.activeTelephoneLine(lineNumber);
     }
 
-    @GetMapping("/findByNumber")
-    public TelephoneLine findByNumber(@RequestParam String number)throws TelephoneLineNotExistsException, ValidationException
+    @GetMapping("/{number}")
+    public TelephoneLine getByNumber(@PathVariable String number)throws TelephoneLineNotExistsException, ValidationException
     {
-        return telephoneLineService.findByNumber(number);
+        return telephoneLineService.findByLineNumber(number);
     }
 }

@@ -1,5 +1,7 @@
 package com.utn.TP_Final.controller;
 
+import com.utn.TP_Final.exceptions.CityAlreadyExistsException;
+import com.utn.TP_Final.exceptions.CityNotExistsException;
 import com.utn.TP_Final.model.City;
 import com.utn.TP_Final.service.CityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +24,13 @@ public class CityController {
     }
 
     @PostMapping("/")
-    public void addCity(@RequestBody City newCity)
-    {
-        cityService.addCity(newCity);
+    public City addCity(@RequestBody City newCity) throws CityAlreadyExistsException {
+       return cityService.addCity(newCity);
+    }
+
+    @PostMapping("/delete/{id}")
+    public City deleteCity(@RequestParam Integer id) throws CityNotExistsException {
+        return cityService.deleteCity(id);
     }
 
     @GetMapping("/")
@@ -33,15 +39,13 @@ public class CityController {
         return cityService.getAll(name);
     }
 
-    @GetMapping("/getById/{id}")
-    public Optional<City> getById(@RequestParam(required = true)Integer id)
-    {
+    @GetMapping("/{id}")
+    public Optional<City> getById(@PathVariable Integer id) throws CityNotExistsException {
         return cityService.getById(id);
     }
 
-    @GetMapping("/getByPrefix/{prefix}")
-    public City getByPrefix(@RequestParam(required = true)String prefix)
-    {
+    @GetMapping("/prefix/{prefix}")
+    public City getByPrefix(@PathVariable String prefix) throws CityNotExistsException {
         return cityService.getByPrefix(prefix);
     }
 

@@ -1,11 +1,9 @@
-package com.utn.TP_Final.service;
+package com.utn.TP_Final.controller;
 
 import com.utn.TP_Final.exceptions.CityAlreadyExistsException;
 import com.utn.TP_Final.exceptions.CityNotExistsException;
 import com.utn.TP_Final.model.City;
-import com.utn.TP_Final.model.Province;
-import com.utn.TP_Final.repository.CityRepository;
-import com.utn.TP_Final.repository.ProvinceRepository;
+import com.utn.TP_Final.service.CityService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -19,29 +17,27 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class CityServiceTest {
+public class CityControllerTest {
 
     @Autowired
-    CityService cityService;
-    @Mock
-    ProvinceRepository provinceRepository;
+    CityController cityController;
 
     @Mock
-    CityRepository cityRepository;
+    CityService cityService;
 
     @Before
     public void setUp()
     {
         initMocks(this);
-        cityService = new CityService(cityRepository,provinceRepository);
+        cityController = new CityController(cityService);
     }
 
     @Test
     public void addCityTest() throws CityAlreadyExistsException
     {
         City city = new City(1, "Mar del Plata", "223", null);
-        when(cityRepository.save(city)).thenReturn(city);
-        City cityResult = cityService.addCity(city);
+        when(cityService.addCity(city)).thenReturn(city);
+        City cityResult = cityController.addCity(city);
         assertEquals(city.getName(), cityResult.getName());
         assertEquals(city.getPrefixNumber(), cityResult.getPrefixNumber());
     }
@@ -50,24 +46,24 @@ public class CityServiceTest {
     public void addCityAlreadyExists() throws CityAlreadyExistsException
     {
         City city = new City(1, "Mar del Plata", "223", null);
-        when(cityRepository.save(city)).thenReturn(null);
-        cityService.addCity(city);
+        when(cityService.addCity(city)).thenReturn(null);
+        cityController.addCity(city);
     }
 
     @Test
     public void deleteCityOk() throws CityNotExistsException
     {
         City city = new City(1, "Mar del Plata", "223", null);
-        when(cityRepository.delete(1)).thenReturn(city);
-        City cityResult = cityService.deleteCity(1);
+        when(cityService.deleteCity(1)).thenReturn(city);
+        City cityResult = cityController.deleteCity(1);
         assertEquals(city, cityResult);
     }
 
     @Test(expected = CityNotExistsException.class)
     public void deleteCityNotExists() throws CityNotExistsException
     {
-        when(cityRepository.delete(1)).thenReturn(null);
-        cityService.deleteCity(1);
+        when(cityService.deleteCity(1)).thenReturn(null);
+        cityController.deleteCity(1);
     }
 
     @Test
@@ -79,19 +75,19 @@ public class CityServiceTest {
         cities.add(city1);
         cities.add(city2);
 
-        when(cityRepository.findAll()).thenReturn(cities);
+        when(cityService.getAll(null)).thenReturn(cities);
 
-        List<City> cityList = cityService.getAll(null);
+        List<City> cityList = cityController.getAll(null);
         assertEquals(2, cityList.size());
-        verify(cityRepository, times(1)).findAll();
+        verify(cityService, times(1)).getAll(null);
     }
 
     @Test
     public void getAllEmptyTest()
     {
         List<City> cities = new ArrayList<City>();
-        when(cityRepository.findAll()).thenReturn(cities);
-        List<City> citiesResult = cityService.getAll(null);
+        when(cityService.getAll(null)).thenReturn(cities);
+        List<City> citiesResult = cityController.getAll(null);
         assertEquals(cities, citiesResult);
     }
 
@@ -106,18 +102,18 @@ public class CityServiceTest {
 
         Optional<City> cityOptional = Optional.ofNullable(cities.get(0));
 
-        when(cityRepository.findById(1)).thenReturn(cityOptional);
+        when(cityService.getById(1)).thenReturn(cityOptional);
 
-        Optional<City> cityResult = cityService.getById(1);
+        Optional<City> cityResult = cityController.getById(1);
 
         assertEquals(cityOptional, cityResult);
-        verify(cityRepository, times(1)).findById(1);
+        verify(cityService, times(1)).getById(1);
     }
 
     @Test(expected = CityNotExistsException.class)
     public void getByIdCityNotExists() throws CityNotExistsException
     {
-        when(cityRepository.findById(1)).thenReturn(null);
+        when(cityService.getById(1)).thenReturn(null);
         cityService.getById(1);
     }
 
@@ -131,21 +127,19 @@ public class CityServiceTest {
         cities.add(city1);
         cities.add(city2);
 
-        when(cityRepository.findByPrefix("223")).thenReturn(cities.get(0));
+        when(cityService.getByPrefix("223")).thenReturn(cities.get(0));
 
-        City cityResult = cityService.getByPrefix("223");
+        City cityResult = cityController.getByPrefix("223");
         assertEquals(cities.get(0), cityResult);
-        verify(cityRepository, times(1)).findByPrefix("223");
+        verify(cityService, times(1)).getByPrefix("223");
     }
 
     @Test(expected = CityNotExistsException.class)
     public void findByPrefixCityNotExistsTest() throws CityNotExistsException
     {
-        when(cityRepository.findByPrefix("223")).thenReturn(null);
-        cityService.getByPrefix("223");
+        when(cityService.getByPrefix("223")).thenReturn(null);
+        cityController.getByPrefix("223");
     }
 
     //test de uploadCities??
-
-
 }

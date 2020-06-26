@@ -1,9 +1,9 @@
 package com.utn.TP_Final;
 
-import org.junit.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.Test;
 
-@SpringBootTest
+
+
 class TpFinalApplicationTests {
 
 	@Test

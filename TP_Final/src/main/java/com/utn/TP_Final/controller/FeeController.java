@@ -2,6 +2,8 @@ package com.utn.TP_Final.controller;
 
 
 import com.utn.TP_Final.exceptions.CityNotExistsException;
+import com.utn.TP_Final.exceptions.FeeAlreadyExistsException;
+import com.utn.TP_Final.exceptions.FeeNotExistsException;
 import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.Fee;
 import com.utn.TP_Final.projections.FeeRequest;
@@ -24,9 +26,13 @@ public class FeeController {
     }
 
     @PostMapping("/")
-    public void addFee(@RequestBody Fee newFee)
-    {
-        feeService.addFee(newFee);
+    public Fee addFee(@RequestBody Fee newFee) throws FeeAlreadyExistsException {
+        return feeService.addFee(newFee);
+    }
+
+    @PostMapping("/delete/{id}")
+    public Fee deleteFee(Integer id) throws FeeNotExistsException {
+        return feeService.deleteFee(id);
     }
 
     @GetMapping("/")
@@ -35,33 +41,28 @@ public class FeeController {
         return feeService.getAll();
     }
 
-    @GetMapping("/getById/{id}")
-    public Optional<Fee> getById(@RequestParam(required = true)Integer id)
-    {
+    @GetMapping("/{id}")
+    public Optional<Fee> getById(@PathVariable Integer id) throws FeeNotExistsException {
         return feeService.getById(id);
     }
 
-    @GetMapping("/getBySourceCity/{sourceCityName}")
-    public List<Fee> getBySourceCity(@RequestParam(required = true)String cityName) throws CityNotExistsException, ValidationException
-    {
+    @GetMapping("/sourceCity/{sourceCityName}")
+    public List<Fee> getBySourceCity(@PathVariable String cityName) throws CityNotExistsException, ValidationException, FeeNotExistsException {
         return feeService.getBySourceCity(cityName);
     }
 
-    @GetMapping("/getByDestinationCity/{destinationCityName}")
-    public List<Fee> getByDestinationCity(@RequestParam(required = true)String cityName)throws CityNotExistsException, ValidationException
-    {
+    @GetMapping("/destinationCity/{destinationCityName}")
+    public List<Fee> getByDestinationCity(@PathVariable String cityName) throws CityNotExistsException, ValidationException, FeeNotExistsException {
         return feeService.getByDestinationCity(cityName);
     }
 
-    @GetMapping("/getFeeByIdCities/{idCityFrom}/{idCityTo}")
-    public FeeRequest getFeeByIdCities(@PathVariable Integer idCityFrom, @PathVariable Integer idCityTo)throws CityNotExistsException, ValidationException
-    {
+    @GetMapping("/idCities/{idCityFrom}/{idCityTo}")
+    public FeeRequest getFeeByIdCities(@PathVariable Integer idCityFrom, @PathVariable Integer idCityTo) throws CityNotExistsException, ValidationException, FeeNotExistsException {
         return feeService.getFeeByIdCities(idCityFrom, idCityTo);
     }
 
-    @GetMapping("/getFeeByNameCities/{cityFrom}/{cityTo}")
-    public FeeRequest getFeeByNameCities(@PathVariable String cityFrom, @PathVariable String cityTo)throws CityNotExistsException, ValidationException
-    {
+    @GetMapping("/nameCities/{cityFrom}/{cityTo}")
+    public FeeRequest getFeeByNameCities(@PathVariable String cityFrom, @PathVariable String cityTo) throws CityNotExistsException, ValidationException, FeeNotExistsException {
         return feeService.getFeeByNameCities(cityFrom, cityTo);
     }
 }

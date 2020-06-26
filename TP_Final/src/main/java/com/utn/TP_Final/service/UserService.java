@@ -1,5 +1,7 @@
 package com.utn.TP_Final.service;
 
+import com.utn.TP_Final.exceptions.DateNotExistsException;
+import com.utn.TP_Final.exceptions.UserAlreadyExistsException;
 import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.model.User;
 import com.utn.TP_Final.projections.CallsBetweenDates;
@@ -9,6 +11,7 @@ import com.utn.TP_Final.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -25,42 +28,45 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-
-    public void addUser(User newUser) { //esto vendria a ser como el registro de usuarios
-        userRepository.save(newUser);
+    public User addUser(User newUser) throws UserAlreadyExistsException
+    {
+        User user = userRepository.save(newUser);
+        return Optional.ofNullable(user).orElseThrow(()-> new UserAlreadyExistsException());
     }
 
-    public void deleteUser(String dni)
+    //devuelve el dni del usuario eliminado
+    public String deleteUser(String dni) throws UserNotExistsException
     {
-        userRepository.delete(dni);
-    } //esto es como el remove user
+        String dniResult = userRepository.delete(dni);
+        return Optional.ofNullable(dniResult).orElseThrow(()-> new UserNotExistsException());
+    }
 
-    public List<User> getAll(String name) {
-        if(isNull(name))
+    public List<User> getAll(String dni) {
+        if(isNull(dni))
         {
             return userRepository.findAll();
         }
-        return userRepository.findByLastname(name);
+        List<User> users = new ArrayList<User>();
+        users.add(userRepository.findByDni(dni));
+        return users;
     }
 
     public User getByDni(String dni) throws UserNotExistsException
     {
-        return userRepository.findByDni(dni);
+        User user = userRepository.findByDni(dni);
+        return Optional.ofNullable(user).orElseThrow(()-> new UserNotExistsException());
     }
 
-    public User getByLineNumber(String lineNumber) throws UserNotExistsException
+    public Optional<User> getById(Integer id) throws UserNotExistsException
     {
-        return userRepository.findByLineNumber(lineNumber);
-    }
-
-    public Optional<User> getById(Integer id)
-    {
-        return userRepository.findById(id);
+        Optional<User> user = userRepository.findById(id);
+        return Optional.ofNullable(user).orElseThrow(()-> new UserNotExistsException());
     }
 
     public User getByUsername(String username, String password) throws UserNotExistsException
     {
-        return userRepository.findByUsername(username, password);
+        User user = userRepository.findByUsername(username, password);
+        return Optional.ofNullable(user).orElseThrow(()-> new UserNotExistsException());
     }
 
     public User login(String username, String password) throws UserNotExistsException {
@@ -68,19 +74,25 @@ public class UserService {
         return Optional.ofNullable(user).orElseThrow(()-> new UserNotExistsException());
     }
 
-    public List<CallsBetweenDates> getCallsBetweenDates(Date from, Date to, Integer idLoggedUser)
+    //hay q chequear cual de los valores q recibe por parametro es el que puede
+    // hacer saltar la excepcion y hacer if donde se hagan los orElseThrow correspondientes
+    public List<CallsBetweenDates> getCallsBetweenDates(Date from, Date to, Integer idLoggedUser) throws UserNotExistsException
     {
-        return userRepository.getCallsBetweenDates(from, to, idLoggedUser);
+        List<CallsBetweenDates> callsBetweenDates = userRepository.getCallsBetweenDates(from, to, idLoggedUser);
+        return Optional.ofNullable(callsBetweenDates).orElseThrow(()-> new UserNotExistsException());
     }
 
-    public List<InvoicesBetweenDatesUser> getInvoicesBetweenDates(Date from, Date to, Integer idLoggedUser)
+
+    public List<InvoicesBetweenDatesUser> getInvoicesBetweenDates(Date from, Date to, Integer idLoggedUser) throws UserNotExistsException
     {
-        return userRepository.getInvoicesBetweenDates(from, to, idLoggedUser);
+        List<InvoicesBetweenDatesUser> invoicesBetweenDatesUsers = userRepository.getInvoicesBetweenDates(from, to, idLoggedUser);
+        return Optional.ofNullable(invoicesBetweenDatesUsers).orElseThrow(()-> new UserNotExistsException());
     }
 
-    public List<TopMostCalledDestinations> getTopMostCalledDestinations(Integer idLoggedUser)
+    public List<TopMostCalledDestinations> getTopMostCalledDestinations(Integer idLoggedUser) throws UserNotExistsException
     {
-        return userRepository.getTopMostCalledDestinations(idLoggedUser);
+        List<TopMostCalledDestinations> topMostCalledDestinations = userRepository.getTopMostCalledDestinations(idLoggedUser);
+        return Optional.ofNullable(topMostCalledDestinations).orElseThrow(()-> new UserNotExistsException());
     }
 
 }

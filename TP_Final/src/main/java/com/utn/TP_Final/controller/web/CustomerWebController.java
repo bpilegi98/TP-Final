@@ -53,7 +53,7 @@ public class CustomerWebController {
             List<CallsBetweenDates> callsBetweenDates = userController.getCallsBetweenDates(from, to, currentUser.getId());
             return (callsBetweenDates.size() > 0) ? ResponseEntity.ok(callsBetweenDates) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-        catch (DateNotExistsException e)
+        catch (DateNotExistsException | UserNotExistsException e)
         {
             throw new ValidationException(e.getMessage());
         }
@@ -71,7 +71,7 @@ public class CustomerWebController {
             List<InvoicesBetweenDatesUser> invoicesBetweenDateUsers = userController.getInvoicesBetweenDates(from, to, currentUser.getId());
             return (invoicesBetweenDateUsers.size() > 0) ? ResponseEntity.ok(invoicesBetweenDateUsers) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-        catch (DateNotExistsException e)
+        catch (DateNotExistsException | UserNotExistsException e)
         {
             throw new ValidationException(e.getMessage());
         }

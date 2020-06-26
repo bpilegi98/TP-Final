@@ -15,4 +15,7 @@ public interface CityRepository extends JpaRepository<City, Integer> {
 
     @Query(value = "select * from cities where prefix_number = ?1", nativeQuery = true)
     City findByPrefix(String prefix);
+
+    @Query(value = "remove from cities where id = ?1", nativeQuery = true)
+    City delete(Integer id);
 }

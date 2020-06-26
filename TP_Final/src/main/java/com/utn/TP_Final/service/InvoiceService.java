@@ -1,6 +1,8 @@
 package com.utn.TP_Final.service;
 
 
+import com.utn.TP_Final.exceptions.InvoiceNotExistsException;
+import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.model.Invoice;
 import com.utn.TP_Final.projections.InvoiceIncome;
 import com.utn.TP_Final.projections.InvoicesFromUser;
@@ -11,8 +13,10 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Objects.isNull;
+import static org.apache.tomcat.jni.Mmap.delete;
 
 @Service
 public class InvoiceService {
@@ -24,28 +28,38 @@ public class InvoiceService {
         this.invoiceRepository = invoiceRepository;
     }
 
-    public void addInvoice(Invoice newInvoice){
-        invoiceRepository.save(newInvoice);
+    public Invoice addInvoice(Invoice newInvoice)
+    {
+        return invoiceRepository.save(newInvoice);
     }
 
-    public void deleteInvoice(Invoice invoice)
+    public Invoice deleteInvoice(Integer id) throws InvoiceNotExistsException
     {
-        invoiceRepository.delete(invoice);
+        Invoice invoice = invoiceRepository.delete(id);
+        return Optional.ofNullable(invoice).orElseThrow(()-> new InvoiceNotExistsException());
     }
 
-    public List<InvoicesFromUser> getInvoicesFromUser(String dni)
+    public List<Invoice> getAll()
     {
-        return invoiceRepository.getInvoicesFromUser(dni);
+        return invoiceRepository.findAll();
     }
 
-    public List<InvoicesFromUser> getInvoicesPaidFromUser(String dni)
+    public List<InvoicesFromUser> getInvoicesFromUser(String dni) throws UserNotExistsException
     {
-        return invoiceRepository.getInvoicesPaidFromUser(dni);
+        List<InvoicesFromUser> invoicesFromUsers = invoiceRepository.getInvoicesFromUser(dni);
+        return Optional.ofNullable(invoicesFromUsers).orElseThrow(()-> new UserNotExistsException());
     }
 
-    public List<InvoicesFromUser> getInvoicesNotPaidFromUser(String dni)
+    public List<InvoicesFromUser> getInvoicesPaidFromUser(String dni) throws UserNotExistsException
     {
-        return invoiceRepository.getInvoicesNotPaidFromUser(dni);
+        List<InvoicesFromUser> invoicesFromUsers = invoiceRepository.getInvoicesPaidFromUser(dni);
+        return Optional.ofNullable(invoicesFromUsers).orElseThrow(()-> new UserNotExistsException());
+    }
+
+    public List<InvoicesFromUser> getInvoicesNotPaidFromUser(String dni) throws UserNotExistsException
+    {
+        List<InvoicesFromUser> invoicesFromUsers = invoiceRepository.getInvoicesNotPaidFromUser(dni);
+        return Optional.ofNullable(invoicesFromUsers).orElseThrow(()-> new UserNotExistsException());
     }
 
     public List<InvoicesRequestFromPeriods> getInvoicesFromMonth(String monthI)

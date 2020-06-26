@@ -2,6 +2,7 @@ package com.utn.TP_Final.controller;
 
 
 import com.utn.TP_Final.exceptions.DateNotExistsException;
+import com.utn.TP_Final.exceptions.InvoiceNotExistsException;
 import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.Invoice;
@@ -28,60 +29,71 @@ public class InvoiceController {
     }
 
     @PostMapping("/")
-    public void addInvoice(@RequestBody Invoice newInvoice)
+    public Invoice addInvoice(@RequestBody Invoice newInvoice)
     {
-        invoiceService.addInvoice(newInvoice);
+        return invoiceService.addInvoice(newInvoice);
     }
 
-    @GetMapping("/getInvoicesFromUser/{dni}")
+    @PostMapping("/delete/{id}")
+    public Invoice deleteInvoice(Integer id) throws InvoiceNotExistsException {
+        return invoiceService.deleteInvoice(id);
+    }
+
+    @GetMapping("/")
+    public List<Invoice> getAll()
+    {
+        return invoiceService.getAll();
+    }
+
+    @GetMapping("/user/{dni}")
     public List<InvoicesFromUser> getInvoicesFromUser(@PathVariable String dni) throws UserNotExistsException, ValidationException
     {
         return invoiceService.getInvoicesFromUser(dni);
     }
 
-    @GetMapping("/getInvoicesPaidFromUser/{dni}")
+    @GetMapping("/paid/{dni}")
     public List<InvoicesFromUser> getInvoicesPaidFromUser(@PathVariable String dni) throws UserNotExistsException, ValidationException
     {
         return invoiceService.getInvoicesPaidFromUser(dni);
     }
 
-    @GetMapping("/getInvoicesNotPaidFromUser/{dni}")
+    @GetMapping("/notPaid/{dni}")
     public List<InvoicesFromUser> getInvoicesNotPaidFromUser(@PathVariable String dni) throws UserNotExistsException, ValidationException
     {
         return invoiceService.getInvoicesNotPaidFromUser(dni);
     }
 
-    @GetMapping("/getInvoicesFromMonth/{monthI}")
+    @GetMapping("/month/{monthI}")
     public List<InvoicesRequestFromPeriods> getInvoicesFromMonth(@PathVariable String monthI) throws DateNotExistsException, ValidationException
     {
         return invoiceService.getInvoicesFromMonth(monthI);
     }
 
-    @GetMapping("/getInvoicesFromYear/{yearI}")
+    @GetMapping("/year/{yearI}")
     public List<InvoicesRequestFromPeriods> getInvoicesFromYear(@PathVariable String yearI) throws DateNotExistsException, ValidationException
     {
         return invoiceService.getInvoicesFromYear(yearI);
     }
 
-    @GetMapping("/getInvoicesBetweenDates/{fromI}/{toI}")
+    @GetMapping("/betweenDates/{fromI}/{toI}")
     public List<InvoicesRequestFromPeriods> getInvoicesBetweenDates(@PathVariable Date fromI, @PathVariable Date toI) throws DateNotExistsException, ValidationException
     {
         return invoiceService.getInvoicesBetweenDates(fromI, toI);
     }
 
-    @GetMapping("/getIncome")
+    @GetMapping("/income")
     public InvoiceIncome getIncome()
     {
         return invoiceService.getIncome();
     }
 
-    @GetMapping("/getIncomeMonth/{monthI}")
+    @GetMapping("/incomeMonth/{monthI}")
     public InvoiceIncome getIncomeMonth(@PathVariable String monthI) throws DateNotExistsException, ValidationException
     {
         return invoiceService.getIncomeMonth(monthI);
     }
 
-    @GetMapping("/getIncomeYear/{yearI}")
+    @GetMapping("/incomeYear/{yearI}")
     public InvoiceIncome getIncomeYear(@PathVariable String yearI) throws DateNotExistsException, ValidationException
     {
         return invoiceService.getIncomeYear(yearI);

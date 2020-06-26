@@ -1,12 +1,16 @@
 package com.utn.TP_Final.service;
 
 
+import com.utn.TP_Final.exceptions.CallNotExistsException;
 import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.model.Call;
+import com.utn.TP_Final.model.User;
 import com.utn.TP_Final.projections.CallsFromUser;
 import com.utn.TP_Final.projections.CallsFromUserSimple;
 import com.utn.TP_Final.repository.CallRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.projection.ProjectionFactory;
+import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -27,14 +31,15 @@ public class CallService {
 
     //no es dto aca? xd
 
-    public void addCall(Call newCall)
+    public Call addCall(Call newCall)
     {
-        callRepository.save(newCall);
+        return callRepository.save(newCall);
     }
 
-    public void deleteCall(Call call)
+    public Call deleteCall(Integer id) throws CallNotExistsException
     {
-        callRepository.delete(call);
+        Call call = callRepository.delete(id);
+        return Optional.ofNullable(call).orElseThrow(()-> new CallNotExistsException());
     }
 
     public List<Call> getAll()
@@ -42,18 +47,23 @@ public class CallService {
         return callRepository.findAll();
     }
 
-    public Optional<Call> getById(Integer id)
+    public Optional<Call> getById(Integer id) throws CallNotExistsException
     {
-        return callRepository.findById(id);
+        Optional<Call> call = callRepository.findById(id);
+        return Optional.ofNullable(call).orElseThrow(()-> new CallNotExistsException());
     }
 
-    public CallsFromUserSimple getCallsFromUserSimple(String dni)
+    public CallsFromUserSimple getCallsFromUserSimple(String dni) throws UserNotExistsException
     {
-        return callRepository.getCallsFromUserSimple(dni);
+        ProjectionFactory factory = new SpelAwareProxyProjectionFactory();
+        CallsFromUserSimple callsFromUserSimple = factory.createProjection(CallsFromUserSimple.class);
+        callsFromUserSimple = callRepository.getCallsFromUserSimple(dni);
+        return Optional.ofNullable(callsFromUserSimple).orElseThrow(()-> new UserNotExistsException());
     }
 
-    public List<CallsFromUser> getCallsFromUser(String dni)
+    public List<CallsFromUser> getCallsFromUser(String dni) throws UserNotExistsException
     {
-        return callRepository.getCallsFromUser(dni);
+        List<CallsFromUser> callsFromUser = callRepository.getCallsFromUser(dni);
+        return Optional.ofNullable(callsFromUser).orElseThrow(()-> new UserNotExistsException());
     }
 }

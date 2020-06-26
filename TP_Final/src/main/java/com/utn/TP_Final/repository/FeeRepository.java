@@ -1,5 +1,6 @@
 package com.utn.TP_Final.repository;
 
+import com.utn.TP_Final.model.City;
 import com.utn.TP_Final.model.Fee;
 import com.utn.TP_Final.projections.FeeRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,10 +14,11 @@ import java.util.List;
 @Repository
 public interface FeeRepository extends JpaRepository<Fee, Integer> {
 
-    //fijarse si funciona correctamente
-
     @Query(value = "select * from fees f join cities c on f.id_source_city = c.id where c.name = ?1", nativeQuery = true)
     List<Fee> findBySourceCity(String city);
+
+    @Query(value = "remove from fees where id = ?1", nativeQuery = true)
+    Fee delete(Integer id);
 
     @Query(value = "select * from fees f join cities c on f.id_destination_city = c.id where c.name = ?1", nativeQuery = true)
     List<Fee> findByDestinationCity(String city);

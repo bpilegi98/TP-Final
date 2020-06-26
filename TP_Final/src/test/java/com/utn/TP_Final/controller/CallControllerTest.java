@@ -1,14 +1,16 @@
-package com.utn.TP_Final.service;
+package com.utn.TP_Final.controller;
 
 import com.utn.TP_Final.exceptions.CallNotExistsException;
+import com.utn.TP_Final.exceptions.CityNotExistsException;
 import com.utn.TP_Final.exceptions.UserNotExistsException;
+import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.Call;
-import com.utn.TP_Final.model.City;
 import com.utn.TP_Final.model.TelephoneLine;
 import com.utn.TP_Final.model.User;
 import com.utn.TP_Final.projections.CallsFromUser;
 import com.utn.TP_Final.projections.CallsFromUserSimple;
-import com.utn.TP_Final.repository.CallRepository;
+import com.utn.TP_Final.service.CallService;
+import com.utn.TP_Final.service.CityService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -22,29 +24,32 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class CallServiceTest {
+public class CallControllerTest {
 
     @Autowired
+    CallController callController;
+
+    @Mock
     CallService callService;
 
     @Mock
-    CallRepository callRepository;
+    CityService cityService;
 
     @Before
     public void setUp()
     {
         initMocks(this);
-        callService = new CallService(callRepository);
+        callController = new CallController(callService, cityService);
     }
 
-    @Test
-    public void addCallTest()
-    {
+    @Test //error NPE (null pointer exception)
+    public void addCallTest() throws CityNotExistsException {
         Call call = new Call(1, 5, 120, 2, 10, null, null, null, null, null, null, null);
-        when(callRepository.save(call)).thenReturn(call);
-        Call callResult = callService.addCall(call);
+        when(callService.addCall(call)).thenReturn(call);
+        Call callResult = callController.addCall(call.getSourceNumber(), call.getDestinationNumber(), call.getDurationSecs(), call.getDateCall());
         assertEquals(call.getSourceNumber(), callResult.getSourceNumber());
     }
 
@@ -52,16 +57,16 @@ public class CallServiceTest {
     public void deleteCallOk() throws CallNotExistsException
     {
         Call call = new Call(1, 5, 120, 2, 10, null, null, null, null, null, null, null);
-        when(callRepository.delete(1)).thenReturn(call);
-        Call callResult = callService.deleteCall(1);
+        when(callService.deleteCall(1)).thenReturn(call);
+        Call callResult = callController.deleteCall(1);
         assertEquals(call, callResult);
     }
 
     @Test(expected = CallNotExistsException.class)
     public void deleteCallNotExists() throws CallNotExistsException
     {
-        when(callRepository.delete(1)).thenReturn(null);
-        callService.deleteCall(1);
+        when(callService.deleteCall(1)).thenReturn(null);
+        callController.deleteCall(1);
     }
 
     @Test
@@ -73,17 +78,17 @@ public class CallServiceTest {
         calls.add(call1);
         calls.add(call2);
 
-        when(callRepository.findAll()).thenReturn(calls);
-        assertEquals(2, callService.getAll().size());
-        verify(callRepository, times(1)).findAll();
+        when(callService.getAll()).thenReturn(calls);
+        assertEquals(2, callController.getAll().size());
+        verify(callService, times(1)).getAll();
     }
 
     @Test
     public void getAllEmptyTest()
     {
         List<Call> calls = new ArrayList<Call>();
-        when(callRepository.findAll()).thenReturn(calls);
-        List<Call> callsResult = callService.getAll();
+        when(callService.getAll()).thenReturn(calls);
+        List<Call> callsResult = callController.getAll();
         assertEquals(calls, callsResult);
     }
 
@@ -96,22 +101,21 @@ public class CallServiceTest {
         calls.add(call1);
         calls.add(call2);
         Optional<Call> callOptional = Optional.ofNullable(calls.get(0));
-        when(callRepository.findById(1)).thenReturn(callOptional);
-        Optional<Call> callResult = callService.getById(1);
+        when(callService.getById(1)).thenReturn(callOptional);
+        Optional<Call> callResult = callController.getById(1);
         assertEquals(callOptional, callResult);
-        verify(callRepository, times(1)).findById(1);
+        verify(callService, times(1)).getById(1);
     }
 
     @Test(expected = CallNotExistsException.class)
     public void getByIdCallNotExists() throws CallNotExistsException
     {
-        when(callRepository.findById(1)).thenReturn(null);
-        callService.getById(1);
+        when(callService.getById(1)).thenReturn(null);
+        callController.getById(1);
     }
 
     @Test
-    public void getCallsFromUserSimpleOk() throws UserNotExistsException
-    {
+    public void getCallsFromUserSimpleOk() throws UserNotExistsException, ValidationException {
         List<Call> calls = new ArrayList<Call>();
 
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
@@ -138,22 +142,20 @@ public class CallServiceTest {
         callsFromUserSimple.setDni("41307541");
         callsFromUserSimple.setCallsMade(1);
 
-        when(callRepository.getCallsFromUserSimple("41307541")).thenReturn(callsFromUserSimple);
-        assertEquals(callService.getCallsFromUserSimple("41307541"), callsFromUserSimple);
-        verify(callRepository, times(1)).getCallsFromUserSimple("41307541");
+        when(callService.getCallsFromUserSimple("41307541")).thenReturn(callsFromUserSimple);
+        assertEquals(callController.getCallsFromUserSimple("41307541"), callsFromUserSimple);
+        verify(callService, times(1)).getCallsFromUserSimple("41307541");
 
     }
 
     @Test(expected = UserNotExistsException.class)
-    public void getCallsFromUserSimpleUserNotExists() throws UserNotExistsException
-    {
-        when(callRepository.getCallsFromUserSimple("41307541")).thenReturn(null);
-        callService.getCallsFromUserSimple("41307541");
+    public void getCallsFromUserSimpleUserNotExists() throws UserNotExistsException, ValidationException {
+        when(callService.getCallsFromUserSimple("41307541")).thenReturn(null);
+        callController.getCallsFromUserSimple("41307541");
     }
 
     @Test
-    public void getCallsFromUserTest() throws UserNotExistsException
-    {
+    public void getCallsFromUserTest() throws UserNotExistsException, ValidationException {
         List<Call> calls = new ArrayList<Call>();
 
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
@@ -186,18 +188,16 @@ public class CallServiceTest {
         List<CallsFromUser> callsFromUsersList = new ArrayList<CallsFromUser>();
         callsFromUsersList.add(callsFromUser);
 
-        when(callRepository.getCallsFromUser(user.getDni())).thenReturn(callsFromUsersList);
+        when(callService.getCallsFromUser(user.getDni())).thenReturn(callsFromUsersList);
 
-        List<CallsFromUser> callsFromUserResult = callService.getCallsFromUser(user.getDni());
+        List<CallsFromUser> callsFromUserResult = callController.getCallsFromUser(user.getDni());
 
         assertEquals(callsFromUsersList, callsFromUserResult);
     }
 
     @Test(expected = UserNotExistsException.class)
-    public void getCallsFromUserNotExists() throws UserNotExistsException
-    {
-        when(callRepository.getCallsFromUser("41307541")).thenReturn(null);
-        callService.getCallsFromUser("41307541");
+    public void getCallsFromUserNotExists() throws UserNotExistsException, ValidationException {
+        when(callService.getCallsFromUser("41307541")).thenReturn(null);
+        callController.getCallsFromUser("41307541");
     }
-    
 }

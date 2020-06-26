@@ -1,9 +1,13 @@
 package com.utn.TP_Final.service;
 
+import com.utn.TP_Final.exceptions.FeeAlreadyExistsException;
+import com.utn.TP_Final.exceptions.FeeNotExistsException;
 import com.utn.TP_Final.model.Fee;
 import com.utn.TP_Final.projections.FeeRequest;
 import com.utn.TP_Final.repository.FeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.projection.ProjectionFactory;
+import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,14 +23,16 @@ public class FeeService {
         this.feeRepository = feeRepository;
     }
 
-    public void addFee(Fee newFee)
+    public Fee addFee(Fee newFee) throws FeeAlreadyExistsException
     {
-        feeRepository.save(newFee);
+        Fee fee = feeRepository.save(newFee);
+        return Optional.ofNullable(fee).orElseThrow(()-> new FeeAlreadyExistsException());
     }
 
-    public void deleteFee(Fee fee)
+    public Fee deleteFee(Integer id) throws FeeNotExistsException
     {
-        feeRepository.delete(fee);
+        Fee fee = feeRepository.delete(id);
+        return Optional.ofNullable(fee).orElseThrow(()-> new FeeNotExistsException());
     }
 
     public List<Fee> getAll()
@@ -34,28 +40,37 @@ public class FeeService {
         return feeRepository.findAll();
     }
 
-    public Optional<Fee> getById(Integer id)
+    public Optional<Fee> getById(Integer id) throws FeeNotExistsException
     {
-        return feeRepository.findById(id);
+        Optional<Fee> fee = feeRepository.findById(id);
+        return Optional.ofNullable(fee).orElseThrow(()-> new FeeNotExistsException());
     }
 
-    public List<Fee> getBySourceCity(String cityName)
+    public List<Fee> getBySourceCity(String cityName) throws FeeNotExistsException
     {
-        return feeRepository.findBySourceCity(cityName);
+        List<Fee> fees = feeRepository.findBySourceCity(cityName);
+        return Optional.ofNullable(fees).orElseThrow(()-> new FeeNotExistsException());
     }
 
-    public List<Fee> getByDestinationCity(String cityName)
+    public List<Fee> getByDestinationCity(String cityName) throws FeeNotExistsException
     {
-        return feeRepository.findByDestinationCity(cityName);
+        List<Fee> fees = feeRepository.findByDestinationCity(cityName);
+        return Optional.ofNullable(fees).orElseThrow(()-> new FeeNotExistsException());
     }
 
-    public FeeRequest getFeeByIdCities(Integer idCityFrom, Integer idCityTo)
+    public FeeRequest getFeeByIdCities(Integer idCityFrom, Integer idCityTo) throws FeeNotExistsException
     {
-        return feeRepository.getFeeByIdCities(idCityFrom, idCityTo);
+        ProjectionFactory factory = new SpelAwareProxyProjectionFactory();
+        FeeRequest feeRequest = factory.createProjection(FeeRequest.class);
+        feeRequest = feeRepository.getFeeByIdCities(idCityFrom, idCityTo);
+        return Optional.ofNullable(feeRequest).orElseThrow(()-> new FeeNotExistsException());
     }
 
-    public FeeRequest getFeeByNameCities(String cityFrom, String cityTo)
+    public FeeRequest getFeeByNameCities(String cityFrom, String cityTo) throws FeeNotExistsException
     {
-        return feeRepository.getFeeByNameCities(cityFrom, cityTo);
+        ProjectionFactory factory = new SpelAwareProxyProjectionFactory();
+        FeeRequest feeRequest = factory.createProjection(FeeRequest.class);
+        feeRequest = feeRepository.getFeeByNameCities(cityFrom, cityTo);
+        return Optional.ofNullable(feeRequest).orElseThrow(()-> new FeeNotExistsException());
     }
 }

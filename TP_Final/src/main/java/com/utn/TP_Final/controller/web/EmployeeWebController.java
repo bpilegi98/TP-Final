@@ -233,7 +233,7 @@ public class EmployeeWebController {
             FeeRequest feeRequest = feeController.getFeeByIdCities(idCityFrom, idCityTo);
             return (feeRequest != null) ? ResponseEntity.ok(feeRequest) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-        catch (CityNotExistsException e)
+        catch (CityNotExistsException | FeeNotExistsException e)
         {
             throw new ValidationException(e.getMessage());
         }
@@ -252,7 +252,7 @@ public class EmployeeWebController {
             FeeRequest feeRequest = feeController.getFeeByNameCities(cityFrom, cityTo);
             return (feeRequest != null) ? ResponseEntity.ok(feeRequest) : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-        catch (CityNotExistsException e)
+        catch (CityNotExistsException | FeeNotExistsException e)
         {
             throw new ValidationException(e.getMessage());
         }
