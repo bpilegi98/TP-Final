@@ -11,8 +11,11 @@ import com.utn.TP_Final.projections.InvoicesBetweenDatesUser;
 import com.utn.TP_Final.projections.TopMostCalledDestinations;
 import com.utn.TP_Final.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -31,8 +34,7 @@ public class UserController {
 
 
     @PostMapping("/")
-    public void addUser(@RequestBody User newUser) throws UserAlreadyExistsException, ValidationException
-    {
+    public void addUser(@RequestBody User newUser) throws UserAlreadyExistsException, ValidationException, InvalidKeySpecException, NoSuchAlgorithmException {
         userService.addUser(newUser);
     }
 
@@ -62,14 +64,13 @@ public class UserController {
     }
 
     @GetMapping("/username/{username}/{password}")
-    public User getByUsername(@PathVariable String username, @PathVariable String password) throws UserNotExistsException, ValidationException
+    public User getByUsername(@PathVariable String username) throws UserNotExistsException, ValidationException
     {
-        return userService.getByUsername(username, password);
+        return userService.getByUsername(username);
     }
 
     @PostMapping("/login")
-    public User login(@RequestBody String username, @RequestBody String password) throws UserNotExistsException, ValidationException
-    {
+    public ResponseEntity<User> login(@RequestBody String username, @RequestBody String password) throws UserNotExistsException, ValidationException, InvalidKeySpecException, NoSuchAlgorithmException {
         if((username != null) && (password != null))
         {
             return userService.login(username, password);

@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -34,7 +34,7 @@ public class Call {
     private float totalPrice;
 
     @Column(name = "date_call")
-    private Date dateCall;
+    private LocalDateTime dateCall;
 
     @Column(name = "source_number", nullable = false)
     private String sourceNumber;
@@ -68,11 +68,17 @@ public class Call {
     @JoinColumn(name = "id_destination_city")
     private City destinationCity;
 
-    public Call(String sourceNumber, String destinationNumber,Integer durationSecs, Date dateCall ) {
+    public Call(String sourceNumber, String destinationNumber,Integer durationSecs, LocalDateTime dateCall ) {
         this.durationSecs = durationSecs;
         this.dateCall = dateCall;
         this.sourceNumber = sourceNumber;
         this.destinationNumber = destinationNumber;
     }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference(value="call-invoice")
+    @JoinColumn(name = "id_invoice")
+    private Invoice invoice;
+
 
 }

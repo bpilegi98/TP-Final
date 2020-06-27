@@ -47,7 +47,7 @@ public class CallControllerTest {
 
     @Test //error NPE (null pointer exception)
     public void addCallTest() throws CityNotExistsException {
-        Call call = new Call(1, 5, 120, 2, 10, null, null, null, null, null, null, null);
+        Call call = new Call(1, 5, 120, 2, 10, null, null, null, null, null, null, null, null);
         when(callService.addCall(call)).thenReturn(call);
         Call callResult = callController.addCall(call.getSourceNumber(), call.getDestinationNumber(), call.getDurationSecs(), call.getDateCall());
         assertEquals(call.getSourceNumber(), callResult.getSourceNumber());
@@ -56,7 +56,7 @@ public class CallControllerTest {
     @Test
     public void deleteCallOk() throws CallNotExistsException
     {
-        Call call = new Call(1, 5, 120, 2, 10, null, null, null, null, null, null, null);
+        Call call = new Call(1, 5, 120, 2, 10, null, null, null, null, null, null, null, null);
         when(callService.deleteCall(1)).thenReturn(call);
         Call callResult = callController.deleteCall(1);
         assertEquals(call, callResult);
@@ -72,8 +72,8 @@ public class CallControllerTest {
     @Test
     public void getAllTest()
     {
-        Call call1 = new Call(1, 5, 120, 2, 10, null, null, null, null, null, null, null);
-        Call call2 = new Call(2, 5, 120, 2, 10, null, null, null, null, null, null, null);
+        Call call1 = new Call(1, 5, 120, 2, 10, null, null, null, null, null, null, null, null);
+        Call call2 = new Call(2, 5, 120, 2, 10, null, null, null, null, null, null, null, null);
         List<Call> calls = new ArrayList<Call>();
         calls.add(call1);
         calls.add(call2);
@@ -95,8 +95,8 @@ public class CallControllerTest {
     @Test
     public void getByIdOk() throws CallNotExistsException
     {
-        Call call1 = new Call(1, 5, 120, 2, 10, null, null, null, null, null, null, null);
-        Call call2 = new Call(2, 5, 120, 2, 10, null, null, null, null, null, null, null);
+        Call call1 = new Call(1, 5, 120, 2, 10, null, null, null, null, null, null, null, null);
+        Call call2 = new Call(2, 5, 120, 2, 10, null, null, null, null, null, null, null, null);
         List<Call> calls = new ArrayList<Call>();
         calls.add(call1);
         calls.add(call2);
@@ -129,8 +129,8 @@ public class CallControllerTest {
 
         user.setTelephoneLines(telephoneLines);
 
-        Call call1 = new Call(1, 5, 50, 15, 25, null, telephoneLine2.getLineNumber(), null, null, null, null, null);
-        Call call2 = new Call(3, 5, 50, 15, 25, null, telephoneLine3.getLineNumber(), null, null, null, null, null);
+        Call call1 = new Call(1, 5, 50, 15, 25, null, telephoneLine2.getLineNumber(), null, null, null, null, null, null);
+        Call call2 = new Call(3, 5, 50, 15, 25, null, telephoneLine3.getLineNumber(), null, null, null, null, null, null);
 
         calls.add(call1);
         calls.add(call2);
@@ -169,7 +169,7 @@ public class CallControllerTest {
 
         user.setTelephoneLines(telephoneLines);
 
-        Call call1 = new Call(1, 5, 50, 15, 25, null, telephoneLine2.getLineNumber(), null, null, null, null, null);
+        Call call1 = new Call(1, 5, 50, 15, 25, null, telephoneLine2.getLineNumber(), null, null, null, null, null, null);
 
         calls.add(call1);
 

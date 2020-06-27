@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.Date;
 import java.util.List;
 
@@ -54,8 +56,7 @@ public class EmployeeWebController {
 
 
     @PostMapping("/users/add")
-    public ResponseEntity newPerson(@RequestHeader("Authorization") String sessionToken, @RequestBody User user) throws ValidationException
-    {
+    public ResponseEntity newPerson(@RequestHeader("Authorization") String sessionToken, @RequestBody User user) throws ValidationException, InvalidKeySpecException, NoSuchAlgorithmException {
         try
         {
             User currentUser = sessionManager.getLoggedUser(sessionToken);

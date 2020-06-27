@@ -13,6 +13,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+
 
 @RestController
 @RequestMapping("/")
@@ -28,16 +31,17 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginDto loginDto) throws InvalidLoginException, ValidationException
+    public ResponseEntity<User> login(@RequestBody LoginDto loginDto) throws InvalidLoginException, ValidationException
     {
         ResponseEntity responseEntity;
         try
         {
-            User user = userController.login(loginDto.getUsername(), loginDto.getPassword());
+
+            User user = userController.login(loginDto.getUsername(), loginDto.getPassword()).getBody();
             String token = sessionManager.createSession(user);
             responseEntity = ResponseEntity.ok().headers(createHeaders(token)).build();
-        }catch (UserNotExistsException e){
-            throw new InvalidLoginException(e);
+        }catch (UserNotExistsException | InvalidKeySpecException | NoSuchAlgorithmException e){
+            throw new InvalidLoginException(e.getMessage());
         }
         return responseEntity;
     }

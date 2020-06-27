@@ -18,8 +18,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query(value = "select * from users where dni = ?1", nativeQuery = true)
     User findByDni(String dni);
 
-    @Query(value = "select * from users where username = ?1 and password = ?2", nativeQuery = true)
-    User findByUsername(String username, String password);
+    //@Query(value = "select * from users where username = ?1 and password = ?2", nativeQuery = true)
+    User findByUsername(String username);
 
     @Query(value = "remove from users where dni = ?1", nativeQuery = true)
     String delete(String dni);

@@ -4,12 +4,10 @@ import com.utn.TP_Final.session.AerialSessionFilter;
 import com.utn.TP_Final.session.EmployeeSessionFilter;
 import com.utn.TP_Final.session.SessionFilter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableScheduling;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -44,6 +42,7 @@ public class Configuration {
         Connection connection = DriverManager.getConnection(url + "?user=" + username + "&password=" + password + "");
         return connection;
     }
+
 
     @Bean
     public FilterRegistrationBean customerFilter()

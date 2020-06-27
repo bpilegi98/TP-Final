@@ -17,7 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +45,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void addUserTest() throws ValidationException, UserAlreadyExistsException {
+    public void addUserTest() throws ValidationException, UserAlreadyExistsException, InvalidKeySpecException, NoSuchAlgorithmException {
         City city = new City(1, "Mar del Plata", "223", null);
         TelephoneLine telephoneLine = new TelephoneLine(1, "2235388480", null, null, null);
         TelephoneLine telephoneLine2 = new TelephoneLine(2, "2235388478", null, null, null);
@@ -59,7 +62,7 @@ public class UserControllerTest {
     }
 
     @Test(expected = UserAlreadyExistsException.class)
-    public void addUserAlreadyExists() throws UserAlreadyExistsException, ValidationException {
+    public void addUserAlreadyExists() throws UserAlreadyExistsException, ValidationException, InvalidKeySpecException, NoSuchAlgorithmException {
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
         when(userService.addUser(user)).thenReturn(null);
         userController.addUser(user);
@@ -126,22 +129,24 @@ public class UserControllerTest {
         userController.removeUser("41307541");
     }
 
+
     @Test //Error NPE (null pointer exception)
-    public void loginTestOk() throws UserNotExistsException, ValidationException
-    {
+    public void loginTestOk() throws UserNotExistsException, ValidationException, InvalidKeySpecException, NoSuchAlgorithmException {
         User loggedUser = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
-        when(userService.getByUsername("user","password")).thenReturn(loggedUser);
-        User userResult = userController.login("user", "password");
+        when(userService.getByUsername("user")).thenReturn(loggedUser);
+        User userResult = userController.login("user","password").getBody();
         assertEquals(loggedUser.getId(), userResult.getId());
         assertEquals(loggedUser.getUsername(), userResult.getUsername());
-        verify(userService, times(1)).getByUsername("user", "password");
+        verify(userService, times(1)).getByUsername("user");
     }
 
     @Test(expected = UserNotExistsException.class)
-    public void loginTestUserNotFound() throws UserNotExistsException, ValidationException {
-        when(userService.getByUsername("user", "password")).thenReturn(null);
+    public void loginTestUserNotFound() throws UserNotExistsException, ValidationException, InvalidKeySpecException, NoSuchAlgorithmException {
+        when(userService.getByUsername("user")).thenReturn(null);
         userController.login("user", "password");
     }
+
+
 
     @Test
     public void getByDniOk() throws UserNotExistsException, ValidationException {
@@ -160,15 +165,15 @@ public class UserControllerTest {
     @Test
     public void getByUsernameOk() throws UserNotExistsException, ValidationException {
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
-        when(userService.getByUsername("bpilegi98", "1234")).thenReturn(user);
-        assertEquals(userController.getByUsername("bpilegi98", "1234"), user);
-        verify(userService, times(1)).getByUsername("bpilegi98", "1234");
+        when(userService.getByUsername("bpilegi98")).thenReturn(user);
+        assertEquals(userController.getByUsername("bpilegi98"), user);
+        verify(userService, times(1)).getByUsername("bpilegi98");
     }
 
     @Test(expected = UserNotExistsException.class)
     public void getByUsernameUserNotExists() throws UserNotExistsException, ValidationException {
-        when(userService.getByUsername("bpilegi98", "1234")).thenReturn(null);
-        userController.getByUsername("bpilegi98", "1234");
+        when(userService.getByUsername("bpilegi98")).thenReturn(null);
+        userController.getByUsername("bpilegi98");
     }
 
     @Test
@@ -176,8 +181,8 @@ public class UserControllerTest {
         User loggedUser = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
         TelephoneLine telephoneLine = new TelephoneLine(1, "2236785467", null, null, loggedUser);
         TelephoneLine telephoneLine2 = new TelephoneLine(2, "2236785469", null, null, null);
-        Date date = Date.valueOf("2020-06-25");
-        Call call = new Call(1, 1, 120, 1, 2, date, telephoneLine.getLineNumber(), telephoneLine2.getLineNumber(), telephoneLine, telephoneLine2, null, null);
+        LocalDateTime date =LocalDateTime.of(2020,06,25,22,25);
+        Call call = new Call(1, 1, 120, 1, 2, date, telephoneLine.getLineNumber(), telephoneLine2.getLineNumber(), telephoneLine, telephoneLine2, null, null, null);
 
         ProjectionFactory factory = new SpelAwareProxyProjectionFactory();
         CallsBetweenDates callsBetweenDates = factory.createProjection(CallsBetweenDates.class);
@@ -215,8 +220,8 @@ public class UserControllerTest {
         User loggedUser = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
         TelephoneLine telephoneLine = new TelephoneLine(1, "2236785467", null, null, loggedUser);
         TelephoneLine telephoneLine2 = new TelephoneLine(2, "2236785469", null, null, null);
-        Date date = Date.valueOf("2020-06-25");
-        Call call = new Call(1, 1, 120, 1, 2, date, telephoneLine.getLineNumber(), telephoneLine2.getLineNumber(), telephoneLine, telephoneLine2, null, null);
+        LocalDateTime date =LocalDateTime.of(2020,06,25,22,25);
+        Call call = new Call(1, 1, 120, 1, 2, date, telephoneLine.getLineNumber(), telephoneLine2.getLineNumber(), telephoneLine, telephoneLine2, null, null, null);
         Invoice invoice = new Invoice(1, 2, 1, Date.valueOf("2020-06-25"), Date.valueOf("2020-07-25"), false, telephoneLine, loggedUser);
 
         ProjectionFactory factory = new SpelAwareProxyProjectionFactory();
@@ -259,7 +264,7 @@ public class UserControllerTest {
         List<TelephoneLine> telephoneLines = new ArrayList<TelephoneLine>();
         telephoneLines.add(telephoneLine);
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, city, telephoneLines, null);
-        Call call = new Call(1, 2, 120, 1, 4, null, telephoneLine.getLineNumber(), telephoneLine2.getLineNumber(), telephoneLine, telephoneLine2, city, city);
+        Call call = new Call(1, 2, 120, 1, 4, null, telephoneLine.getLineNumber(), telephoneLine2.getLineNumber(), telephoneLine, telephoneLine2, city, city, null);
 
         ProjectionFactory factory =  new SpelAwareProxyProjectionFactory();
         TopMostCalledDestinations topMostCalledDestinations = factory.createProjection(TopMostCalledDestinations.class);

@@ -45,4 +45,6 @@ public class Invoice {
     @JsonBackReference(value="fee-user")
     @JoinColumn(name = "id_user")
     private User user;
+
+
 }

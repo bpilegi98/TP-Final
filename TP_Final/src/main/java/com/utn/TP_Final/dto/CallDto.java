@@ -3,7 +3,7 @@ package com.utn.TP_Final.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @Data
@@ -12,5 +12,5 @@ public class CallDto {
     String sourceNumber;
     String destinationNumber;
     Integer duration;
-    Date date;
+    LocalDateTime date;
 }

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,31 +32,8 @@ public class CallController {
     }
 
 
-
     @PostMapping("/")
-    public Call addCall( @RequestBody String sourceNumber,@RequestBody String destinationNumber,@RequestBody Integer duration,@RequestBody Date date) throws CityNotExistsException {
-
-     Call call = new Call();
-     call.setDateCall(date);
-     call.setDurationSecs(duration);
-     /*
-     call.setSourceNumber(telephoneLineController.findByNumber(sourceNumber));
-     call.setDestinationNumber(telephoneLineController.findByNumber(destinationNumber));
-
-
-      */
-     String prefixSource = sourceNumber.substring(0,sourceNumber.length()-7);
-     String prefixDest = destinationNumber.substring(0,destinationNumber.length()-7);
-
-     call.setDestinationCity(cityService.getByPrefix(prefixDest));
-     call.setSourceCity(cityService.getByPrefix(prefixSource));
-
-
-     return callService.addCall(call);
-    }
-
-    @PostMapping("/2/")
-    public Call addCall2( @RequestBody String sourceNumber,@RequestBody String destinationNumber,@RequestBody Integer duration,@RequestBody Date date)
+    public Call addCall( @RequestBody String sourceNumber,@RequestBody String destinationNumber,@RequestBody Integer duration,@RequestBody LocalDateTime date)
     {
         Call call = new Call(sourceNumber,destinationNumber,duration,date);
         System.out.println(call.getSourceNumber() + " //// "+ call.getDestinationNumber());

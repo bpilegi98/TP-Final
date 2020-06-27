@@ -32,12 +32,14 @@ firstname varchar(50),
 lastname varchar(50),
 dni varchar(50) unique,
 username varchar(50) UNIQUE,
-password varchar(50),
+password varchar(500),
 user_type enum('AERIAL', 'EMPLOYEE', 'CUSTOMER'),
 is_active boolean,
 id_city int,
 constraint fk_city_user foreign key (id_city) references cities(id)
 );
+select * from users;
+
 
 create table fees(
 id int auto_increment primary key,
@@ -81,13 +83,15 @@ source_number varchar(50),
 id_source_number int,
 destination_number varchar(50),
 id_destination_number int,
-date_call date,
+date_call timestamp,
 id_source_city int,
 id_destination_city int,
+id_invoice int,
 constraint fk_id_source_number_call foreign key (id_source_number) references telephone_lines(id),
 constraint fk_id_destination_number_call foreign key (id_destination_number) references telephone_lines(id),
 constraint fk_id_source_city_call foreign key (id_source_city) references cities(id),
-constraint fk_id_destination_city_call foreign key (id_destination_city) references cities(id)
+constraint fk_id_destination_city_call foreign key (id_destination_city) references cities(id),
+constraint fk_id_invoice_call foreign key (id_invoice) references invoices(id) 
 );
 
 -- TRIGGERS
@@ -194,7 +198,7 @@ end //
 -- STOP STOP STOP //////////////////////////////////
 -- /////////////////////////////////////////////////
 -- tenemos un script en java que carga las ciudades, aca deberias ir y ejecutarlo
-
+select * from cities
 delimiter //
 create procedure add_users()
 begin
@@ -204,6 +208,7 @@ insert into users(firstname, lastname, dni, username, password, id_city, user_ty
 insert into users(firstname, lastname, dni, username, password, id_city, user_type,is_active) values ('fisrtname2', 'lastname2', '2222222', 'username2', 'password2', 4, 'CUSTOMER',true);
 insert into users(firstname, lastname, dni, username, password, id_city, user_type,is_active) values ('fisrtname3', 'lastname3', '3333333', 'username3', 'password3', 4, 'CUSTOMER',true);
 insert into users(firstname, lastname, dni, username, password, id_city, user_type,is_active) values ('fisrtname4', 'lastname4', '4444444', 'username4', 'password4', 2, 'CUSTOMER',true);
+insert into users(username, password, user_type, firstname, lastname, dni, is_active,id_city) values ('aerial','123','AERIAL','aerial','aerial','123',1,1);
 end //
 
 -- Script de fees (tarda 15 minutos)
@@ -218,7 +223,7 @@ declare aux_ppm float;
 declare aux_cpm float;
 
 -- SET total_cities = (select count(id) from cities);
-SET total_cities = 250;
+SET total_cities = 750;
 SET i = 1;
 set j=1;
 set aux_ppm = 0;
@@ -266,7 +271,7 @@ declare source_number_var varchar(30);
 declare destination_number_var varchar(30) default 0;
 declare duration_var int default 0;
 
-SET actual_date = (select DATE(now()));
+SET actual_date = (select now());
 SET total_lines = (select count(id) from telephone_lines);
 
 start transaction;
@@ -301,8 +306,10 @@ call create_provinces();
 call add_users();
 call add_telephone_lines();
 call add_fees();
-call add_x_calls(50);
+call add_x_calls(500);
 -- call add_invoices();
+
+select * from users
 
 DELIMITER // 
 CREATE TRIGGER tbi_new_city BEFORE INSERT ON cities FOR EACH ROW
@@ -566,14 +573,8 @@ declare id_province int;
 SELECT p.id FROM provinces p WHERE p.name = province_name_var   LIMIT 1 into id_province;
 insert into cities(name, prefix_number,id_province) values (name_var,prefix_var, id_province);
 end // 
-i) Número de origen
-ii) Ciudad de origen
-iii) Número de destino
-iv) Ciudad de destino
-v) Precio total
-vi) Duración
-vii) Fecha y hora de llamada.
-delimiter // 
+
+delimiter //
 create procedure show_calls_user(IN id_user int)
 begin
 select c.source_number as "Numero de origen" , (select name from cities where id=c.id_source_number) as "Ciudad de origen" , c.destination_number as "Numero de destino" , (select name from cities where id=c.id_destination_number) as "Ciudad de destino" , c.total_price as "Precio total", c.date_call as "Fecha y hora" 
@@ -582,7 +583,6 @@ join telephone_lines t
 on c.source_number = t.line_number
 where  t.id_user = id_user;
 end //	
-drop procedure show_calls_user;
 
 delimiter // 
 create procedure show_calls_telephone(IN telephone varchar(30))
@@ -595,7 +595,14 @@ end //
 call show_calls_user(1);
 call show_calls_telephone("2236784509");
 
-insert into invoices (total_price, total_cost, date_creation, date_expiration, id_telephone_line, id_user, paid) values (23.3, 7.68, '2020-05-30', '2020-06-15', 2, 1, false);
+-- un par de views 
+
+-- deje las 2 formas porque sinceramente no se cual de las 2 es la mas eficaz
+create view v_calls
+as 
+select c.source_number as "Numero de origen" , (select name from cities where id=c.id_source_number) as "Ciudad de origen" , c.destination_number as "Numero de destino" , (select name from cities where id=c.id_destination_number) as "Ciudad de destino" , c.total_price as "Precio total", c.date_call as "Fecha y hora" 
+from calls c
+select * from v_calls;
 
 call facturation()
 drop procedure facturation
@@ -626,7 +633,7 @@ SET vfinished=1;
 
 SET date_creation_var = (select DATE(now()));
 SET date_expiration_var =(select (DATE(now()) + INTERVAL 1 MONTH));
-
+start transaction;
 OPEN cur_telephone_lines;
   LOOP1: LOOP
     FETCH cur_telephone_lines INTO id_telephone_line_var, id_user_var;
@@ -656,8 +663,49 @@ OPEN cur_telephone_lines;
 	CLOSE cur_calls;
   END LOOP LOOP1;
   CLOSE cur_telephone_lines;
+  commit;
 end //
 
 CREATE EVENT facturation_event
 ON SCHEDULE EVERY 1 MONTH STARTS '2020-07-01 00:00:00'
 DO CALL facturation();
+
+-- ////////////
+-- ///USERS////
+-- ////////////
+
+CREATE USER 'backoffice'@'localhost'identified by 'back123';
+
+CREATE USER 'aerial'@'localhost' identified by 'aerial123';
+
+create user 'customer'@'localhost' identified by 'customer123';
+
+grant insert on tpfinal.calls to 'aerial'@'localhost';
+
+-- /// PERMISOS AERIAL ///
+grant  execute on procedure add_call_aerial to 'aerial'@'localhost';
+
+-- /// PERMISOS BACKOFFICE ///
+
+grant execute on procedure backoffice_request_fee_by_id to 'backoffice'@'localhost';
+grant execute on procedure backoffice_request_fee to 'backoffice'@'localhost';
+grant execute on procedure backoffice_request_calls_user_simple to 'backoffice'@'localhost';
+grant execute on procedure backoffice_request_calls_user to 'backoffice'@'localhost';
+grant execute on procedure backoffice_invoices_from_user to 'backoffice'@'localhost';
+grant execute on procedure backoffice_invoices_from_user_paid to 'backoffice'@'localhost';
+grant execute on procedure backoffice_invoices_from_user_not_paid to 'backoffice'@'localhost';
+grant execute on procedure backoffice_invoices_from_month to 'backoffice'@'localhost';
+grant execute on procedure backoffice_invoices_from_year to 'backoffice'@'localhost';
+grant execute on procedure backoffice_invoices_between_dates to 'backoffice'@'localhost';
+grant execute on procedure backoffice_check_income to 'backoffice'@'localhost';
+grant execute on procedure backoffice_check_income_month to 'backoffice'@'localhost';
+grant execute on procedure backoffice_check_income_year to 'backoffice'@'localhost';
+
+grant insert on tpfinal.users to 'backoffice'@'localhost';
+grant update on tpfinal.users to 'backoffice'@'localhost';
+
+-- /// PERMISOS CLIENTE/API ////
+
+grant execute on procedure user_calls_between_dates to 'customer'@'localhost';
+grant execute on procedure user_invoices_between_dates to 'customer'@'localhost';
+grant execute on procedure user_top_most_called to 'customer'@'localhost';
