@@ -22,7 +22,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     User findByUsername(String username);
 
     @Query(value = "remove from users where dni = ?1", nativeQuery = true)
-    String delete(String dni);
+    User delete(String dni);
 
     //averiguar el tema de manejo de fechas q chocan los formatos
     @Query(value = "call user_calls_between_dates(:fromD, :toD, :idLoggedUser);", nativeQuery = true)

@@ -1,7 +1,6 @@
 package com.utn.TP_Final.service;
 
-import com.utn.TP_Final.exceptions.FeeAlreadyExistsException;
-import com.utn.TP_Final.exceptions.FeeNotExistsException;
+import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.City;
 import com.utn.TP_Final.model.Fee;
 import com.utn.TP_Final.projections.FeeRequest;
@@ -38,7 +37,7 @@ public class FeeServiceTest {
     }
 
     @Test
-    public void addFeeTest() throws FeeAlreadyExistsException
+    public void addFeeTest() throws ValidationException
     {
         Fee fee = new Fee(1, 2, 4, null, null);
         when(feeRepository.save(fee)).thenReturn(fee);
@@ -46,8 +45,8 @@ public class FeeServiceTest {
         assertEquals(fee.getCostPerMinute(), feeResult.getCostPerMinute());
     }
 
-    @Test(expected = FeeAlreadyExistsException.class)
-    public void addFeeAlreadyExists() throws FeeAlreadyExistsException
+    @Test(expected = ValidationException.class)
+    public void addFeeAlreadyExists() throws ValidationException
     {
         Fee fee = new Fee(1, 2, 4, null, null);
         when(feeRepository.save(fee)).thenReturn(null);
@@ -55,7 +54,7 @@ public class FeeServiceTest {
     }
 
     @Test
-    public void deleteFeeOk() throws FeeNotExistsException
+    public void deleteFeeOk() throws ValidationException
     {
         Fee fee = new Fee(1, 2, 4, null, null);
         when(feeRepository.delete(1)).thenReturn(fee);
@@ -63,8 +62,8 @@ public class FeeServiceTest {
         assertEquals(fee, feeResult);
     }
 
-    @Test(expected = FeeNotExistsException.class)
-    public void deleteFeeNotExists() throws FeeNotExistsException
+    @Test(expected = ValidationException.class)
+    public void deleteFeeNotExists() throws ValidationException
     {
         when(feeRepository.delete(1)).thenReturn(null);
         feeService.deleteFee(1);
@@ -94,7 +93,7 @@ public class FeeServiceTest {
     }
 
     @Test
-    public void getByIdOk() throws FeeNotExistsException
+    public void getByIdOk() throws ValidationException
     {
         Fee fee = new Fee(1, 10, 5, null, null);
         Fee fee2 = new Fee(2, 4, 2, null, null);
@@ -108,15 +107,15 @@ public class FeeServiceTest {
         verify(feeRepository, times(1)).findById(1);
     }
 
-    @Test(expected = FeeNotExistsException.class)
-    public void getByIdFeeNotExists() throws FeeNotExistsException
+    @Test(expected = ValidationException.class)
+    public void getByIdFeeNotExists() throws ValidationException
     {
         when(feeRepository.findById(1)).thenReturn(null);
         feeService.getById(1);
     }
 
     @Test
-    public void getBySourceCityOk() throws FeeNotExistsException
+    public void getBySourceCityOk() throws ValidationException
     {
         City city = new City(1, "Mar del Plata", "223", null);
         Fee fee = new Fee(1, 10, 5, city, null);
@@ -132,15 +131,15 @@ public class FeeServiceTest {
         verify(feeRepository, times(1)).findBySourceCity("Mar del Plata");
     }
 
-    @Test(expected = FeeNotExistsException.class)
-    public void getBySourceCityFeeNotExists() throws FeeNotExistsException
+    @Test(expected = ValidationException.class)
+    public void getBySourceCityFeeNotExists() throws ValidationException
     {
         when(feeRepository.findBySourceCity("Mar del Plata")).thenReturn(null);
         feeService.getBySourceCity("Mar del Plata");
     }
 
     @Test
-    public void getByDestinationCityOk() throws FeeNotExistsException
+    public void getByDestinationCityOk() throws ValidationException
     {
         City city = new City(1, "Mar del Plata", "223", null);
         Fee fee = new Fee(1, 10, 5, null, city);
@@ -156,15 +155,15 @@ public class FeeServiceTest {
         verify(feeRepository, times(1)).findByDestinationCity("Mar del Plata");
     }
 
-    @Test(expected = FeeNotExistsException.class)
-    public void getByDestinationCityFeeNotExists() throws FeeNotExistsException
+    @Test(expected = ValidationException.class)
+    public void getByDestinationCityFeeNotExists() throws ValidationException
     {
         when(feeRepository.findByDestinationCity("Mar del Plata")).thenReturn(null);
         feeService.getByDestinationCity("Mar del Plata");
     }
 
     @Test
-    public void getByIdCitiesOk() throws FeeNotExistsException
+    public void getByIdCitiesOk() throws ValidationException
     {
         City city = new City(1, "Mar del Plata", "223", null);
         Fee fee = new Fee(1, 10, 5, city, city);
@@ -184,15 +183,15 @@ public class FeeServiceTest {
         verify(feeRepository, times(1)).getFeeByIdCities(1,1);
     }
 
-    @Test(expected = FeeNotExistsException.class)
-    public void getByIdCitiesFeeNotExists() throws FeeNotExistsException
+    @Test(expected = ValidationException.class)
+    public void getByIdCitiesFeeNotExists() throws ValidationException
     {
         when(feeRepository.getFeeByIdCities(1,1)).thenReturn(null);
         feeService.getFeeByIdCities(1,1);
     }
 
     @Test
-    public void getByNameCitiesOk() throws FeeNotExistsException
+    public void getByNameCitiesOk() throws ValidationException
     {
         City city = new City(1, "Mar del Plata", "223", null);
         Fee fee = new Fee(1, 10, 5, city, city);
@@ -212,8 +211,8 @@ public class FeeServiceTest {
         verify(feeRepository, times(1)).getFeeByNameCities("Mar del Plata", "Mar del Plata");
     }
 
-    @Test(expected = FeeNotExistsException.class)
-    public void getByNameCitiesFeeNotExists() throws FeeNotExistsException
+    @Test(expected = ValidationException.class)
+    public void getByNameCitiesFeeNotExists() throws ValidationException
     {
         when(feeRepository.getFeeByNameCities("Mar del Plata", "Mar del Plata")).thenReturn(null);
         feeService.getFeeByNameCities("Mar del Plata", "Mar del Plata");

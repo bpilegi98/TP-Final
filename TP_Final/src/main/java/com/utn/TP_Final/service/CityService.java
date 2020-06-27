@@ -1,14 +1,12 @@
 package com.utn.TP_Final.service;
 
-import com.utn.TP_Final.exceptions.CityAlreadyExistsException;
-import com.utn.TP_Final.exceptions.CityNotExistsException;
+import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.City;
 import com.utn.TP_Final.model.Province;
 import com.utn.TP_Final.repository.CityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -33,16 +31,16 @@ public class CityService {
         this.cityRepository = cityRepository;
     }
 
-    public City addCity(City newCity) throws CityAlreadyExistsException
+    public City addCity(City newCity) throws ValidationException
     {
         City city = cityRepository.save(newCity);
-        return Optional.ofNullable(city).orElseThrow(()-> new CityAlreadyExistsException());
+        return Optional.ofNullable(city).orElseThrow(()-> new ValidationException("That city already exists."));
     }
 
-    public City deleteCity(Integer id) throws CityNotExistsException
+    public City deleteCity(Integer id) throws ValidationException
     {
         City city = cityRepository.delete(id);
-        return Optional.ofNullable(city).orElseThrow(()-> new CityNotExistsException());
+        return Optional.ofNullable(city).orElseThrow(()-> new ValidationException("Couldn't delete, that city doesn't exists."));
     }
 
     public List<City> getAll(String name)
@@ -54,16 +52,16 @@ public class CityService {
         return cityRepository.findByName(name);
     }
 
-    public Optional<City> getById(Integer id)throws CityNotExistsException
+    public Optional<City> getById(Integer id)throws ValidationException
     {
         Optional<City> city = cityRepository.findById(id);
-        return Optional.ofNullable(city).orElseThrow(()-> new CityNotExistsException());
+        return Optional.ofNullable(city).orElseThrow(()-> new ValidationException("Couldn't find that city."));
     }
 
-    public City getByPrefix(String prefix) throws CityNotExistsException
+    public City getByPrefix(String prefix) throws ValidationException
     {
         City city = cityRepository.findByPrefix(prefix);
-        return Optional.ofNullable(city).orElseThrow(()-> new CityNotExistsException());
+        return Optional.ofNullable(city).orElseThrow(()-> new ValidationException("Couldn't find that city."));
     }
 
 

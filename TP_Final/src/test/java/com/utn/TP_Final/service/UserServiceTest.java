@@ -1,6 +1,5 @@
 package com.utn.TP_Final.service;
 
-import com.utn.TP_Final.exceptions.DateNotExistsException;
 import com.utn.TP_Final.exceptions.UserAlreadyExistsException;
 import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.exceptions.ValidationException;
@@ -16,7 +15,6 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
-import org.springframework.http.ResponseEntity;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -121,10 +119,10 @@ public class UserServiceTest {
     @Test //fijarse si esta bien planteado
     public void deleteUserOk() throws UserNotExistsException
     {
-        when(userRepository.delete("41307541")).thenReturn("41307541");
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
-        String deleteResult = userService.deleteUser("41307541");
-        assertEquals(user.getDni(), deleteResult);
+        when(userRepository.delete("41307541")).thenReturn(user);
+        User userResult = userService.deleteUser("41307541");
+        assertEquals(user, userResult);
     }
 
     @Test(expected = UserNotExistsException.class)
@@ -183,7 +181,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getCallsBetweenDatesTestOk() throws DateNotExistsException, UserNotExistsException
+    public void getCallsBetweenDatesTestOk() throws UserNotExistsException
     {
         User loggedUser = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
         TelephoneLine telephoneLine = new TelephoneLine(1, "2236785467", null, null, loggedUser);
@@ -207,14 +205,6 @@ public class UserServiceTest {
         verify(userRepository, times(1)).getCallsBetweenDates(Date.valueOf("2020-06-20"), Date.valueOf("2020-06-26"), 1);
     }
 
-    /*
-    @Test(expected = DateNotExistsException.class)
-    public void getCallsBetweenDatesDateNotExists() throws DateNotExistsException, UserNotExistsException
-    {
-        when(userRepository.getCallsBetweenDates(Date.valueOf("2020-06-20"), Date.valueOf("2020-06-26"), 1)).thenReturn(null);
-        userService.getCallsBetweenDates(Date.valueOf("2020-06-20"), Date.valueOf("2020-06-26"), 1);
-    }
-     */
 
     @Test(expected = UserNotExistsException.class)
     public void getCallsBetweenDatesUserNotExists() throws UserNotExistsException
@@ -224,7 +214,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getInvoicesBetweenDatesOk() throws DateNotExistsException, UserNotExistsException
+    public void getInvoicesBetweenDatesOk() throws UserNotExistsException
     {
         User loggedUser = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
         TelephoneLine telephoneLine = new TelephoneLine(1, "2236785467", null, null, loggedUser);
@@ -249,15 +239,6 @@ public class UserServiceTest {
         assertEquals(invoicesBetweenDatesUserList, invoicesBetweenDatesUsersResult);
         verify(userRepository, times(1)).getInvoicesBetweenDates(Date.valueOf("2020-06-25"), Date.valueOf("2020-07-25"), 1);
     }
-
-    /*
-    @Test(expected = DateNotExistsException.class)
-    public void getInvoicesBetweenDatesDateNotExists() throws DateNotExistsException, UserNotExistsException
-    {
-        when(userRepository.getInvoicesBetweenDates(Date.valueOf("2020-06-25"), Date.valueOf("2020-07-25"), 1)).thenReturn(null);
-        userService.getInvoicesBetweenDates(Date.valueOf("2020-06-25"), Date.valueOf("2020-07-25"), 1);
-    }
-     */
 
     @Test(expected = UserNotExistsException.class)
     public void getInvoicesBetweenDatesUserNotExists() throws UserNotExistsException

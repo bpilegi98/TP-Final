@@ -1,18 +1,20 @@
 package com.utn.TP_Final.controller;
 
 
-import com.utn.TP_Final.exceptions.TelephoneLineAlreadyExistsException;
-import com.utn.TP_Final.exceptions.TelephoneLineNotExistsException;
 import com.utn.TP_Final.exceptions.ValidationException;
+import com.utn.TP_Final.model.City;
 import com.utn.TP_Final.model.TelephoneLine;
 import com.utn.TP_Final.service.TelephoneLineService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
-@RestController("")
-@RequestMapping("/telephoneLine")
+@Controller
 public class TelephoneLineController {
 
     private final TelephoneLineService telephoneLineService;
@@ -22,39 +24,49 @@ public class TelephoneLineController {
         this.telephoneLineService = telephoneLineService;
     }
 
-    @PostMapping("/")
-    public TelephoneLine addTelephoneLine(@RequestBody TelephoneLine newTelephoneLine) throws TelephoneLineAlreadyExistsException, ValidationException
+
+    public ResponseEntity<TelephoneLine> addTelephoneLine(@RequestBody TelephoneLine newTelephoneLine) throws ValidationException
     {
-        return telephoneLineService.addTelephoneLine(newTelephoneLine);
+        return ResponseEntity.created(getUri(telephoneLineService.addTelephoneLine(newTelephoneLine))).build();
     }
 
-    @PostMapping("/delete/{lineNumber}")
-    public TelephoneLine removeTelephoneLine(@PathVariable String lineNumber) throws TelephoneLineNotExistsException, ValidationException
+
+    public ResponseEntity<TelephoneLine> removeTelephoneLine(@PathVariable String lineNumber) throws ValidationException
     {
-        return telephoneLineService.deleteTelephoneLine(lineNumber);
+        return ResponseEntity.ok(telephoneLineService.deleteTelephoneLine(lineNumber));
     }
 
-    @GetMapping("/")
-    public List<TelephoneLine> getAll(@PathVariable String lineNumber)
+
+    public ResponseEntity<List<TelephoneLine>> getAll(@PathVariable String lineNumber)
     {
-        return telephoneLineService.getAll(lineNumber);
+        return ResponseEntity.ok(telephoneLineService.getAll(lineNumber));
     }
 
-    @PutMapping("/suspend/{lineNumber}")
-    public TelephoneLine suspendTelephoneLine(@PathVariable String lineNumber)throws TelephoneLineNotExistsException, ValidationException
+
+    public ResponseEntity<TelephoneLine> suspendTelephoneLine(@PathVariable String lineNumber)throws ValidationException
     {
-        return telephoneLineService.suspendTelephoneLine(lineNumber);
+        return ResponseEntity.ok(telephoneLineService.suspendTelephoneLine(lineNumber));
     }
 
-    @PutMapping("/active/{lineNumber}")
-    public TelephoneLine activeTelephoneLine(@PathVariable String lineNumber)throws TelephoneLineNotExistsException, ValidationException
+
+    public ResponseEntity<TelephoneLine> activeTelephoneLine(@PathVariable String lineNumber)throws ValidationException
     {
-        return telephoneLineService.activeTelephoneLine(lineNumber);
+        return ResponseEntity.ok(telephoneLineService.activeTelephoneLine(lineNumber));
     }
 
-    @GetMapping("/{number}")
-    public TelephoneLine getByNumber(@PathVariable String number)throws TelephoneLineNotExistsException, ValidationException
+
+    public ResponseEntity<TelephoneLine> getByNumber(@PathVariable String number)throws ValidationException
     {
-        return telephoneLineService.findByLineNumber(number);
+        return ResponseEntity.ok(telephoneLineService.findByLineNumber(number));
+    }
+
+
+    private URI getUri(TelephoneLine telephoneLine)
+    {
+        return ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}/")
+                .buildAndExpand(telephoneLine.getId())
+                .toUri();
     }
 }
