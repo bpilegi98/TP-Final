@@ -1,0 +1,143 @@
+use UTNPhones //Crea la base de datos si es que no existe una con ese nombre
+db.dropDatabase() //Dropea la base de datos
+
+//Formato Date de MongoDB -> YYYY-mm-ddTHH:MM:ssZ
+
+//Las tablas se crean haciendo un insert si es que antes no existían
+
+db.countries.insert({
+	id: 1,
+	name: "Argentina"
+})
+
+db.provinces.insert({
+	id: 1,
+	name: "Buenos Aires",
+	country: {
+		id: 1
+	}
+})
+
+db.cities.insert({
+	id: 1,
+	name: "Mar del Plata",
+	prefix_number: "223",
+	province: {
+		id: 1
+	}
+})
+
+db.users.insert({
+	id: 1,
+	firstname: "Bianca",
+	lastname: "Pilegi",
+	dni: "41307541",
+	username: "bpilegi98",
+	password: "1234",
+	user_type: {
+		name: "CUSTOMER"
+	},
+	is_active: true,
+	city: {
+		id: 1
+	}
+})
+
+db.users.insert({
+	id: 2,
+	firstname: "Juan Martin",
+	lastname: "Ludueña",
+	dni: "41306777",
+	username: "juanludu",
+	password: "4321",
+	user_type: {
+		name: "EMPLOYEE"
+	},
+	is_active: true,
+	city: {
+		id: 1
+	}
+})
+
+db.fees.insert({
+	id: 1,
+	price_per_minute: 2.5,
+	cost_per_minute: 0.5,
+	source_city: {
+		id: 1
+	},
+	destination_city: {
+		id: 1
+	}
+})
+
+db.telephone_lines.insert({
+	id: 1,
+	line_number: "2235388479",
+	line_type: {
+		name: "MOBILE"
+	},
+	status: {
+		name: "ACTIVE"
+	},
+	user: {
+		id: 1
+	}
+})
+
+db.telephone_lines.insert({
+	id: 2,
+	line_number: "2235388478",
+	line_type: {
+		name: "MOBILE"
+	},
+	status: {
+		name: "ACTIVE"
+	},
+	user: {
+		id: 2
+	}
+})
+
+db.invoices.insert({
+	id: 1,
+	total_price: 15.5,
+	total_cost: 10.5,
+	date_creation: "2020-06-25T20:45:09.000+0000",
+	date_expiration: "2020-07-25T20:45:09.000+0000",
+	paid: false,
+	telephone_line: {
+		id: 1
+	},
+	user: {
+		id: 1
+	}
+})
+
+db.calls.insert({
+	id: 1,
+	price_per_minute: 2.5,
+	duration_secs: 150,
+	total_cost: 1.5,
+	total_price: 6.25,
+	source_number: {
+		line_number: "2235388479"
+	},
+	id_source_number: {
+		id: 1
+	},
+	destination_number: {
+		line_number: "2235388478"
+	},
+	id_destination_number: {
+		id: 2
+	},
+	date_call: "2020-06-20T20:45:09.000+0000",
+	source_city: {
+		id: 1
+	},
+	destination_city: {
+		id: 1
+	}
+})
+
