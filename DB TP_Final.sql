@@ -603,7 +603,8 @@ as
 select c.source_number as "Numero de origen" , (select name from cities where id=c.id_source_number) as "Ciudad de origen" , c.destination_number as "Numero de destino" , (select name from cities where id=c.id_destination_number) as "Ciudad de destino" , c.total_price as "Precio total", c.date_call as "Fecha y hora" 
 from calls c
 select * from v_calls;
-
+select  * from calls
+select * from invoices
 call facturation()
 drop procedure facturation
 DELIMITER //
@@ -618,19 +619,20 @@ DECLARE date_expiration_var date;
 DECLARE id_telephone_line_var int;
 DECLARE id_user_var int;
 DECLARE id_source_number_call int;
+DECLARE id_invoice_var int;
+DECLARE id_call_var int DEFAULT 0;
 DECLARE vFinished INTEGER DEFAULT 0;
 
 DECLARE cur_telephone_lines CURSOR FOR 
 SELECT id, id_user
 FROM telephone_lines;
 DECLARE cur_calls CURSOR FOR 
-SELECT total_cost, total_price,id_source_number
+SELECT id, total_cost, total_price,id_source_number
 FROM calls
-WHERE date_call > (DATE(now()) - INTERVAL 1 MONTH);
+WHERE date_call > (DATE(now()) - INTERVAL 1 MONTH) and ISNULL(id_invoice);
 
 DECLARE CONTINUE HANDLER FOR NOT FOUND 
 SET vfinished=1;
-
 SET date_creation_var = (select DATE(now()));
 SET date_expiration_var =(select (DATE(now()) + INTERVAL 1 MONTH));
 start transaction;
@@ -642,12 +644,22 @@ OPEN cur_telephone_lines;
     END IF;
     OPEN cur_calls;
     LOOP2: LOOP
-      FETCH cur_calls INTO total_cost_var, total_price_var,id_source_number_call;
+      FETCH cur_calls INTO id_call_var, total_cost_var, total_price_var,id_source_number_call;
         IF vfinished = 1 THEN
 			SET vfinished =0;
           LEAVE LOOP2;
 		ELSE 
 			IF (id_source_number_call = id_telephone_line_var) THEN
+				IF(total_cost_sum = 0) THEN 
+					INSERT INTO invoices (total_price, total_cost, date_creation, date_expiration, paid, id_telephone_line, id_user)
+					values (0, 0, date_creation_var, date_expiration_var, 0, id_telephone_line_var, id_user_var);
+                    SET id_invoice_var = last_insert_id();
+                END IF;
+                IF(id_invoice_var > 0) THEN
+                    UPDATE calls
+                    SET id_invoice = id_invoice_var
+                    WHERE id=id_call_var;
+				END IF;
 				SET total_cost_sum = total_cost_sum + total_cost_var;
                 SET total_price_sum = total_price_sum + total_price_var;
 			END IF;
@@ -655,10 +667,12 @@ OPEN cur_telephone_lines;
 	SET vfinished =0;
     END LOOP LOOP2;
     IF (total_price_sum >0) THEN
-		INSERT INTO invoices (total_price, total_cost, date_creation, date_expiration, paid, id_telephone_line, id_user)
-        values (total_price_sum, total_cost_sum, date_creation_var, date_expiration_var, 0, id_telephone_line_var, id_user_var);
+		UPDATE invoices
+        SET total_price = total_price_sum , total_cost = total_cost_sum
+        where id = id_invoice_var;
         SET total_price_sum =0;
 		SET total_cost_sum =0;
+        SET id_invoice_var =0;
 	END IF;
 	CLOSE cur_calls;
   END LOOP LOOP1;
