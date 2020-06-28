@@ -95,7 +95,6 @@ constraint fk_id_invoice_call foreign key (id_invoice) references invoices(id)
 );
 
 -- TRIGGERS
-
 -- TRIGGER de calls
 DELIMITER // 
 CREATE TRIGGER tbi_call_complete_and_check BEFORE INSERT ON calls FOR EACH ROW
@@ -132,9 +131,9 @@ END IF;
 IF (NEW.date_call < (NOW() - INTERVAL 10 DAY)) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'La fecha tiene no puede ser anterior a 10 dias', mysql_errno = 1000;
 END IF;
 
-select u.id_city from users u join telephone_lines t on u.id=t.id_user  where t.line_number = NEW.source_number into id_source;
-select u.id_city from users u join telephone_lines t on u.id=t.id_user  where t.line_number = NEW.destination_number into id_dest;
-
+-- Este metodo busca la ciudad por el prefijo, pero como hay prefijos repetidos entre ciudades no se si esta del todo bien
+SET id_source = (SELECT c.id FROM cities c WHERE new.source_number LIKE CONCAT(c.prefix_number, '%') ORDER BY LENGTH(c.prefix_number) DESC LIMIT 1);
+SET id_dest = (SELECT c.id FROM cities c WHERE new.destination_number LIKE CONCAT(c.prefix_number, '%') ORDER BY LENGTH(c.prefix_number) DESC LIMIT 1);
 select IFNULL(f.price_per_minute,2), IFNULL(f.cost_per_minute,1)
 from fees f
 where (f.id_source_city = id_source) and (f.id_destination_city = id_dest) into ppp,cpp;
@@ -142,8 +141,6 @@ where (f.id_source_city = id_source) and (f.id_destination_city = id_dest) into 
 select CEIL(new.duration_secs / 60) into duration_minutes;
 select ppp * duration_minutes , cpp * duration_minutes into price,cost;
 
--- Este metodo buscaba la ciudad por el prefijo, pero como hay prefijos repetidos entre ciudades no sabia si esta bien
--- SET NEW.id_source_number = (SELECT c.id FROM cities c WHERE new.source_number LIKE CONCAT(c.prefix_number, '%') ORDER BY LENGTH(c.prefix_number) DESC LIMIT 1)
 SET NEW.id_source_number = (select t.id from telephone_lines t where t.line_number = NEW.source_number  limit 1);
 SET NEW.id_destination_number = (select t.id from telephone_lines t where t.line_number = NEW.destination_number  limit 1);
 SET NEW.price_per_minute = ppp;
@@ -153,7 +150,7 @@ SET NEW.id_source_city = id_source;
 SET NEW.id_destination_city = id_dest;
 END//
 
-
+select * from calls order by id DESC;
 
 -- ///STORED PROCEDURES///
 
@@ -738,7 +735,7 @@ grant execute on procedure user_top_most_called to 'customer'@'localhost';
 select * from fees
 
 select * from calls
-
+call facturation
 
 -- /// INDICES ///
 
@@ -756,14 +753,24 @@ explain select * from cities where id_province = 1;
 
 -- CALLS
 -- user_calls_between_dates
+-- La performance es 44.5 veces mas rapida 
+-- Con medio millon de llamadas sin indice 1.38s CON indice 0.031s
 create index idx_user_calls_between_date on calls (date_call, id_source_number) using btree;
 
 -- backoffice_request_calls_user // backoffice_request_calls_user_simple
+-- La performance pasa de 0.078 a 0.0 (pocos users)
 create index idx_backoffice_request_calls_user on calls (id_source_number) using btree;
 
 -- INVOICES
 -- backoffice_invoices_between_dates
+-- la performance pasa de 0.016 a 0.0 (40 invoices)
 create index idx_backoffice_invoices_between_dates on invoices (date_creation) using btree;
 
 -- user_invoices_between_dates
+-- la performance pasa de 0.016 a 0.0 (40 invoices)
 create index idx_user_invoices_between_dates on invoices (date_creation, id_user) using btree;
+
+call backoffice_request_calls_user(7555)
+call backoffice_request_calls_user_simple(7555)
+call backoffice_invoices_between_dates("2020-06-20","2020-06-27")
+call user_invoices_between_dates("2020-06-20","2020-06-27",3)

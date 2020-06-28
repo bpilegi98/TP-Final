@@ -38,7 +38,7 @@ public class CustomerWebController {
 
 
 
-    @GetMapping("/getCallsBetweenDates")
+    @GetMapping("/calls")
     public ResponseEntity<List<CallsBetweenDates>> getCallsBetweenDates(@RequestHeader("Authorization") String sessionToken,
                                                                         @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date from,
                                                                         @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date to,
@@ -51,7 +51,7 @@ public class CustomerWebController {
             return (callsBetweenDates != null) ? callsBetweenDates : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
        }
 
-    @GetMapping("/getInvoicesBetweenDates")
+    @GetMapping("/invoices")
     public ResponseEntity<List<InvoicesBetweenDatesUser>> getInvoicesBetweenDates(@RequestHeader("Authorization")String sessionToken,
                                                                                   @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date from,
                                                                                   @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date to, Integer idLoggedUser) throws ValidationException, UserNotExistsException
@@ -62,7 +62,7 @@ public class CustomerWebController {
             return (invoicesBetweenDateUsers != null) ? invoicesBetweenDateUsers : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
 
-    @GetMapping("/getTopMostCalledDestinations")
+    @GetMapping("/topMostCalledDestinations")
     public ResponseEntity<List<TopMostCalledDestinations>> getTopMostCalledDestinations(@RequestHeader("Authorization") String sessionToken, Integer idLoggedUser) throws ValidationException, UserNotExistsException
     {
             User currentUser = sessionManager.getLoggedUser(sessionToken);
