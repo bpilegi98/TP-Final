@@ -1,5 +1,6 @@
 package com.utn.TP_Final.repository;
 
+import com.utn.TP_Final.model.TelephoneLine;
 import com.utn.TP_Final.model.User;
 import com.utn.TP_Final.projections.CallsBetweenDates;
 import com.utn.TP_Final.projections.InvoicesBetweenDatesUser;
@@ -22,9 +23,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     User findByUsername(String username);
 
     @Query(value = "remove from users where dni = ?1", nativeQuery = true)
-    String delete(String dni);
+    User delete(String dni);
 
-    //averiguar el tema de manejo de fechas q chocan los formatos
     @Query(value = "call user_calls_between_dates(:fromD, :toD, :idLoggedUser);", nativeQuery = true)
     List<CallsBetweenDates> getCallsBetweenDates(@Param("fromD") Date from, @Param("toD") Date to, @Param("idLoggedUser") Integer idLoggedUser); //agregar exceptions correspondientes
 
@@ -33,4 +33,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query(value = "call user_top_most_called(:idLoggedUser);", nativeQuery = true)
     List<TopMostCalledDestinations> getTopMostCalledDestinations(@Param("idLoggedUser") Integer idLoggedUser);
+
+    @Query(value = "update users set is_active = true where dni = ?1", nativeQuery = true)
+    User activeUser(String dni);
+
+    @Query(value = "update users set is_active = false where dni = ?1", nativeQuery = true)
+    User suspendUser(String dni);
 }

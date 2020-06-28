@@ -1,6 +1,5 @@
 package com.utn.TP_Final.controller;
 
-import com.utn.TP_Final.exceptions.DateNotExistsException;
 import com.utn.TP_Final.exceptions.UserAlreadyExistsException;
 import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.exceptions.ValidationException;
@@ -12,11 +11,16 @@ import com.utn.TP_Final.projections.TopMostCalledDestinations;
 import com.utn.TP_Final.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.Date;
@@ -31,17 +35,20 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 public class UserControllerTest {
 
-    @Autowired
+    @InjectMocks
     UserController userController;
 
     @Mock
     UserService userService;
 
+    @Mock
+    HttpServletRequest request;
+
     @Before
     public void setUp()
     {
         initMocks(this);
-        userController = new UserController(userService);
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
     }
 
     @Test
@@ -54,18 +61,8 @@ public class UserControllerTest {
         UserType userType = UserType.CUSTOMER;
         User user = new User(1, "Nombre", "Apellido", "11111111", "prueba", "1234", userType, true, city, telephoneLines, null);
         when(userService.addUser(user)).thenReturn(user);
-        User userResult = new User();
-        userResult.setUserType(UserType.CUSTOMER);
-        userResult.setActive(true);
-        assertEquals(user.getUserType(), userResult.getUserType());
-        assertEquals(user.isActive(), userResult.isActive());
-    }
-
-    @Test(expected = UserAlreadyExistsException.class)
-    public void addUserAlreadyExists() throws UserAlreadyExistsException, ValidationException, InvalidKeySpecException, NoSuchAlgorithmException {
-        User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
-        when(userService.addUser(user)).thenReturn(null);
-        userController.addUser(user);
+        ResponseEntity<User> userResult = userController.addUser(user);
+        assertEquals(HttpStatus.CREATED, userResult.getStatusCode());
     }
 
 
@@ -81,8 +78,8 @@ public class UserControllerTest {
 
         when(userService.getAll(null)).thenReturn(users);
 
-        List<User> userList = userController.getAll(null);
-        assertEquals(2, userList.size());
+        ResponseEntity<List<User>> userList = userController.getAll(null);
+        assertEquals(HttpStatus.OK, userList.getStatusCode());
         verify(userService, times(1)).getAll(null);
     }
 
@@ -91,8 +88,8 @@ public class UserControllerTest {
     {
         List<User> users = new ArrayList<User>();
         when(userService.getAll(null)).thenReturn(users);
-        List<User> result = userController.getAll(null);
-        assertEquals(users, result);
+        ResponseEntity<List<User>> result = userController.getAll(null);
+        assertEquals(HttpStatus.OK, result.getStatusCode());
     }
 
     @Test
@@ -104,40 +101,28 @@ public class UserControllerTest {
         users.add(user2);
         Optional<User> userOptional = Optional.ofNullable(users.get(0));
         when(userService.getById(1)).thenReturn(userOptional);
-        Optional<User> userResult = userController.getById(1);
-        assertEquals(userOptional, userResult);
+        ResponseEntity<Optional<User>> userResult = userController.getById(1);
+        assertEquals(HttpStatus.OK, userResult.getStatusCode());
         verify(userService, times(1)).getById(1);
     }
 
-    @Test(expected = UserNotExistsException.class)
-    public void getByIdUserNotExists() throws UserNotExistsException, ValidationException {
-        when(userService.getById(1)).thenReturn(null);
-        Optional<User> user = userController.getById(1);
-    }
 
-    @Test //fijarse si esta bien planteado
+    @Test
     public void deleteUserOk() throws UserNotExistsException, ValidationException {
-        when(userService.deleteUser("41307541")).thenReturn("41307541");
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
-        String deleteResult = userController.removeUser("41307541");
-        assertEquals(user.getDni(), deleteResult);
-    }
-
-    @Test(expected = UserNotExistsException.class)
-    public void deleteUserNotExists() throws UserNotExistsException, ValidationException {
-        when(userService.deleteUser("41307541")).thenReturn(null);
-        userController.removeUser("41307541");
+        when(userService.deleteUser("41307541")).thenReturn(user);
+        ResponseEntity<User> deleteResult = userController.removeUser("41307541");
+        assertEquals(HttpStatus.OK, deleteResult.getStatusCode());
     }
 
 
-    @Test //Error NPE (null pointer exception)
+    @Test //NPE error
     public void loginTestOk() throws UserNotExistsException, ValidationException, InvalidKeySpecException, NoSuchAlgorithmException {
         User loggedUser = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
-        when(userService.getByUsername("user")).thenReturn(loggedUser);
-        User userResult = userController.login("user","password").getBody();
-        assertEquals(loggedUser.getId(), userResult.getId());
-        assertEquals(loggedUser.getUsername(), userResult.getUsername());
-        verify(userService, times(1)).getByUsername("user");
+        when(userService.getByUsername("bpilegi98")).thenReturn(loggedUser);
+        ResponseEntity<User> userResult = userController.login("bpilegi98","1234");
+        assertEquals(HttpStatus.OK, userResult.getStatusCode());
+        verify(userService, times(1)).getByUsername("bpilegi98");
     }
 
     @Test(expected = UserNotExistsException.class)
@@ -147,37 +132,28 @@ public class UserControllerTest {
     }
 
 
-
     @Test
     public void getByDniOk() throws UserNotExistsException, ValidationException {
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
         when(userService.getByDni("41307541")).thenReturn(user);
-        assertEquals(userController.getByDni("41307541"), user);
+        ResponseEntity<User> userResult = userController.getByDni("41307541");
+        assertEquals(HttpStatus.OK, userResult.getStatusCode());
         verify(userService, times(1)).getByDni("41307541");
     }
 
-    @Test(expected = UserNotExistsException.class)
-    public void getByDniUserNotExists() throws UserNotExistsException, ValidationException {
-        when(userService.getByDni("41307541")).thenReturn(null);
-        userController.getByDni("41307541");
-    }
 
     @Test
     public void getByUsernameOk() throws UserNotExistsException, ValidationException {
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
         when(userService.getByUsername("bpilegi98")).thenReturn(user);
-        assertEquals(userController.getByUsername("bpilegi98"), user);
+        ResponseEntity<User> result = userController.getByUsername("bpilegi98");
+        assertEquals(HttpStatus.OK, result.getStatusCode());
         verify(userService, times(1)).getByUsername("bpilegi98");
     }
 
-    @Test(expected = UserNotExistsException.class)
-    public void getByUsernameUserNotExists() throws UserNotExistsException, ValidationException {
-        when(userService.getByUsername("bpilegi98")).thenReturn(null);
-        userController.getByUsername("bpilegi98");
-    }
 
     @Test
-    public void getCallsBetweenDatesTestOk() throws DateNotExistsException, UserNotExistsException, ValidationException {
+    public void getCallsBetweenDatesTestOk() throws UserNotExistsException, ValidationException {
         User loggedUser = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
         TelephoneLine telephoneLine = new TelephoneLine(1, "2236785467", null, null, loggedUser);
         TelephoneLine telephoneLine2 = new TelephoneLine(2, "2236785469", null, null, null);
@@ -194,29 +170,15 @@ public class UserControllerTest {
 
         when(userService.getCallsBetweenDates(Date.valueOf("2020-06-20"), Date.valueOf("2020-06-26"), 1)).thenReturn(callsBetweenDatesList);
 
-        List<CallsBetweenDates> callsBetweenDatesResult = userController.getCallsBetweenDates(Date.valueOf("2020-06-20"), Date.valueOf("2020-06-26"), 1);
+        ResponseEntity<List<CallsBetweenDates>> callsBetweenDatesResult = userController.getCallsBetweenDates(Date.valueOf("2020-06-20"), Date.valueOf("2020-06-26"), 1);
 
-        assertEquals(callsBetweenDatesList, callsBetweenDatesResult);
+        assertEquals(HttpStatus.OK, callsBetweenDatesResult.getStatusCode());
         verify(userService, times(1)).getCallsBetweenDates(Date.valueOf("2020-06-20"), Date.valueOf("2020-06-26"), 1);
     }
 
-    /*
-    @Test(expected = DateNotExistsException.class)
-    public void getCallsBetweenDatesDateNotExists() throws DateNotExistsException, UserNotExistsException
-    {
-        when(userRepository.getCallsBetweenDates(Date.valueOf("2020-06-20"), Date.valueOf("2020-06-26"), 1)).thenReturn(null);
-        userService.getCallsBetweenDates(Date.valueOf("2020-06-20"), Date.valueOf("2020-06-26"), 1);
-    }
-     */
-
-    @Test(expected = UserNotExistsException.class)
-    public void getCallsBetweenDatesUserNotExists() throws UserNotExistsException, DateNotExistsException, ValidationException {
-        when(userService.getCallsBetweenDates(Date.valueOf("2020-06-20"), Date.valueOf("2020-06-26"), 1)).thenReturn(null);
-        userController.getCallsBetweenDates(Date.valueOf("2020-06-20"), Date.valueOf("2020-06-26"), 1);
-    }
 
     @Test
-    public void getInvoicesBetweenDatesOk() throws DateNotExistsException, UserNotExistsException, ValidationException {
+    public void getInvoicesBetweenDatesOk() throws UserNotExistsException, ValidationException {
         User loggedUser = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
         TelephoneLine telephoneLine = new TelephoneLine(1, "2236785467", null, null, loggedUser);
         TelephoneLine telephoneLine2 = new TelephoneLine(2, "2236785469", null, null, null);
@@ -235,26 +197,12 @@ public class UserControllerTest {
 
         when(userService.getInvoicesBetweenDates(Date.valueOf("2020-06-25"), Date.valueOf("2020-07-25"), 1)).thenReturn(invoicesBetweenDatesUserList);
 
-        List<InvoicesBetweenDatesUser> invoicesBetweenDatesUsersResult = userController.getInvoicesBetweenDates(Date.valueOf("2020-06-25"), Date.valueOf("2020-07-25"), 1);
+        ResponseEntity<List<InvoicesBetweenDatesUser>> invoicesBetweenDatesUsersResult = userController.getInvoicesBetweenDates(Date.valueOf("2020-06-25"), Date.valueOf("2020-07-25"), 1);
 
-        assertEquals(invoicesBetweenDatesUserList, invoicesBetweenDatesUsersResult);
+        assertEquals(HttpStatus.OK, invoicesBetweenDatesUsersResult.getStatusCode());
         verify(userService, times(1)).getInvoicesBetweenDates(Date.valueOf("2020-06-25"), Date.valueOf("2020-07-25"), 1);
     }
 
-    /*
-    @Test(expected = DateNotExistsException.class)
-    public void getInvoicesBetweenDatesDateNotExists() throws DateNotExistsException, UserNotExistsException
-    {
-        when(userRepository.getInvoicesBetweenDates(Date.valueOf("2020-06-25"), Date.valueOf("2020-07-25"), 1)).thenReturn(null);
-        userService.getInvoicesBetweenDates(Date.valueOf("2020-06-25"), Date.valueOf("2020-07-25"), 1);
-    }
-     */
-
-    @Test(expected = UserNotExistsException.class)
-    public void getInvoicesBetweenDatesUserNotExists() throws UserNotExistsException, DateNotExistsException, ValidationException {
-        when(userService.getInvoicesBetweenDates(Date.valueOf("2020-06-25"), Date.valueOf("2020-07-25"), 1)).thenReturn(null);
-        userController.getInvoicesBetweenDates(Date.valueOf("2020-06-25"), Date.valueOf("2020-07-25"), 1);
-    }
 
     @Test
     public void getTopMostCalledDestinationsOK() throws UserNotExistsException, ValidationException {
@@ -275,13 +223,8 @@ public class UserControllerTest {
         topMostCalledDestinationsList.add(topMostCalledDestinations);
 
         when(userService.getTopMostCalledDestinations(1)).thenReturn(topMostCalledDestinationsList);
-        assertEquals(userController.getTopMostCalledDestinations(1), topMostCalledDestinationsList);
+        ResponseEntity<List<TopMostCalledDestinations>> result = userController.getTopMostCalledDestinations(1);
+        assertEquals(HttpStatus.OK, result.getStatusCode());
         verify(userService, times(1)).getTopMostCalledDestinations(1);
-    }
-
-    @Test(expected = UserNotExistsException.class)
-    public void getTopMostCalledDestinationsUserNotExists() throws UserNotExistsException, ValidationException {
-        when(userService.getTopMostCalledDestinations(1)).thenReturn(null);
-        userController.getTopMostCalledDestinations(1);
     }
 }

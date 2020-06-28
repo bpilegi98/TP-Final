@@ -1,7 +1,6 @@
 package com.utn.TP_Final.service;
 
-import com.utn.TP_Final.exceptions.TelephoneLineAlreadyExistsException;
-import com.utn.TP_Final.exceptions.TelephoneLineNotExistsException;
+import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.TelephoneLine;
 import com.utn.TP_Final.model.enums.LineStatus;
 import com.utn.TP_Final.repository.TelephoneLineRepository;
@@ -32,7 +31,7 @@ public class TelephoneLineServiceTest {
     }
 
     @Test
-    public void addTelephoneLineTest() throws TelephoneLineAlreadyExistsException
+    public void addTelephoneLineTest() throws ValidationException
     {
         TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
         when(telephoneLineRepository.save(telephoneLine)).thenReturn(telephoneLine);
@@ -40,8 +39,8 @@ public class TelephoneLineServiceTest {
         assertEquals(telephoneLine.getLineNumber(), telephoneLineResult.getLineNumber());
     }
 
-    @Test(expected = TelephoneLineAlreadyExistsException.class)
-    public void addTelephoneLineAlreadyExists() throws TelephoneLineAlreadyExistsException
+    @Test(expected = ValidationException.class)
+    public void addTelephoneLineAlreadyExists() throws ValidationException
     {
         TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
         when(telephoneLineRepository.save(telephoneLine)).thenReturn(null);
@@ -49,7 +48,7 @@ public class TelephoneLineServiceTest {
     }
 
     @Test
-    public void deleteTelephoneLineOk() throws TelephoneLineNotExistsException
+    public void deleteTelephoneLineOk() throws ValidationException
     {
         TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
         when(telephoneLineRepository.delete(telephoneLine.getLineNumber())).thenReturn(telephoneLine);
@@ -57,8 +56,8 @@ public class TelephoneLineServiceTest {
         assertEquals(telephoneLine, telephoneLineResult);
     }
 
-    @Test(expected = TelephoneLineNotExistsException.class)
-    public void deleteTelephoneLineNotExists() throws TelephoneLineNotExistsException
+    @Test(expected = ValidationException.class)
+    public void deleteTelephoneLineNotExists() throws ValidationException
     {
         TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
         when(telephoneLineRepository.delete(telephoneLine.getLineNumber())).thenReturn(null);
@@ -91,7 +90,7 @@ public class TelephoneLineServiceTest {
     }
 
     @Test
-    public void suspendTelephoneLineOK() throws TelephoneLineNotExistsException
+    public void suspendTelephoneLineOK() throws ValidationException
     {
         LineStatus lineStatus = LineStatus.ACTIVE;
         TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, lineStatus, null);
@@ -100,8 +99,8 @@ public class TelephoneLineServiceTest {
         assertEquals(telephoneLine.getStatus(), telephoneLineResult.getStatus());
     }
 
-    @Test(expected = TelephoneLineNotExistsException.class)
-    public void suspendTelephoneLineNotExists() throws TelephoneLineNotExistsException
+    @Test(expected = ValidationException.class)
+    public void suspendTelephoneLineNotExists() throws ValidationException
     {
         TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
         when(telephoneLineRepository.suspendTelephoneLine(telephoneLine.getLineNumber())).thenReturn(null);
@@ -109,7 +108,7 @@ public class TelephoneLineServiceTest {
     }
 
     @Test
-    public void activeTelephoneLineOK() throws TelephoneLineNotExistsException
+    public void activeTelephoneLineOK() throws ValidationException
     {
         LineStatus lineStatus = LineStatus.ACTIVE;
         TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, lineStatus, null);
@@ -118,8 +117,8 @@ public class TelephoneLineServiceTest {
         assertEquals(telephoneLine.getStatus(), telephoneLineResult.getStatus());
     }
 
-    @Test(expected = TelephoneLineNotExistsException.class)
-    public void activeTelephoneLineNotExists() throws TelephoneLineNotExistsException
+    @Test(expected = ValidationException.class)
+    public void activeTelephoneLineNotExists() throws ValidationException
     {
         TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
         when(telephoneLineRepository.activeTelephoneLine(telephoneLine.getLineNumber())).thenReturn(null);
@@ -128,7 +127,7 @@ public class TelephoneLineServiceTest {
 
 
     @Test
-    public void getByNumberOk() throws TelephoneLineNotExistsException
+    public void getByNumberOk() throws ValidationException
     {
         TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
         when(telephoneLineRepository.findByLineNumber(telephoneLine.getLineNumber())).thenReturn(telephoneLine);
@@ -136,8 +135,8 @@ public class TelephoneLineServiceTest {
         verify(telephoneLineRepository, times(1)).findByLineNumber(telephoneLine.getLineNumber());
     }
 
-    @Test(expected = TelephoneLineNotExistsException.class)
-    public void getByNumberTelephoneLineNotExists() throws TelephoneLineNotExistsException
+    @Test(expected = ValidationException.class)
+    public void getByNumberTelephoneLineNotExists() throws ValidationException
     {
         when(telephoneLineRepository.findByLineNumber("2235388479")).thenReturn(null);
         telephoneLineService.findByLineNumber("2235388479");

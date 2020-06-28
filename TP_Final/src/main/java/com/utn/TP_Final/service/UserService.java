@@ -37,11 +37,23 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    //devuelve el dni del usuario eliminado
-    public String deleteUser(String dni) throws UserNotExistsException
+
+    public User deleteUser(String dni) throws UserNotExistsException
     {
-        String dniResult = userRepository.delete(dni);
-        return Optional.ofNullable(dniResult).orElseThrow(()-> new UserNotExistsException());
+        User user = userRepository.delete(dni);
+        return Optional.ofNullable(user).orElseThrow(()-> new UserNotExistsException());
+    }
+
+    public User activeUser(String dni) throws UserNotExistsException
+    {
+        User user = userRepository.activeUser(dni);
+        return Optional.ofNullable(user).orElseThrow(()-> new UserNotExistsException());
+    }
+
+    public User suspendUser(String dni) throws UserNotExistsException
+    {
+        User user = userRepository.suspendUser(dni);
+        return Optional.ofNullable(user).orElseThrow(()-> new UserNotExistsException());
     }
 
     public List<User> getAll(String dni) {
@@ -73,8 +85,6 @@ public class UserService {
     }
 
 
-    //hay q chequear cual de los valores q recibe por parametro es el que puede
-    // hacer saltar la excepcion y hacer if donde se hagan los orElseThrow correspondientes
     public List<CallsBetweenDates> getCallsBetweenDates(Date from, Date to, Integer idLoggedUser) throws UserNotExistsException
     {
         List<CallsBetweenDates> callsBetweenDates = userRepository.getCallsBetweenDates(from, to, idLoggedUser);

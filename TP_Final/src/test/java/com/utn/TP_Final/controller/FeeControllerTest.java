@@ -1,8 +1,5 @@
 package com.utn.TP_Final.controller;
 
-import com.utn.TP_Final.exceptions.CityNotExistsException;
-import com.utn.TP_Final.exceptions.FeeAlreadyExistsException;
-import com.utn.TP_Final.exceptions.FeeNotExistsException;
 import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.City;
 import com.utn.TP_Final.model.Fee;
@@ -10,11 +7,16 @@ import com.utn.TP_Final.projections.FeeRequest;
 import com.utn.TP_Final.service.FeeService;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,50 +27,38 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 public class FeeControllerTest {
 
-    @Autowired
+    @InjectMocks
     FeeController feeController;
 
     @Mock
     FeeService feeService;
 
+    @Mock
+    HttpServletRequest request;
+
     @Before
     public void setUp()
     {
         initMocks(this);
-        feeController = new FeeController(feeService);
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
     }
 
     @Test
-    public void addFeeTest() throws FeeAlreadyExistsException
+    public void addFeeTest() throws ValidationException
     {
         Fee fee = new Fee(1, 2, 4, null, null);
         when(feeService.addFee(fee)).thenReturn(fee);
-        Fee feeResult = feeController.addFee(fee);
-        assertEquals(fee.getCostPerMinute(), feeResult.getCostPerMinute());
-    }
-
-    @Test(expected = FeeAlreadyExistsException.class)
-    public void addFeeAlreadyExists() throws FeeAlreadyExistsException
-    {
-        Fee fee = new Fee(1, 2, 4, null, null);
-        when(feeService.addFee(fee)).thenReturn(null);
-        feeController.addFee(fee);
+        ResponseEntity<Fee> feeResult = feeController.addFee(fee);
+        assertEquals(HttpStatus.CREATED, feeResult.getStatusCode());
     }
 
     @Test
-    public void deleteFeeOk() throws FeeNotExistsException
+    public void deleteFeeOk() throws ValidationException
     {
         Fee fee = new Fee(1, 2, 4, null, null);
         when(feeService.deleteFee(1)).thenReturn(fee);
-        Fee feeResult = feeController.deleteFee(1);
-        assertEquals(fee, feeResult);
-    }
-
-    @Test(expected = FeeNotExistsException.class)
-    public void deleteFeeNotExists() throws FeeNotExistsException
-    {
-        when(feeService.deleteFee(1)).thenReturn(null);
-        feeController.deleteFee(1);
+        ResponseEntity<Fee> feeResult = feeController.deleteFee(1);
+        assertEquals(HttpStatus.OK, feeResult.getStatusCode());
     }
 
     @Test
@@ -80,8 +70,8 @@ public class FeeControllerTest {
         feeList.add(fee);
         feeList.add(fee2);
         when(feeService.getAll()).thenReturn(feeList);
-        List<Fee> feeListResult = feeController.getAll();
-        assertEquals(2, feeListResult.size());
+        ResponseEntity<List<Fee>> feeListResult = feeController.getAll();
+        assertEquals(HttpStatus.OK, feeListResult.getStatusCode());
         verify(feeService, times(1)).getAll();
     }
 
@@ -90,12 +80,12 @@ public class FeeControllerTest {
     {
         List<Fee> fees = new ArrayList<Fee>();
         when(feeService.getAll()).thenReturn(fees);
-        List<Fee> feeResult = feeController.getAll();
-        assertEquals(fees, feeResult);
+        ResponseEntity<List<Fee>> feeResult = feeController.getAll();
+        assertEquals(HttpStatus.OK, feeResult.getStatusCode());
     }
 
     @Test
-    public void getByIdOk() throws FeeNotExistsException
+    public void getByIdOk() throws ValidationException
     {
         Fee fee = new Fee(1, 10, 5, null, null);
         Fee fee2 = new Fee(2, 4, 2, null, null);
@@ -104,20 +94,13 @@ public class FeeControllerTest {
         feeList.add(fee2);
         Optional<Fee> optionalFee = Optional.ofNullable(feeList.get(0));
         when(feeService.getById(1)).thenReturn(optionalFee);
-        Optional<Fee> feeResult = feeController.getById(1);
-        assertEquals(optionalFee, feeResult);
+        ResponseEntity<Optional<Fee>> feeResult = feeController.getById(1);
+        assertEquals(HttpStatus.OK, feeResult.getStatusCode());
         verify(feeService, times(1)).getById(1);
     }
 
-    @Test(expected = FeeNotExistsException.class)
-    public void getByIdFeeNotExists() throws FeeNotExistsException
-    {
-        when(feeService.getById(1)).thenReturn(null);
-        feeController.getById(1);
-    }
-
     @Test
-    public void getBySourceCityOk() throws FeeNotExistsException, CityNotExistsException, ValidationException {
+    public void getBySourceCityOk() throws ValidationException {
         City city = new City(1, "Mar del Plata", "223", null);
         Fee fee = new Fee(1, 10, 5, city, null);
         Fee fee2 = new Fee(2, 4, 2, null, null);
@@ -127,19 +110,13 @@ public class FeeControllerTest {
         List<Fee> feeCast = new ArrayList<Fee>();
         feeCast.add( feeList.get(0));
         when(feeService.getBySourceCity("Mar del Plata")).thenReturn(feeCast);
-        List<Fee> feeResult = feeController.getBySourceCity("Mar del Plata");
-        assertEquals(feeCast, feeResult);
+        ResponseEntity<List<Fee>> feeResult = feeController.getBySourceCity("Mar del Plata");
+        assertEquals(HttpStatus.OK, feeResult.getStatusCode());
         verify(feeService, times(1)).getBySourceCity("Mar del Plata");
     }
 
-    @Test(expected = FeeNotExistsException.class)
-    public void getBySourceCityFeeNotExists() throws FeeNotExistsException, CityNotExistsException, ValidationException {
-        when(feeService.getBySourceCity("Mar del Plata")).thenReturn(null);
-        feeController.getBySourceCity("Mar del Plata");
-    }
-
     @Test
-    public void getByDestinationCityOk() throws FeeNotExistsException, CityNotExistsException, ValidationException {
+    public void getByDestinationCityOk() throws ValidationException {
         City city = new City(1, "Mar del Plata", "223", null);
         Fee fee = new Fee(1, 10, 5, null, city);
         Fee fee2 = new Fee(2, 4, 2, null, null);
@@ -149,19 +126,13 @@ public class FeeControllerTest {
         List<Fee> feeCast = new ArrayList<Fee>();
         feeCast.add( feeList.get(0));
         when(feeService.getByDestinationCity("Mar del Plata")).thenReturn(feeCast);
-        List<Fee> feeResult = feeController.getByDestinationCity("Mar del Plata");
-        assertEquals(feeCast, feeResult);
+        ResponseEntity<List<Fee>> feeResult = feeController.getByDestinationCity("Mar del Plata");
+        assertEquals(HttpStatus.OK, feeResult.getStatusCode());
         verify(feeService, times(1)).getByDestinationCity("Mar del Plata");
     }
 
-    @Test(expected = FeeNotExistsException.class)
-    public void getByDestinationCityFeeNotExists() throws FeeNotExistsException, CityNotExistsException, ValidationException {
-        when(feeService.getByDestinationCity("Mar del Plata")).thenReturn(null);
-        feeController.getByDestinationCity("Mar del Plata");
-    }
-
     @Test
-    public void getByIdCitiesOk() throws FeeNotExistsException, CityNotExistsException, ValidationException {
+    public void getByIdCitiesOk() throws ValidationException {
         City city = new City(1, "Mar del Plata", "223", null);
         Fee fee = new Fee(1, 10, 5, city, city);
         Fee fee2 = new Fee(2, 4, 2, null, null);
@@ -176,18 +147,13 @@ public class FeeControllerTest {
         feeRequest.setFee(10);
 
         when(feeService.getFeeByIdCities(1,1)).thenReturn(feeRequest);
-        assertEquals(feeController.getFeeByIdCities(1,1), feeRequest);
+        ResponseEntity<FeeRequest> result = feeController.getFeeByIdCities(1,1);
+        assertEquals(HttpStatus.OK, result.getStatusCode());
         verify(feeService, times(1)).getFeeByIdCities(1,1);
     }
 
-    @Test(expected = FeeNotExistsException.class)
-    public void getByIdCitiesFeeNotExists() throws FeeNotExistsException, CityNotExistsException, ValidationException {
-        when(feeService.getFeeByIdCities(1,1)).thenReturn(null);
-        feeController.getFeeByIdCities(1,1);
-    }
-
     @Test
-    public void getByNameCitiesOk() throws FeeNotExistsException, CityNotExistsException, ValidationException {
+    public void getByNameCitiesOk() throws ValidationException {
         City city = new City(1, "Mar del Plata", "223", null);
         Fee fee = new Fee(1, 10, 5, city, city);
         Fee fee2 = new Fee(2, 4, 2, null, null);
@@ -202,13 +168,8 @@ public class FeeControllerTest {
         feeRequest.setFee(10);
 
         when(feeService.getFeeByNameCities("Mar del Plata", "Mar del Plata")).thenReturn(feeRequest);
-        assertEquals(feeController.getFeeByNameCities("Mar del Plata", "Mar del Plata"), feeRequest);
+        ResponseEntity<FeeRequest> result = feeController.getFeeByNameCities("Mar del Plata", "Mar del Plata");
+        assertEquals(HttpStatus.OK, result.getStatusCode());
         verify(feeService, times(1)).getFeeByNameCities("Mar del Plata", "Mar del Plata");
-    }
-
-    @Test(expected = FeeNotExistsException.class)
-    public void getByNameCitiesFeeNotExists() throws FeeNotExistsException, CityNotExistsException, ValidationException {
-        when(feeService.getFeeByNameCities("Mar del Plata", "Mar del Plata")).thenReturn(null);
-        feeController.getFeeByNameCities("Mar del Plata", "Mar del Plata");
     }
 }

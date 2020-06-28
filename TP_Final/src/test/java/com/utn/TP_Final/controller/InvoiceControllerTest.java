@@ -1,7 +1,5 @@
 package com.utn.TP_Final.controller;
 
-import com.utn.TP_Final.exceptions.DateNotExistsException;
-import com.utn.TP_Final.exceptions.InvoiceNotExistsException;
 import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.Invoice;
@@ -13,32 +11,39 @@ import com.utn.TP_Final.projections.InvoicesRequestFromPeriods;
 import com.utn.TP_Final.service.InvoiceService;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class InvoiceControllerTest {
 
-    @Autowired
+    @InjectMocks
     InvoiceController invoiceController;
 
     @Mock
     InvoiceService invoiceService;
 
+    @Mock
+    HttpServletRequest request;
+
     @Before
     public void setUp()
     {
         initMocks(this);
-        invoiceController = new InvoiceController(invoiceService);
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
     }
 
     @Test
@@ -46,8 +51,8 @@ public class InvoiceControllerTest {
     {
         Invoice invoice = new Invoice(1, 5, 2, Date.valueOf("2020-06-20"), Date.valueOf("2020-07-20"), false, null, null);
         when(invoiceService.addInvoice(invoice)).thenReturn(invoice);
-        Invoice invoiceResult = invoiceController.addInvoice(invoice);
-        assertEquals(invoice, invoiceResult);
+        ResponseEntity<Invoice> invoiceResult = invoiceController.addInvoice(invoice);
+        assertEquals(HttpStatus.CREATED, invoiceResult.getStatusCode());
     }
 
     @Test
@@ -57,8 +62,8 @@ public class InvoiceControllerTest {
         List<Invoice> invoices = new ArrayList<Invoice>();
         invoices.add(invoice);
         when(invoiceService.getAll()).thenReturn(invoices);
-        List<Invoice> invoicesResult = invoiceController.getAll();
-        assertEquals(invoices, invoicesResult);
+        ResponseEntity<List<Invoice>> invoicesResult = invoiceController.getAll();
+        assertEquals(HttpStatus.OK, invoicesResult.getStatusCode());
     }
 
     @Test
@@ -66,28 +71,22 @@ public class InvoiceControllerTest {
     {
         List<Invoice> invoices = new ArrayList<Invoice>();
         when(invoiceService.getAll()).thenReturn(invoices);
-        List<Invoice> invoicesResult = invoiceController.getAll();
-        assertEquals(invoices, invoicesResult);
+        ResponseEntity<List<Invoice>> invoicesResult = invoiceController.getAll();
+        assertEquals(HttpStatus.OK, invoicesResult.getStatusCode());
     }
 
     @Test
-    public void deleteInvoiceOk() throws InvoiceNotExistsException
+    public void deleteInvoiceOk() throws ValidationException
     {
         Invoice invoice = new Invoice(1, 5, 2, Date.valueOf("2020-06-20"), Date.valueOf("2020-07-20"), false, null, null);
         when(invoiceService.deleteInvoice(1)).thenReturn(invoice);
-        Invoice invoiceResult = invoiceController.deleteInvoice(1);
-        assertEquals(invoice, invoiceResult);
+        ResponseEntity<Invoice> invoiceResult = invoiceController.deleteInvoice(1);
+        assertEquals(HttpStatus.OK, invoiceResult.getStatusCode());
     }
 
-    @Test(expected = InvoiceNotExistsException.class)
-    public void deleteInvoiceNotExists() throws InvoiceNotExistsException
-    {
-        when(invoiceService.deleteInvoice(1)).thenReturn(null);
-        invoiceController.deleteInvoice(1);
-    }
 
     @Test
-    public void getInvoicesFromUserOk() throws UserNotExistsException, ValidationException {
+    public void getInvoicesFromUserOk() throws UserNotExistsException{
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
 
         TelephoneLine telephoneLine1 = new TelephoneLine(1, "2235678987", null, null, user);
@@ -115,19 +114,14 @@ public class InvoiceControllerTest {
 
         when(invoiceService.getInvoicesFromUser(user.getDni())).thenReturn(invoicesFromUserList);
 
-        List<InvoicesFromUser> invoicesFromUserResult = invoiceController.getInvoicesFromUser(user.getDni());
+        ResponseEntity<List<InvoicesFromUser>> invoicesFromUserResult = invoiceController.getInvoicesFromUser(user.getDni());
 
-        assertEquals(invoicesFromUserList, invoicesFromUserResult);
+        assertEquals(HttpStatus.OK, invoicesFromUserResult.getStatusCode());
     }
 
-    @Test(expected = UserNotExistsException.class)
-    public void getInvoicesFromUserNotExists() throws UserNotExistsException, ValidationException {
-        when(invoiceService.getInvoicesFromUser("41307541")).thenReturn(null);
-        invoiceController.getInvoicesFromUser("41307541");
-    }
 
     @Test
-    public void getInvoicesPaidFromUserOk() throws UserNotExistsException, ValidationException {
+    public void getInvoicesPaidFromUserOk() throws UserNotExistsException{
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
 
         TelephoneLine telephoneLine1 = new TelephoneLine(1, "2235678987", null, null, user);
@@ -155,19 +149,14 @@ public class InvoiceControllerTest {
 
         when(invoiceService.getInvoicesPaidFromUser(user.getDni())).thenReturn(invoicesFromUserList);
 
-        List<InvoicesFromUser> invoicesFromUserResult = invoiceController.getInvoicesPaidFromUser(user.getDni());
+        ResponseEntity<List<InvoicesFromUser>> invoicesFromUserResult = invoiceController.getInvoicesPaidFromUser(user.getDni());
 
-        assertEquals(true, invoicesFromUserResult.get(0).getPaid());
+        assertEquals(HttpStatus.OK, invoicesFromUserResult.getStatusCode());
     }
 
-    @Test(expected = UserNotExistsException.class)
-    public void getInvoicesPaidFromUserNotExists() throws UserNotExistsException, ValidationException {
-        when(invoiceService.getInvoicesPaidFromUser("41307541")).thenReturn(null);
-        invoiceController.getInvoicesPaidFromUser("41307541");
-    }
 
     @Test
-    public void getInvoicesNotPaidFromUserOk() throws UserNotExistsException, ValidationException {
+    public void getInvoicesNotPaidFromUserOk() throws UserNotExistsException{
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
 
         TelephoneLine telephoneLine1 = new TelephoneLine(1, "2235678987", null, null, user);
@@ -195,19 +184,14 @@ public class InvoiceControllerTest {
 
         when(invoiceService.getInvoicesNotPaidFromUser(user.getDni())).thenReturn(invoicesFromUserList);
 
-        List<InvoicesFromUser> invoicesFromUserResult = invoiceController.getInvoicesNotPaidFromUser(user.getDni());
+        ResponseEntity<List<InvoicesFromUser>> invoicesFromUserResult = invoiceController.getInvoicesNotPaidFromUser(user.getDni());
 
-        assertEquals(false, invoicesFromUserResult.get(0).getPaid());
+        assertEquals(HttpStatus.OK, invoicesFromUserResult.getStatusCode());
     }
 
-    @Test(expected = UserNotExistsException.class)
-    public void getInvoicesNotPaidFromUserNotExists() throws UserNotExistsException, ValidationException {
-        when(invoiceService.getInvoicesNotPaidFromUser("41307541")).thenReturn(null);
-        invoiceController.getInvoicesNotPaidFromUser("41307541");
-    }
 
     @Test
-    public void getInvoicesFromMonthOk() throws DateNotExistsException, ValidationException {
+    public void getInvoicesFromMonthOk()  {
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
 
         TelephoneLine telephoneLine1 = new TelephoneLine(1, "2235678987", null, null, user);
@@ -232,9 +216,9 @@ public class InvoiceControllerTest {
 
         when(invoiceService.getInvoicesFromMonth("06")).thenReturn(invoicesRequestFromPeriodsList);
 
-        List<InvoicesRequestFromPeriods> invoicesRequestFromPeriodsResult = invoiceController.getInvoicesFromMonth("06");
+        ResponseEntity<List<InvoicesRequestFromPeriods>> invoicesRequestFromPeriodsResult = invoiceController.getInvoicesFromMonth("06");
 
-        assertEquals(invoicesRequestFromPeriodsList, invoicesRequestFromPeriodsResult);
+        assertEquals(HttpStatus.OK, invoicesRequestFromPeriodsResult.getStatusCode());
     }
 
     @Test
@@ -246,7 +230,7 @@ public class InvoiceControllerTest {
     }
 
     @Test
-    public void getInvoicesFromYearOk() throws DateNotExistsException, ValidationException {
+    public void getInvoicesFromYearOk() {
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
 
         TelephoneLine telephoneLine1 = new TelephoneLine(1, "2235678987", null, null, user);
@@ -271,9 +255,9 @@ public class InvoiceControllerTest {
 
         when(invoiceService.getInvoicesFromYear("2020")).thenReturn(invoicesRequestFromPeriodsList);
 
-        List<InvoicesRequestFromPeriods> invoicesRequestFromPeriodsResult = invoiceController.getInvoicesFromYear("2020");
+        ResponseEntity<List<InvoicesRequestFromPeriods>> invoicesRequestFromPeriodsResult = invoiceController.getInvoicesFromYear("2020");
 
-        assertEquals(invoicesRequestFromPeriodsList, invoicesRequestFromPeriodsResult);
+        assertEquals(HttpStatus.OK, invoicesRequestFromPeriodsResult.getStatusCode());
     }
 
     @Test
@@ -285,7 +269,7 @@ public class InvoiceControllerTest {
     }
 
     @Test
-    public void getInvoicesBetweenDatesOk() throws DateNotExistsException, ValidationException {
+    public void getInvoicesBetweenDatesOk()  {
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
 
         TelephoneLine telephoneLine1 = new TelephoneLine(1, "2235678987", null, null, user);
@@ -310,9 +294,9 @@ public class InvoiceControllerTest {
 
         when(invoiceService.getInvoicesBetweenDates(Date.valueOf("2020-06-06"), Date.valueOf("2020-06-28"))).thenReturn(invoicesRequestFromPeriodsList);
 
-        List<InvoicesRequestFromPeriods> invoicesRequestFromPeriodsResult = invoiceController.getInvoicesBetweenDates(Date.valueOf("2020-06-06"), Date.valueOf("2020-06-28"));
+        ResponseEntity<List<InvoicesRequestFromPeriods>> invoicesRequestFromPeriodsResult = invoiceController.getInvoicesBetweenDates(Date.valueOf("2020-06-06"), Date.valueOf("2020-06-28"));
 
-        assertEquals(invoicesRequestFromPeriodsList, invoicesRequestFromPeriodsResult);
+        assertEquals(HttpStatus.OK, invoicesRequestFromPeriodsResult.getStatusCode());
     }
 
     @Test
@@ -342,13 +326,13 @@ public class InvoiceControllerTest {
 
         when(invoiceService.getIncome()).thenReturn(invoiceIncome);
 
-        InvoiceIncome invoiceIncomeResult = invoiceController.getIncome();
+        ResponseEntity<InvoiceIncome> invoiceIncomeResult = invoiceController.getIncome();
 
-        assertEquals(invoiceIncome, invoiceIncomeResult);
+        assertEquals(HttpStatus.OK, invoiceIncomeResult.getStatusCode());
     }
 
     @Test
-    public void getIncomeMonthTest() throws DateNotExistsException, ValidationException {
+    public void getIncomeMonthTest()  {
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
 
         TelephoneLine telephoneLine1 = new TelephoneLine(1, "2235678987", null, null, user);
@@ -365,13 +349,13 @@ public class InvoiceControllerTest {
 
         when(invoiceService.getIncomeMonth("06")).thenReturn(invoiceIncome);
 
-        InvoiceIncome invoiceIncomeResult = invoiceController.getIncomeMonth("06");
+        ResponseEntity<InvoiceIncome> invoiceIncomeResult = invoiceController.getIncomeMonth("06");
 
-        assertEquals(invoiceIncome, invoiceIncomeResult);
+        assertEquals(HttpStatus.OK, invoiceIncomeResult.getStatusCode());
     }
 
     @Test
-    public void getIncomeYearTest() throws DateNotExistsException, ValidationException {
+    public void getIncomeYearTest()  {
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
 
         TelephoneLine telephoneLine1 = new TelephoneLine(1, "2235678987", null, null, user);
@@ -388,8 +372,8 @@ public class InvoiceControllerTest {
 
         when(invoiceService.getIncomeYear("2020")).thenReturn(invoiceIncome);
 
-        InvoiceIncome invoiceIncomeResult = invoiceController.getIncomeYear("2020");
+        ResponseEntity<InvoiceIncome> invoiceIncomeResult = invoiceController.getIncomeYear("2020");
 
-        assertEquals(invoiceIncome, invoiceIncomeResult);
+        assertEquals(HttpStatus.OK, invoiceIncomeResult.getStatusCode());
     }
 }

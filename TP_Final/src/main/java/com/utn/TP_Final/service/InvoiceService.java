@@ -1,7 +1,6 @@
 package com.utn.TP_Final.service;
 
-
-import com.utn.TP_Final.exceptions.InvoiceNotExistsException;
+import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.model.Invoice;
 import com.utn.TP_Final.projections.InvoiceIncome;
@@ -10,13 +9,10 @@ import com.utn.TP_Final.projections.InvoicesRequestFromPeriods;
 import com.utn.TP_Final.repository.InvoiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.Objects.isNull;
-import static org.apache.tomcat.jni.Mmap.delete;
 
 @Service
 public class InvoiceService {
@@ -24,7 +20,8 @@ public class InvoiceService {
     private final InvoiceRepository invoiceRepository;
 
     @Autowired
-    public InvoiceService(InvoiceRepository invoiceRepository) {
+    public InvoiceService(InvoiceRepository invoiceRepository)
+    {
         this.invoiceRepository = invoiceRepository;
     }
 
@@ -33,10 +30,10 @@ public class InvoiceService {
         return invoiceRepository.save(newInvoice);
     }
 
-    public Invoice deleteInvoice(Integer id) throws InvoiceNotExistsException
+    public Invoice deleteInvoice(Integer id) throws ValidationException
     {
         Invoice invoice = invoiceRepository.delete(id);
-        return Optional.ofNullable(invoice).orElseThrow(()-> new InvoiceNotExistsException());
+        return Optional.ofNullable(invoice).orElseThrow(()-> new ValidationException("Couldn't delete, that invoice doesn't exists."));
     }
 
     public List<Invoice> getAll()

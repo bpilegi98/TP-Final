@@ -1,9 +1,8 @@
 package com.utn.TP_Final.service;
 
-import com.utn.TP_Final.exceptions.CallNotExistsException;
 import com.utn.TP_Final.exceptions.UserNotExistsException;
+import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.Call;
-import com.utn.TP_Final.model.City;
 import com.utn.TP_Final.model.TelephoneLine;
 import com.utn.TP_Final.model.User;
 import com.utn.TP_Final.projections.CallsFromUser;
@@ -40,8 +39,7 @@ public class CallServiceTest {
     }
 
     @Test
-    public void addCallTest()
-    {
+    public void addCallTest() throws ValidationException {
         Call call = new Call(1, 5, 120, 2, 10, null, null, null, null, null, null, null,null);
         when(callRepository.save(call)).thenReturn(call);
         Call callResult = callService.addCall(call);
@@ -49,7 +47,7 @@ public class CallServiceTest {
     }
 
     @Test
-    public void deleteCallOk() throws CallNotExistsException
+    public void deleteCallOk() throws ValidationException
     {
         Call call = new Call(1, 5, 120, 2, 10, null, null, null, null, null, null, null, null);
         when(callRepository.delete(1)).thenReturn(call);
@@ -57,8 +55,8 @@ public class CallServiceTest {
         assertEquals(call, callResult);
     }
 
-    @Test(expected = CallNotExistsException.class)
-    public void deleteCallNotExists() throws CallNotExistsException
+    @Test(expected = ValidationException.class)
+    public void deleteCallNotExists() throws ValidationException
     {
         when(callRepository.delete(1)).thenReturn(null);
         callService.deleteCall(1);
@@ -88,7 +86,7 @@ public class CallServiceTest {
     }
 
     @Test
-    public void getByIdOk() throws CallNotExistsException
+    public void getByIdOk() throws ValidationException
     {
         Call call1 = new Call(1, 5, 120, 2, 10, null, null, null, null, null, null, null, null);
         Call call2 = new Call(2, 5, 120, 2, 10, null, null, null, null, null, null, null, null);
@@ -102,8 +100,8 @@ public class CallServiceTest {
         verify(callRepository, times(1)).findById(1);
     }
 
-    @Test(expected = CallNotExistsException.class)
-    public void getByIdCallNotExists() throws CallNotExistsException
+    @Test(expected = ValidationException.class)
+    public void getByIdCallNotExists() throws ValidationException
     {
         when(callRepository.findById(1)).thenReturn(null);
         callService.getById(1);

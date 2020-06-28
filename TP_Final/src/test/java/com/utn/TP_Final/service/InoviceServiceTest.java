@@ -1,8 +1,7 @@
 package com.utn.TP_Final.service;
 
-import com.utn.TP_Final.exceptions.InvoiceNotExistsException;
 import com.utn.TP_Final.exceptions.UserNotExistsException;
-import com.utn.TP_Final.model.Call;
+import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.Invoice;
 import com.utn.TP_Final.model.TelephoneLine;
 import com.utn.TP_Final.model.User;
@@ -70,7 +69,7 @@ public class InoviceServiceTest {
     }
 
     @Test
-    public void deleteInvoiceOk() throws InvoiceNotExistsException
+    public void deleteInvoiceOk() throws ValidationException
     {
         Invoice invoice = new Invoice(1, 5, 2, Date.valueOf("2020-06-20"), Date.valueOf("2020-07-20"), false, null, null);
         when(invoiceRepository.delete(1)).thenReturn(invoice);
@@ -78,8 +77,8 @@ public class InoviceServiceTest {
         assertEquals(invoice, invoiceResult);
     }
 
-    @Test(expected = InvoiceNotExistsException.class)
-    public void deleteInvoiceNotExists() throws InvoiceNotExistsException
+    @Test(expected = ValidationException.class)
+    public void deleteInvoiceNotExists() throws ValidationException
     {
         when(invoiceRepository.delete(1)).thenReturn(null);
         invoiceService.deleteInvoice(1);

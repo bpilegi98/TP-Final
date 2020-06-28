@@ -1,10 +1,9 @@
 package com.utn.TP_Final.controller;
 
-
-import com.utn.TP_Final.exceptions.DateNotExistsException;
 import com.utn.TP_Final.exceptions.UserAlreadyExistsException;
 import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.exceptions.ValidationException;
+import com.utn.TP_Final.model.City;
 import com.utn.TP_Final.model.User;
 import com.utn.TP_Final.projections.CallsBetweenDates;
 import com.utn.TP_Final.projections.InvoicesBetweenDatesUser;
@@ -12,16 +11,18 @@ import com.utn.TP_Final.projections.TopMostCalledDestinations;
 import com.utn.TP_Final.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-@RestController("")
-@RequestMapping("/user")
+@Controller
 public class UserController {
 
     private final UserService userService;
@@ -33,43 +34,52 @@ public class UserController {
 
 
 
-    @PostMapping("/")
-    public void addUser(@RequestBody User newUser) throws UserAlreadyExistsException, ValidationException, InvalidKeySpecException, NoSuchAlgorithmException {
-        userService.addUser(newUser);
-    }
-
-    @PostMapping("/delete/{dni}")
-    public String removeUser(@PathVariable String dni)throws UserNotExistsException, ValidationException
+    public ResponseEntity<User> addUser(@RequestBody User newUser) throws UserAlreadyExistsException, ValidationException, InvalidKeySpecException, NoSuchAlgorithmException
     {
-        return userService.deleteUser(dni);
+        return ResponseEntity.created(getUri(userService.addUser(newUser))).build();
     }
 
 
-    @GetMapping("/")
-    public List<User> getAll(@RequestParam(required = false) String name)
+    public ResponseEntity<User> removeUser(@PathVariable String dni)throws UserNotExistsException, ValidationException
     {
-        return userService.getAll(name);
+        return ResponseEntity.ok(userService.deleteUser(dni));
     }
 
-    @GetMapping("/dni/{dni}")
-    public User getByDni(@PathVariable String dni) throws UserNotExistsException, ValidationException
+    public ResponseEntity<User> activeUser(@PathVariable String dni) throws UserNotExistsException
     {
-        return userService.getByDni(dni);
+        return ResponseEntity.ok(userService.activeUser(dni));
     }
 
-    @GetMapping("/{id}")
-    public Optional<User> getById(@PathVariable Integer id)throws UserNotExistsException, ValidationException
+    public ResponseEntity<User> suspendUser(@PathVariable String dni) throws UserNotExistsException
     {
-        return userService.getById(id);
+        return ResponseEntity.ok(userService.suspendUser(dni));
     }
 
-    @GetMapping("/username/{username}/{password}")
-    public User getByUsername(@PathVariable String username) throws UserNotExistsException, ValidationException
+
+    public ResponseEntity<List<User>> getAll(@RequestParam(required = false) String name)
     {
-        return userService.getByUsername(username);
+        return ResponseEntity.ok(userService.getAll(name));
     }
 
-    @PostMapping("/login")
+
+    public ResponseEntity<User> getByDni(@PathVariable String dni) throws UserNotExistsException, ValidationException
+    {
+        return ResponseEntity.ok(userService.getByDni(dni));
+    }
+
+
+    public ResponseEntity<Optional<User>> getById(@PathVariable Integer id)throws UserNotExistsException, ValidationException
+    {
+        return ResponseEntity.ok(userService.getById(id));
+    }
+
+
+    public ResponseEntity<User> getByUsername(@PathVariable String username) throws UserNotExistsException, ValidationException
+    {
+        return ResponseEntity.ok(userService.getByUsername(username));
+    }
+
+
     public ResponseEntity<User> login(@RequestBody String username, @RequestBody String password) throws UserNotExistsException, ValidationException, InvalidKeySpecException, NoSuchAlgorithmException {
         if((username != null) && (password != null))
         {
@@ -79,21 +89,29 @@ public class UserController {
         }
     }
 
-    @GetMapping("/getCallsBetweenDates/{from}/{to}")
-    public List<CallsBetweenDates> getCallsBetweenDates(@PathVariable Date from, @PathVariable Date to, Integer idLoggedUser) throws DateNotExistsException, ValidationException, UserNotExistsException {
-        return userService.getCallsBetweenDates(from, to, idLoggedUser);
-    }
 
-    @GetMapping("/getInvoicesBetweenDates/{from}/{to}")
-    public List<InvoicesBetweenDatesUser> getInvoicesBetweenDates(@PathVariable Date from, @PathVariable Date to, Integer idLoggedUser) throws DateNotExistsException, ValidationException, UserNotExistsException {
-        return userService.getInvoicesBetweenDates(from, to, idLoggedUser);
+    public ResponseEntity<List<CallsBetweenDates>> getCallsBetweenDates(@PathVariable Date from, @PathVariable Date to, Integer idLoggedUser) throws  ValidationException, UserNotExistsException {
+        return ResponseEntity.ok(userService.getCallsBetweenDates(from, to, idLoggedUser));
     }
 
 
-    @GetMapping("/getTopMostCalledDestinations")
-    public List<TopMostCalledDestinations> getTopMostCalledDestinations(Integer idLoggedUser)throws UserNotExistsException, ValidationException
+    public ResponseEntity<List<InvoicesBetweenDatesUser>> getInvoicesBetweenDates(@PathVariable Date from, @PathVariable Date to, Integer idLoggedUser) throws  ValidationException, UserNotExistsException {
+        return ResponseEntity.ok(userService.getInvoicesBetweenDates(from, to, idLoggedUser));
+    }
+
+
+    public ResponseEntity<List<TopMostCalledDestinations>> getTopMostCalledDestinations(Integer idLoggedUser)throws UserNotExistsException, ValidationException
     {
-        return userService.getTopMostCalledDestinations(idLoggedUser);
+        return ResponseEntity.ok(userService.getTopMostCalledDestinations(idLoggedUser));
+    }
+
+    private URI getUri(User user)
+    {
+        return ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}/")
+                .buildAndExpand(user.getId())
+                .toUri();
     }
 
 

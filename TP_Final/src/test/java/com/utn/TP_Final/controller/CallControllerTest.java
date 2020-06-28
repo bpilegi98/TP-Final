@@ -1,23 +1,28 @@
 package com.utn.TP_Final.controller;
 
-import com.utn.TP_Final.exceptions.CallNotExistsException;
-import com.utn.TP_Final.exceptions.CityNotExistsException;
 import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.Call;
+import com.utn.TP_Final.model.City;
 import com.utn.TP_Final.model.TelephoneLine;
 import com.utn.TP_Final.model.User;
+import com.utn.TP_Final.model.enums.UserType;
 import com.utn.TP_Final.projections.CallsFromUser;
 import com.utn.TP_Final.projections.CallsFromUserSimple;
 import com.utn.TP_Final.service.CallService;
-import com.utn.TP_Final.service.CityService;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,44 +34,50 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 public class CallControllerTest {
 
-    @Autowired
+    @InjectMocks
     CallController callController;
 
     @Mock
     CallService callService;
 
+
     @Mock
-    CityService cityService;
+    HttpServletRequest request;
 
     @Before
     public void setUp()
     {
         initMocks(this);
-        callController = new CallController(callService, cityService);
-    }
-
-    @Test //error NPE (null pointer exception)
-    public void addCallTest() throws CityNotExistsException {
-        Call call = new Call(1, 5, 120, 2, 10, null, null, null, null, null, null, null, null);
-        when(callService.addCall(call)).thenReturn(call);
-        Call callResult = callController.addCall(call.getSourceNumber(), call.getDestinationNumber(), call.getDurationSecs(), call.getDateCall());
-        assertEquals(call.getSourceNumber(), callResult.getSourceNumber());
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
     }
 
     @Test
-    public void deleteCallOk() throws CallNotExistsException
+    public void addCallTest() throws ValidationException {
+        City city1 = new City(1, "Mar del Plata", "223", null);
+        TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
+        TelephoneLine telephoneLine2 = new TelephoneLine(1, "2235388478", null, null, null);
+        List<TelephoneLine> telephoneLines = new ArrayList<TelephoneLine>();
+        List<TelephoneLine> telephoneLines2 = new ArrayList<TelephoneLine>();
+        telephoneLines.add(telephoneLine);
+        telephoneLines2.add(telephoneLine2);
+        User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", UserType.CUSTOMER, true, city1, telephoneLines, null);
+        User user2 = new User(2, "Nombre", "Apellido", "11111111", "prueba", "4321", UserType.CUSTOMER, true, city1, telephoneLines2, null);
+        Call call = new Call(1, 5, 120, 2, 10, LocalDateTime.of(2020, 06, 25,20,45, 05, 20), telephoneLine.getLineNumber(), telephoneLine2.getLineNumber(), telephoneLine, telephoneLine2, city1, city1, null);
+
+        when(callService.addCall(call)).thenReturn(call);
+
+        ResponseEntity<Call> callResult = callController.addCall(call.getSourceNumber(), call.getDestinationNumber(), call.getDurationSecs(), call.getDateCall());
+
+        assertEquals(HttpStatus.CREATED, callResult.getStatusCode());
+    }
+
+    @Test
+    public void deleteCallOk() throws ValidationException
     {
         Call call = new Call(1, 5, 120, 2, 10, null, null, null, null, null, null, null, null);
         when(callService.deleteCall(1)).thenReturn(call);
-        Call callResult = callController.deleteCall(1);
-        assertEquals(call, callResult);
-    }
-
-    @Test(expected = CallNotExistsException.class)
-    public void deleteCallNotExists() throws CallNotExistsException
-    {
-        when(callService.deleteCall(1)).thenReturn(null);
-        callController.deleteCall(1);
+        ResponseEntity<Call> callResult = callController.deleteCall(1);
+        assertEquals(HttpStatus.OK, callResult.getStatusCode());
     }
 
     @Test
@@ -79,7 +90,8 @@ public class CallControllerTest {
         calls.add(call2);
 
         when(callService.getAll()).thenReturn(calls);
-        assertEquals(2, callController.getAll().size());
+        ResponseEntity<List<Call>> result = callController.getAll();
+        assertEquals(HttpStatus.OK, result.getStatusCode());
         verify(callService, times(1)).getAll();
     }
 
@@ -88,12 +100,12 @@ public class CallControllerTest {
     {
         List<Call> calls = new ArrayList<Call>();
         when(callService.getAll()).thenReturn(calls);
-        List<Call> callsResult = callController.getAll();
-        assertEquals(calls, callsResult);
+        ResponseEntity<List<Call>> callsResult = callController.getAll();
+        assertEquals(HttpStatus.OK, callsResult.getStatusCode());
     }
 
     @Test
-    public void getByIdOk() throws CallNotExistsException
+    public void getByIdOk() throws ValidationException
     {
         Call call1 = new Call(1, 5, 120, 2, 10, null, null, null, null, null, null, null, null);
         Call call2 = new Call(2, 5, 120, 2, 10, null, null, null, null, null, null, null, null);
@@ -102,16 +114,9 @@ public class CallControllerTest {
         calls.add(call2);
         Optional<Call> callOptional = Optional.ofNullable(calls.get(0));
         when(callService.getById(1)).thenReturn(callOptional);
-        Optional<Call> callResult = callController.getById(1);
-        assertEquals(callOptional, callResult);
+        ResponseEntity<Optional<Call>> callResult = callController.getById(1);
+        assertEquals(HttpStatus.OK, callResult.getStatusCode());
         verify(callService, times(1)).getById(1);
-    }
-
-    @Test(expected = CallNotExistsException.class)
-    public void getByIdCallNotExists() throws CallNotExistsException
-    {
-        when(callService.getById(1)).thenReturn(null);
-        callController.getById(1);
     }
 
     @Test
@@ -143,15 +148,10 @@ public class CallControllerTest {
         callsFromUserSimple.setCallsMade(1);
 
         when(callService.getCallsFromUserSimple("41307541")).thenReturn(callsFromUserSimple);
-        assertEquals(callController.getCallsFromUserSimple("41307541"), callsFromUserSimple);
+        ResponseEntity<CallsFromUserSimple> result = callController.getCallsFromUserSimple("41307541");
+        assertEquals(HttpStatus.OK, result.getStatusCode());
         verify(callService, times(1)).getCallsFromUserSimple("41307541");
 
-    }
-
-    @Test(expected = UserNotExistsException.class)
-    public void getCallsFromUserSimpleUserNotExists() throws UserNotExistsException, ValidationException {
-        when(callService.getCallsFromUserSimple("41307541")).thenReturn(null);
-        callController.getCallsFromUserSimple("41307541");
     }
 
     @Test
@@ -190,14 +190,8 @@ public class CallControllerTest {
 
         when(callService.getCallsFromUser(user.getDni())).thenReturn(callsFromUsersList);
 
-        List<CallsFromUser> callsFromUserResult = callController.getCallsFromUser(user.getDni());
+        ResponseEntity<List<CallsFromUser>> callsFromUserResult = callController.getCallsFromUser(user.getDni());
 
-        assertEquals(callsFromUsersList, callsFromUserResult);
-    }
-
-    @Test(expected = UserNotExistsException.class)
-    public void getCallsFromUserNotExists() throws UserNotExistsException, ValidationException {
-        when(callService.getCallsFromUser("41307541")).thenReturn(null);
-        callController.getCallsFromUser("41307541");
+        assertEquals(HttpStatus.OK, callsFromUserResult.getStatusCode());
     }
 }

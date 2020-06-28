@@ -1,9 +1,7 @@
 package com.utn.TP_Final.service;
 
-import com.utn.TP_Final.exceptions.CityAlreadyExistsException;
-import com.utn.TP_Final.exceptions.CityNotExistsException;
+import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.City;
-import com.utn.TP_Final.model.Province;
 import com.utn.TP_Final.repository.CityRepository;
 import com.utn.TP_Final.repository.ProvinceRepository;
 import org.junit.Before;
@@ -37,7 +35,7 @@ public class CityServiceTest {
     }
 
     @Test
-    public void addCityTest() throws CityAlreadyExistsException
+    public void addCityTest() throws ValidationException
     {
         City city = new City(1, "Mar del Plata", "223", null);
         when(cityRepository.save(city)).thenReturn(city);
@@ -46,8 +44,8 @@ public class CityServiceTest {
         assertEquals(city.getPrefixNumber(), cityResult.getPrefixNumber());
     }
 
-    @Test(expected = CityAlreadyExistsException.class)
-    public void addCityAlreadyExists() throws CityAlreadyExistsException
+    @Test(expected = ValidationException.class)
+    public void addCityAlreadyExists() throws ValidationException
     {
         City city = new City(1, "Mar del Plata", "223", null);
         when(cityRepository.save(city)).thenReturn(null);
@@ -55,7 +53,7 @@ public class CityServiceTest {
     }
 
     @Test
-    public void deleteCityOk() throws CityNotExistsException
+    public void deleteCityOk() throws ValidationException
     {
         City city = new City(1, "Mar del Plata", "223", null);
         when(cityRepository.delete(1)).thenReturn(city);
@@ -63,8 +61,8 @@ public class CityServiceTest {
         assertEquals(city, cityResult);
     }
 
-    @Test(expected = CityNotExistsException.class)
-    public void deleteCityNotExists() throws CityNotExistsException
+    @Test(expected = ValidationException.class)
+    public void deleteCityNotExists() throws ValidationException
     {
         when(cityRepository.delete(1)).thenReturn(null);
         cityService.deleteCity(1);
@@ -96,7 +94,7 @@ public class CityServiceTest {
     }
 
     @Test
-    public void getByIdOk() throws CityNotExistsException
+    public void getByIdOk() throws ValidationException
     {
         List<City> cities = new ArrayList<City>();
         City city1 = new City(1, "Mar del Plata", "223", null);
@@ -114,8 +112,8 @@ public class CityServiceTest {
         verify(cityRepository, times(1)).findById(1);
     }
 
-    @Test(expected = CityNotExistsException.class)
-    public void getByIdCityNotExists() throws CityNotExistsException
+    @Test(expected = ValidationException.class)
+    public void getByIdCityNotExists() throws ValidationException
     {
         when(cityRepository.findById(1)).thenReturn(null);
         cityService.getById(1);
@@ -123,7 +121,7 @@ public class CityServiceTest {
 
 
     @Test
-    public void getByPrefixOk() throws CityNotExistsException
+    public void getByPrefixOk() throws ValidationException
     {
         List<City> cities = new ArrayList<City>();
         City city1 = new City(1, "Mar del Plata", "223", null);
@@ -138,14 +136,11 @@ public class CityServiceTest {
         verify(cityRepository, times(1)).findByPrefix("223");
     }
 
-    @Test(expected = CityNotExistsException.class)
-    public void findByPrefixCityNotExistsTest() throws CityNotExistsException
+    @Test(expected = ValidationException.class)
+    public void findByPrefixCityNotExistsTest() throws ValidationException
     {
         when(cityRepository.findByPrefix("223")).thenReturn(null);
         cityService.getByPrefix("223");
     }
-
-    //test de uploadCities??
-
 
 }
