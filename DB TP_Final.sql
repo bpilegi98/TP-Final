@@ -260,18 +260,18 @@ insert into telephone_lines (line_number, line_type, id_user, status) values ('2
 end //
 
 -- Script de cargar llamadas 
+-- drop procedure add_x_calls
 delimiter //
 create procedure add_x_calls(in x_calls int)
 begin
 declare total_lines int;
 declare i int default 0;
 declare total_cities int;
-declare actual_date date;
+declare date_var timestamp;
 declare source_number_var varchar(30);
 declare destination_number_var varchar(30) default 0;
 declare duration_var int default 0;
 
-SET actual_date = (select now());
 SET total_lines = (select count(id) from telephone_lines);
 
 start transaction;
@@ -281,14 +281,25 @@ start transaction;
 		while(source_number_var = destination_number_var or destination_number_var = 0 ) DO
 			set destination_number_var = (SELECT line_number from telephone_lines order by rand() limit 1);
 		end while;
-	
-		set duration_var = (select ROUND((50+ rand()*4000),0));
-		insert into calls (source_number, destination_number, duration_secs, date_call) values (source_number_var, destination_number_var, duration_var, actual_date);
+        -- un mes tiene 2628000 segundos, 10 dias 864000
+		set date_var = FROM_UNIXTIME(UNIX_TIMESTAMP(now()- interval 10 day) + FLOOR(0 + (RAND() * 863000)));
+		set duration_var = ROUND((50+ rand()*4000),0);
+		insert into calls (source_number, destination_number, duration_secs, date_call) values (source_number_var, destination_number_var, duration_var, date_var);
 		set i=i+1;
       set destination_number_var = 0;
 	end while;
 commit;
 end //
+
+INSERT INTO `sometable` VALUES(
+	select FROM_UNIXTIME(UNIX_TIMESTAMP(now()- interval 1 month) + FLOOR(0 + (RAND() * 2628000)))
+)
+
+select FROM_UNIXTIME(UNIX_TIMESTAMP(now() - interval 1 month) + FLOOR(0 + (RAND() * 63072000)))
+
+
+select UNIX_TIMESTAMP(now() - interval 1 month)
+
 
 delimiter //
 create procedure add_invoices()
@@ -723,3 +734,18 @@ grant update on tpfinal.users to 'backoffice'@'localhost';
 grant execute on procedure user_calls_between_dates to 'customer'@'localhost';
 grant execute on procedure user_invoices_between_dates to 'customer'@'localhost';
 grant execute on procedure user_top_most_called to 'customer'@'localhost';
+
+select * from fees
+
+select * from calls
+-- /// INDICES ///
+
+explain 
+call user_calls_between_date("20-06-2020","27-06-2020",1);
+call add_x_calls(500000)
+select * from calls order by id DESC limit 500;
+
+call user_invoices_between_dates
+call user_top_most_called(1)
+select * from telephone_lines;
+call user_calls_between_dates("2020-06-20","2020-06-27",3);
