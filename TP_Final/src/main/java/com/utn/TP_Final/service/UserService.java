@@ -44,6 +44,18 @@ public class UserService {
         return Optional.ofNullable(user).orElseThrow(()-> new UserNotExistsException());
     }
 
+    public User activeUser(String dni) throws UserNotExistsException
+    {
+        User user = userRepository.activeUser(dni);
+        return Optional.ofNullable(user).orElseThrow(()-> new UserNotExistsException());
+    }
+
+    public User suspendUser(String dni) throws UserNotExistsException
+    {
+        User user = userRepository.suspendUser(dni);
+        return Optional.ofNullable(user).orElseThrow(()-> new UserNotExistsException());
+    }
+
     public List<User> getAll(String dni) {
         if(isNull(dni))
         {

@@ -55,11 +55,12 @@ public class CityController {
         return ResponseEntity.ok(cityService.getByPrefix(prefix));
     }
 
-
+/*
     @GetMapping("/script")
     public void uploadCities() throws IOException {
         cityService.uploadCites();
     }
+ */
 
     private URI getUri(City city)
     {

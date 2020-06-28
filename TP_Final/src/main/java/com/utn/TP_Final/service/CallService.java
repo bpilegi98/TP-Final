@@ -27,9 +27,9 @@ public class CallService {
     }
 
     //cambiar a call dto
-    public Call addCall(Call newCall)
+    public Call addCall(Call newCall) throws ValidationException
     {
-        return callRepository.save(newCall);
+        return Optional.ofNullable(callRepository.save(newCall)).orElseThrow(()-> new ValidationException("Couldn't add that call."));
     }
 
     public Call deleteCall(Integer id) throws ValidationException

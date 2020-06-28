@@ -56,9 +56,21 @@ public class EmployeeWebController {
     }
 
     @PostMapping("/users/delete")
-    public ResponseEntity deletePerson(@RequestHeader("Authorization")String sessionToken, @RequestBody String dni) throws ValidationException, UserNotExistsException
+    public ResponseEntity deletePerson(@RequestHeader("Authorization")String sessionToken, @PathVariable String dni) throws ValidationException, UserNotExistsException
     {
             return userController.removeUser(dni);
+    }
+
+    @PutMapping("/users/active/{dni}")
+    public ResponseEntity<User> activeUser(@RequestHeader("Authorization")String sessionToken, @PathVariable String dni) throws UserNotExistsException
+    {
+        return userController.activeUser(dni);
+    }
+
+    @PutMapping("/users/suspend/{dni}")
+    public ResponseEntity<User> suspendUser(@RequestHeader("Authorization")String sessionToken, @PathVariable String dni) throws UserNotExistsException
+    {
+        return userController.suspendUser(dni);
     }
 
     @GetMapping("/telephoneLines")
@@ -69,25 +81,25 @@ public class EmployeeWebController {
     }
 
     @PostMapping("/telephoneLines")
-    public ResponseEntity newTelephoneLine(@RequestHeader("Authorization") String sessionToken, @RequestBody TelephoneLine telephoneLine) throws ValidationException
+    public ResponseEntity<TelephoneLine> newTelephoneLine(@RequestHeader("Authorization") String sessionToken, @RequestBody TelephoneLine telephoneLine) throws ValidationException
     {
             return telephoneLineController.addTelephoneLine(telephoneLine);
     }
 
     @PostMapping("/telephoneLines/delete")
-    public ResponseEntity deleteTelephoneLine(@RequestHeader("Authorization") String sessionToken, @RequestBody String lineNumber) throws ValidationException
+    public ResponseEntity<TelephoneLine> deleteTelephoneLine(@RequestHeader("Authorization") String sessionToken, @PathVariable String lineNumber) throws ValidationException
     {
             return telephoneLineController.removeTelephoneLine(lineNumber);
     }
 
     @PutMapping("/telephoneLines/suspend")
-    public ResponseEntity suspendTelephoneLine(@RequestHeader("Authorization")String sessionToken, @RequestBody String lineNumber) throws ValidationException
+    public ResponseEntity<TelephoneLine> suspendTelephoneLine(@RequestHeader("Authorization")String sessionToken, @PathVariable String lineNumber) throws ValidationException
     {
         return telephoneLineController.suspendTelephoneLine(lineNumber);
     }
 
     @PutMapping("/telephoneLines/active")
-    public ResponseEntity activeTelephoneLine(@RequestHeader("Authorization")String sessionToken, @RequestBody String lineNumber) throws ValidationException
+    public ResponseEntity<TelephoneLine> activeTelephoneLine(@RequestHeader("Authorization")String sessionToken, @PathVariable String lineNumber) throws ValidationException
     {
         return telephoneLineController.activeTelephoneLine(lineNumber);
     }

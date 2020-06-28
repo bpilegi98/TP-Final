@@ -11,35 +11,39 @@ import com.utn.TP_Final.projections.InvoicesRequestFromPeriods;
 import com.utn.TP_Final.service.InvoiceService;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class InvoiceControllerTest {
 
-    @Autowired
+    @InjectMocks
     InvoiceController invoiceController;
 
     @Mock
     InvoiceService invoiceService;
 
+    @Mock
+    HttpServletRequest request;
+
     @Before
     public void setUp()
     {
         initMocks(this);
-        invoiceController = new InvoiceController(invoiceService);
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
     }
 
     @Test
@@ -68,7 +72,7 @@ public class InvoiceControllerTest {
         List<Invoice> invoices = new ArrayList<Invoice>();
         when(invoiceService.getAll()).thenReturn(invoices);
         ResponseEntity<List<Invoice>> invoicesResult = invoiceController.getAll();
-        assertEquals(HttpStatus.NO_CONTENT, invoicesResult.getStatusCode());
+        assertEquals(HttpStatus.OK, invoicesResult.getStatusCode());
     }
 
     @Test
@@ -80,12 +84,6 @@ public class InvoiceControllerTest {
         assertEquals(HttpStatus.OK, invoiceResult.getStatusCode());
     }
 
-    @Test(expected = ValidationException.class)
-    public void deleteInvoiceNotExists() throws ValidationException
-    {
-        when(invoiceService.deleteInvoice(1)).thenReturn(null);
-        invoiceController.deleteInvoice(1);
-    }
 
     @Test
     public void getInvoicesFromUserOk() throws UserNotExistsException{
@@ -121,11 +119,6 @@ public class InvoiceControllerTest {
         assertEquals(HttpStatus.OK, invoicesFromUserResult.getStatusCode());
     }
 
-    @Test(expected = UserNotExistsException.class)
-    public void getInvoicesFromUserNotExists() throws UserNotExistsException {
-        when(invoiceService.getInvoicesFromUser("41307541")).thenReturn(null);
-        invoiceController.getInvoicesFromUser("41307541");
-    }
 
     @Test
     public void getInvoicesPaidFromUserOk() throws UserNotExistsException{
@@ -161,11 +154,6 @@ public class InvoiceControllerTest {
         assertEquals(HttpStatus.OK, invoicesFromUserResult.getStatusCode());
     }
 
-    @Test(expected = UserNotExistsException.class)
-    public void getInvoicesPaidFromUserNotExists() throws UserNotExistsException{
-        when(invoiceService.getInvoicesPaidFromUser("41307541")).thenReturn(null);
-        invoiceController.getInvoicesPaidFromUser("41307541");
-    }
 
     @Test
     public void getInvoicesNotPaidFromUserOk() throws UserNotExistsException{
@@ -201,11 +189,6 @@ public class InvoiceControllerTest {
         assertEquals(HttpStatus.OK, invoicesFromUserResult.getStatusCode());
     }
 
-    @Test(expected = UserNotExistsException.class)
-    public void getInvoicesNotPaidFromUserNotExists() throws UserNotExistsException{
-        when(invoiceService.getInvoicesNotPaidFromUser("41307541")).thenReturn(null);
-        invoiceController.getInvoicesNotPaidFromUser("41307541");
-    }
 
     @Test
     public void getInvoicesFromMonthOk()  {

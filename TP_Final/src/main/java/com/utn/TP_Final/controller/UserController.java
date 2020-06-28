@@ -45,6 +45,16 @@ public class UserController {
         return ResponseEntity.ok(userService.deleteUser(dni));
     }
 
+    public ResponseEntity<User> activeUser(@PathVariable String dni) throws UserNotExistsException
+    {
+        return ResponseEntity.ok(userService.activeUser(dni));
+    }
+
+    public ResponseEntity<User> suspendUser(@PathVariable String dni) throws UserNotExistsException
+    {
+        return ResponseEntity.ok(userService.suspendUser(dni));
+    }
+
 
     public ResponseEntity<List<User>> getAll(@RequestParam(required = false) String name)
     {

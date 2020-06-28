@@ -2,6 +2,7 @@ package com.utn.TP_Final.controller.web;
 
 import com.utn.TP_Final.controller.CallController;
 import com.utn.TP_Final.dto.CallDto;
+import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.session.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,8 +24,7 @@ public class AerialWebController {
 
 
     @PostMapping("/call")
-    public ResponseEntity addCall(@RequestHeader("Authorization") String sessionToken, @RequestBody CallDto callDto)
-    {
+    public ResponseEntity addCall(@RequestHeader("Authorization") String sessionToken, @RequestBody CallDto callDto) throws ValidationException {
         return callController.addCall(callDto.getSourceNumber(), callDto.getDestinationNumber(), callDto.getDuration(), callDto.getDate());
     }
 

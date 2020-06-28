@@ -39,8 +39,7 @@ public class CallServiceTest {
     }
 
     @Test
-    public void addCallTest()
-    {
+    public void addCallTest() throws ValidationException {
         Call call = new Call(1, 5, 120, 2, 10, null, null, null, null, null, null, null,null);
         when(callRepository.save(call)).thenReturn(call);
         Call callResult = callService.addCall(call);

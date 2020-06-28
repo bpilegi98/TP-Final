@@ -5,11 +5,14 @@ import com.utn.TP_Final.model.City;
 import com.utn.TP_Final.service.CityService;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,17 +23,20 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 public class CityControllerTest {
 
-    @Autowired
+    @InjectMocks
     CityController cityController;
 
     @Mock
     CityService cityService;
 
+    @Mock
+    HttpServletRequest request;
+
     @Before
     public void setUp()
     {
         initMocks(this);
-        cityController = new CityController(cityService);
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
     }
 
     @Test
@@ -42,14 +48,6 @@ public class CityControllerTest {
         assertEquals(HttpStatus.CREATED, cityResult.getStatusCode());
     }
 
-    @Test(expected = ValidationException.class)
-    public void addCityAlreadyExists() throws ValidationException
-    {
-        City city = new City(1, "Mar del Plata", "223", null);
-        when(cityService.addCity(city)).thenReturn(null);
-        cityController.addCity(city);
-    }
-
     @Test
     public void deleteCityOk() throws ValidationException
     {
@@ -57,13 +55,6 @@ public class CityControllerTest {
         when(cityService.deleteCity(1)).thenReturn(city);
         ResponseEntity<City> cityResult = cityController.deleteCity(1);
         assertEquals(HttpStatus.OK, cityResult.getStatusCode());
-    }
-
-    @Test(expected = ValidationException.class)
-    public void deleteCityNotExists() throws ValidationException
-    {
-        when(cityService.deleteCity(1)).thenReturn(null);
-        cityController.deleteCity(1);
     }
 
     @Test
@@ -88,7 +79,7 @@ public class CityControllerTest {
         List<City> cities = new ArrayList<City>();
         when(cityService.getAll(null)).thenReturn(cities);
         ResponseEntity<List<City>> citiesResult = cityController.getAll(null);
-        assertEquals(HttpStatus.NO_CONTENT, citiesResult.getStatusCode());
+        assertEquals(HttpStatus.OK, citiesResult.getStatusCode());
     }
 
     @Test
@@ -110,14 +101,6 @@ public class CityControllerTest {
         verify(cityService, times(1)).getById(1);
     }
 
-    @Test(expected = ValidationException.class)
-    public void getByIdCityNotExists() throws ValidationException
-    {
-        when(cityService.getById(1)).thenReturn(null);
-        cityService.getById(1);
-    }
-
-
     @Test
     public void getByPrefixOk() throws ValidationException
     {
@@ -133,12 +116,4 @@ public class CityControllerTest {
         assertEquals(HttpStatus.OK, cityResult.getStatusCode());
         verify(cityService, times(1)).getByPrefix("223");
     }
-
-    @Test(expected = ValidationException.class)
-    public void findByPrefixCityNotExistsTest() throws ValidationException
-    {
-        when(cityService.getByPrefix("223")).thenReturn(null);
-        cityController.getByPrefix("223");
-    }
-
 }

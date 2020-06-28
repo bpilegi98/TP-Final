@@ -1,6 +1,13 @@
-com\utn\TP_Final\service\CountryServiceTest.class
+com\utn\TP_Final\service\InoviceServiceTest.class
 com\utn\TP_Final\service\UserServiceTest.class
+com\utn\TP_Final\controller\FeeControllerTest.class
+com\utn\TP_Final\controller\CallControllerTest.class
+com\utn\TP_Final\service\CallServiceTest.class
+com\utn\TP_Final\controller\CityControllerTest.class
+com\utn\TP_Final\service\FeeServiceTest.class
+com\utn\TP_Final\service\TelephoneLineServiceTest.class
+com\utn\TP_Final\controller\UserControllerTest.class
 com\utn\TP_Final\TpFinalApplicationTests.class
-com\utn\TP_Final\service\ProvinceServiceTest.class
 com\utn\TP_Final\service\CityServiceTest.class
-com\utn\TP_Final\repository\UserRespositoryTest.class
+com\utn\TP_Final\controller\TelephoneLineControllerTest.class
+com\utn\TP_Final\controller\InvoiceControllerTest.class

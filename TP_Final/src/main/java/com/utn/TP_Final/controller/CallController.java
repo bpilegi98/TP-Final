@@ -31,7 +31,7 @@ public class CallController {
     }
 
 
-    public ResponseEntity<Call> addCall(@RequestBody String sourceNumber, @RequestBody String destinationNumber, @RequestBody Integer duration, @RequestBody LocalDateTime date)
+    public ResponseEntity<Call> addCall(@RequestBody String sourceNumber, @RequestBody String destinationNumber, @RequestBody Integer duration, @RequestBody LocalDateTime date) throws ValidationException
     {
         Call call = new Call(sourceNumber,destinationNumber,duration,date);
         System.out.println(call.getSourceNumber() + " //// "+ call.getDestinationNumber());

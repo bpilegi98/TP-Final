@@ -64,7 +64,7 @@ public class CityService {
         return Optional.ofNullable(city).orElseThrow(()-> new ValidationException("Couldn't find that city."));
     }
 
-
+/*
     public void uploadCites() throws IOException {
         List<String> lista = Files.readAllLines(Paths.get("C:\\Users\\Juan\\Desktop\\cityPrefix.txt"), StandardCharsets.ISO_8859_1);
         //List<String> lista = Files.readAllLines(Paths.get("C:\\Users\\Bianca\\Desktop\\cityPrefix.txt"), StandardCharsets.ISO_8859_1);
@@ -105,5 +105,6 @@ public class CityService {
             }
         }
     }
+ */
 
 }

@@ -15,6 +15,8 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -67,6 +69,36 @@ public class UserServiceTest {
         userService.addUser(user);
     }
 
+    @Test
+    public void activeUserOK() throws UserNotExistsException
+    {
+        User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
+        when(userRepository.activeUser(user.getDni())).thenReturn(user);
+        assertEquals(true, userService.activeUser(user.getDni()).isActive());
+    }
+
+    @Test(expected = UserNotExistsException.class)
+    public void activeUserNotExists() throws UserNotExistsException
+    {
+        when(userRepository.activeUser("41307541")).thenReturn(null);
+        userService.activeUser("41307541");
+    }
+
+    @Test
+    public void suspendUserOk() throws UserNotExistsException
+    {
+        User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, false, null, null, null);
+        when(userRepository.suspendUser(user.getDni())).thenReturn(user);
+        assertEquals(false, userService.suspendUser(user.getDni()).isActive());
+    }
+
+    @Test(expected = UserNotExistsException.class)
+    public void suspendUserNotExists() throws UserNotExistsException
+    {
+        when(userRepository.suspendUser("41307541")).thenReturn(null);
+        userService.suspendUser("41307541");
+    }
+
 
     @Test
     public void getAllTest()
@@ -116,7 +148,7 @@ public class UserServiceTest {
         Optional<User> user = userService.getById(1);
     }
 
-    @Test //fijarse si esta bien planteado
+    @Test
     public void deleteUserOk() throws UserNotExistsException
     {
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
@@ -133,19 +165,19 @@ public class UserServiceTest {
     }
 
     @Test
-    public void loginTestOk() throws UserNotExistsException, ValidationException, InvalidKeySpecException, NoSuchAlgorithmException {
-        User loggedUser = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
-        when(userRepository.findByUsername("user")).thenReturn(loggedUser);
-        User userResult = userService.login("user", "password").getBody();
-        assertEquals(loggedUser.getId(), userResult.getId());
-        assertEquals(loggedUser.getUsername(), userResult.getUsername());
-        verify(userRepository, times(1)).findByUsername("user");
+    public void loginTestOk() throws UserNotExistsException, ValidationException, InvalidKeySpecException, NoSuchAlgorithmException, UserAlreadyExistsException {
+        User user = new User(1, "Nombre", "Apellido", "11111111", "prueba", "1234", null, true, null, null, null);
+        User loggedUser = userService.addUser(user);
+        when(userRepository.findByUsername("prueba")).thenReturn(loggedUser);
+        ResponseEntity<User> userResult = userService.login("prueba", "1234");
+        assertEquals(HttpStatus.OK, userResult.getStatusCode());
+        verify(userRepository, times(1)).findByUsername("prueba");
     }
 
     @Test(expected = UserNotExistsException.class)
     public void loginTestUserNotFound() throws UserNotExistsException, InvalidKeySpecException, NoSuchAlgorithmException, ValidationException {
         when(userRepository.findByUsername("user")).thenReturn(null);
-        userService.login("user", "password").getBody();
+        userService.login("user", "password");
     }
 
     @Test

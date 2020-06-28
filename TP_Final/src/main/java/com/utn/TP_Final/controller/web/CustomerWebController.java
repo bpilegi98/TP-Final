@@ -53,8 +53,8 @@ public class CustomerWebController {
 
     @GetMapping("/getInvoicesBetweenDates")
     public ResponseEntity<List<InvoicesBetweenDatesUser>> getInvoicesBetweenDates(@RequestHeader("Authorization")String sessionToken,
-                                                                                  @PathVariable Date from,
-                                                                                  @PathVariable Date to, Integer idLoggedUser) throws ValidationException, UserNotExistsException
+                                                                                  @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date from,
+                                                                                  @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date to, Integer idLoggedUser) throws ValidationException, UserNotExistsException
     {
             User currentUser = sessionManager.getLoggedUser(sessionToken);
 

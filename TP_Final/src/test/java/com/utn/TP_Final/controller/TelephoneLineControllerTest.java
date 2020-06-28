@@ -6,11 +6,14 @@ import com.utn.TP_Final.model.enums.LineStatus;
 import com.utn.TP_Final.service.TelephoneLineService;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,17 +23,20 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 public class TelephoneLineControllerTest {
 
-    @Autowired
+    @InjectMocks
     TelephoneLineController telephoneLineController;
 
     @Mock
     TelephoneLineService telephoneLineService;
 
+    @Mock
+    HttpServletRequest request;
+
     @Before
     public void setUp()
     {
         initMocks(this);
-        telephoneLineController = new TelephoneLineController(telephoneLineService);
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
     }
 
     @Test
@@ -41,12 +47,6 @@ public class TelephoneLineControllerTest {
         assertEquals(HttpStatus.CREATED, telephoneLineResult.getStatusCode());
     }
 
-    @Test(expected = ValidationException.class)
-    public void addTelephoneLineAlreadyExists() throws ValidationException {
-        TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
-        when(telephoneLineService.addTelephoneLine(telephoneLine)).thenReturn(null);
-        telephoneLineController.addTelephoneLine(telephoneLine);
-    }
 
     @Test
     public void deleteTelephoneLineOk() throws ValidationException {
@@ -56,12 +56,6 @@ public class TelephoneLineControllerTest {
         assertEquals(HttpStatus.OK, telephoneLineResult.getStatusCode());
     }
 
-    @Test(expected = ValidationException.class)
-    public void deleteTelephoneLineNotExists() throws ValidationException {
-        TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
-        when(telephoneLineService.deleteTelephoneLine(telephoneLine.getLineNumber())).thenReturn(null);
-        telephoneLineController.removeTelephoneLine(telephoneLine.getLineNumber());
-    }
 
     @Test
     public void getAllTest()
@@ -85,7 +79,7 @@ public class TelephoneLineControllerTest {
         List<TelephoneLine> telephoneLines = new ArrayList<TelephoneLine>();
         when(telephoneLineService.getAll(null)).thenReturn(telephoneLines);
         ResponseEntity<List<TelephoneLine>> telephoneLinesResult = telephoneLineController.getAll(null);
-        assertEquals(HttpStatus.NO_CONTENT, telephoneLinesResult.getStatusCode());
+        assertEquals(HttpStatus.OK, telephoneLinesResult.getStatusCode());
     }
 
     @Test
@@ -97,12 +91,6 @@ public class TelephoneLineControllerTest {
         assertEquals(HttpStatus.OK, telephoneLineResult.getStatusCode());
     }
 
-    @Test(expected = ValidationException.class)
-    public void suspendTelephoneLineNotExists() throws ValidationException, ValidationException {
-        TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
-        when(telephoneLineService.suspendTelephoneLine(telephoneLine.getLineNumber())).thenReturn(null);
-        telephoneLineController.suspendTelephoneLine(telephoneLine.getLineNumber());
-    }
 
     @Test
     public void activeTelephoneLineOK() throws ValidationException, ValidationException {
@@ -113,13 +101,6 @@ public class TelephoneLineControllerTest {
         assertEquals(HttpStatus.OK, telephoneLineResult.getStatusCode());
     }
 
-    @Test(expected = ValidationException.class)
-    public void activeTelephoneLineNotExists() throws ValidationException, ValidationException {
-        TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
-        when(telephoneLineService.activeTelephoneLine(telephoneLine.getLineNumber())).thenReturn(null);
-        telephoneLineController.activeTelephoneLine(telephoneLine.getLineNumber());
-    }
-
 
     @Test
     public void getByNumberOk() throws ValidationException, ValidationException {
@@ -128,11 +109,5 @@ public class TelephoneLineControllerTest {
         ResponseEntity<TelephoneLine> result = telephoneLineController.getByNumber(telephoneLine.getLineNumber());
         assertEquals(HttpStatus.OK, result.getStatusCode());
         verify(telephoneLineService, times(1)).findByLineNumber(telephoneLine.getLineNumber());
-    }
-
-    @Test(expected = ValidationException.class)
-    public void getByNumberTelephoneLineNotExists() throws ValidationException, ValidationException {
-        when(telephoneLineService.findByLineNumber("2235388479")).thenReturn(null);
-        telephoneLineController.getByNumber("2235388479");
     }
 }
