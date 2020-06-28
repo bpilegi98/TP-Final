@@ -738,6 +738,8 @@ grant execute on procedure user_top_most_called to 'customer'@'localhost';
 select * from fees
 
 select * from calls
+
+
 -- /// INDICES ///
 
 explain 
@@ -749,3 +751,19 @@ call user_invoices_between_dates
 call user_top_most_called(1)
 select * from telephone_lines;
 call user_calls_between_dates("2020-06-20","2020-06-27",3);
+
+explain select * from cities where id_province = 1;
+
+-- CALLS
+-- user_calls_between_dates
+create index idx_user_calls_between_date on calls (date_call, id_source_number) using btree;
+
+-- backoffice_request_calls_user // backoffice_request_calls_user_simple
+create index idx_backoffice_request_calls_user on calls (id_source_number) using btree;
+
+-- INVOICES
+-- backoffice_invoices_between_dates
+create index idx_backoffice_invoices_between_dates on invoices (date_creation) using btree;
+
+-- user_invoices_between_dates
+create index idx_user_invoices_between_dates on invoices (date_creation, id_user) using btree;
