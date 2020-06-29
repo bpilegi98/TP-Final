@@ -73,7 +73,7 @@ public class UserServiceTest {
     public void activeUserOK() throws UserNotExistsException
     {
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
-        when(userRepository.activeUser(user.getDni())).thenReturn(user);
+        when(userRepository.activeUser(user.getDni())).thenReturn(1);
         assertEquals(true, userService.activeUser(user.getDni()).isActive());
     }
 
@@ -84,11 +84,12 @@ public class UserServiceTest {
         userService.activeUser("41307541");
     }
 
+
     @Test
     public void suspendUserOk() throws UserNotExistsException
     {
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, false, null, null, null);
-        when(userRepository.suspendUser(user.getDni())).thenReturn(user);
+        when(userRepository.suspendUser(user.getDni())).thenReturn(1);
         assertEquals(false, userService.suspendUser(user.getDni()).isActive());
     }
 
@@ -98,6 +99,8 @@ public class UserServiceTest {
         when(userRepository.suspendUser("41307541")).thenReturn(null);
         userService.suspendUser("41307541");
     }
+
+
 
 
     @Test
@@ -148,21 +151,6 @@ public class UserServiceTest {
         Optional<User> user = userService.getById(1);
     }
 
-    @Test
-    public void deleteUserOk() throws UserNotExistsException
-    {
-        User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
-        when(userRepository.delete("41307541")).thenReturn(user);
-        User userResult = userService.deleteUser("41307541");
-        assertEquals(user, userResult);
-    }
-
-    @Test(expected = UserNotExistsException.class)
-    public void deleteUserNotExists() throws UserNotExistsException
-    {
-        when(userRepository.delete("41307541")).thenReturn(null);
-        userService.deleteUser("41307541");
-    }
 
     @Test
     public void loginTestOk() throws UserNotExistsException, ValidationException, InvalidKeySpecException, NoSuchAlgorithmException, UserAlreadyExistsException {

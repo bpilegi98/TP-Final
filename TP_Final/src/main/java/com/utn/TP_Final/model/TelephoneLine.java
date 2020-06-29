@@ -2,6 +2,7 @@ package com.utn.TP_Final.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sun.istack.NotNull;
 import com.utn.TP_Final.model.enums.LineStatus;
 import com.utn.TP_Final.model.enums.LineType;
 import lombok.AllArgsConstructor;
@@ -23,7 +24,6 @@ public class TelephoneLine implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    @JsonIgnore
     private Integer id;
 
     @Column(name = "line_number", unique = true)
@@ -37,6 +37,7 @@ public class TelephoneLine implements Serializable {
     @Enumerated(EnumType.STRING)
     private LineStatus status;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference(value="telephone_lines-user")
     @JoinColumn(name = "id_user")

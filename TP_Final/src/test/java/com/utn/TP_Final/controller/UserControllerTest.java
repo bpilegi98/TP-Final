@@ -107,15 +107,6 @@ public class UserControllerTest {
     }
 
 
-    @Test
-    public void deleteUserOk() throws UserNotExistsException, ValidationException {
-        User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
-        when(userService.deleteUser("41307541")).thenReturn(user);
-        ResponseEntity<User> deleteResult = userController.removeUser("41307541");
-        assertEquals(HttpStatus.OK, deleteResult.getStatusCode());
-    }
-
-
     @Test //NPE error
     public void loginTestOk() throws UserNotExistsException, ValidationException, InvalidKeySpecException, NoSuchAlgorithmException {
         User loggedUser = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);

@@ -29,11 +29,6 @@ public class TelephoneLineService {
         return Optional.ofNullable(telephoneLine).orElseThrow(()-> new ValidationException("That telephone line already exists."));
     }
 
-    public TelephoneLine deleteTelephoneLine(String lineNumber) throws ValidationException
-    {
-        TelephoneLine telephoneLine = telephoneLineRepository.delete(lineNumber);
-        return Optional.ofNullable(telephoneLine).orElseThrow(()-> new ValidationException("Couldn't delete, that telephone line doesn't exists."));
-    }
 
     public List<TelephoneLine> getAll(String lineNumber)
     {
@@ -48,13 +43,15 @@ public class TelephoneLineService {
 
     public TelephoneLine suspendTelephoneLine(String lineNumber) throws ValidationException
     {
-        TelephoneLine telephoneLine = telephoneLineRepository.suspendTelephoneLine(lineNumber);
+        telephoneLineRepository.suspendTelephoneLine(lineNumber);
+        TelephoneLine telephoneLine = telephoneLineRepository.findByLineNumber(lineNumber);
         return Optional.ofNullable(telephoneLine).orElseThrow(()-> new ValidationException("Couldn't suspend, that telephone line doesn't exists."));
     }
 
     public TelephoneLine activeTelephoneLine(String lineNumber) throws ValidationException
     {
-        TelephoneLine telephoneLine = telephoneLineRepository.activeTelephoneLine(lineNumber);
+        telephoneLineRepository.activeTelephoneLine(lineNumber);
+        TelephoneLine telephoneLine = telephoneLineRepository.findByLineNumber(lineNumber);
         return Optional.ofNullable(telephoneLine).orElseThrow(()-> new ValidationException("Couldn't active, that telephone line doesn't exists."));
     }
 

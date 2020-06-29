@@ -28,7 +28,6 @@ public class User
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    @JsonIgnore
     private int id;
 
     @Column(name = "firstname")
@@ -44,7 +43,6 @@ public class User
     private String username;
 
     @Column(name = "password")
-    @JsonIgnore
     private String password;
 
     @Column(name = "userType")
@@ -59,6 +57,7 @@ public class User
     @JoinColumn(name = "id_city")
     private City city;
 
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<TelephoneLine> telephoneLines;
 
@@ -67,7 +66,7 @@ public class User
 
 
     // HASHEO
-    public static String generateStrongPasswordHash(String password) throws NoSuchAlgorithmException, InvalidKeySpecException
+    public String generateStrongPasswordHash(String password) throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         int iterations = 1000;
         char[] chars = password.toCharArray();
@@ -81,7 +80,7 @@ public class User
         return iterations + ":" + toHex(salt) + ":" + toHex(hash);
     }
 
-    public static String toHex(byte[] array)
+    public String toHex(byte[] array)
     {
         BigInteger bi = new BigInteger(1, array);
         String hex = bi.toString(16);
@@ -96,7 +95,7 @@ public class User
 
     //DES-HASHEO
 
-    public static boolean validatePassword(String originalPassword, String storedPassword) throws NoSuchAlgorithmException, InvalidKeySpecException
+    public boolean validatePassword(String originalPassword, String storedPassword) throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         String[] parts = storedPassword.split(":");
         int iterations = Integer.parseInt(parts[0]);
@@ -114,7 +113,7 @@ public class User
         }
         return diff == 0;
     }
-    public static byte[] fromHex(String hex) throws NoSuchAlgorithmException
+    public byte[] fromHex(String hex) throws NoSuchAlgorithmException
     {
         byte[] bytes = new byte[hex.length() / 2];
         for(int i = 0; i<bytes.length ;i++)
@@ -123,7 +122,4 @@ public class User
         }
         return bytes;
     }
-
-
-
 }

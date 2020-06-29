@@ -20,7 +20,6 @@ public class Call {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    @JsonIgnore
     private Integer id;
 
     @Column(name = "price_per_minute", nullable = false)

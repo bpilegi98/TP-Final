@@ -3,6 +3,7 @@ package com.utn.TP_Final.controller.web;
 
 import com.utn.TP_Final.controller.*;
 import com.utn.TP_Final.exceptions.*;
+import com.utn.TP_Final.model.Call;
 import com.utn.TP_Final.model.Fee;
 import com.utn.TP_Final.model.TelephoneLine;
 import com.utn.TP_Final.model.User;
@@ -50,25 +51,20 @@ public class EmployeeWebController {
 
 
     @PostMapping("/users")
-    public ResponseEntity newPerson(@RequestHeader("Authorization") String sessionToken, @RequestBody User user) throws ValidationException, InvalidKeySpecException, NoSuchAlgorithmException, UserAlreadyExistsException
+    public ResponseEntity newUser(@RequestHeader("Authorization") String sessionToken, @RequestBody User user) throws ValidationException, InvalidKeySpecException, NoSuchAlgorithmException, UserAlreadyExistsException
     {
             return userController.addUser(user);
     }
 
-    @PostMapping("/users/delete")
-    public ResponseEntity deletePerson(@RequestHeader("Authorization")String sessionToken, @RequestParam String dni) throws ValidationException, UserNotExistsException
-    {
-            return userController.removeUser(dni);
-    }
 
     @PutMapping("/users/active/{dni}")
-    public ResponseEntity<User> activeUser(@RequestHeader("Authorization")String sessionToken, @RequestParam String dni) throws UserNotExistsException
+    public ResponseEntity<User> activeUser(@RequestHeader("Authorization")String sessionToken, @PathVariable String dni) throws UserNotExistsException
     {
         return userController.activeUser(dni);
     }
 
     @PutMapping("/users/suspend/{dni}")
-    public ResponseEntity<User> suspendUser(@RequestHeader("Authorization")String sessionToken, @RequestParam String dni) throws UserNotExistsException
+    public ResponseEntity<User> suspendUser(@RequestHeader("Authorization")String sessionToken, @PathVariable String dni) throws UserNotExistsException
     {
         return userController.suspendUser(dni);
     }
@@ -86,92 +82,95 @@ public class EmployeeWebController {
             return telephoneLineController.addTelephoneLine(telephoneLine);
     }
 
-    @PostMapping("/telephoneLines/delete")
-    public ResponseEntity<TelephoneLine> deleteTelephoneLine(@RequestHeader("Authorization") String sessionToken, @RequestParam String lineNumber) throws ValidationException
-    {
-            return telephoneLineController.removeTelephoneLine(lineNumber);
-    }
-
-    @PutMapping("/telephoneLines/suspend")
-    public ResponseEntity<TelephoneLine> suspendTelephoneLine(@RequestHeader("Authorization")String sessionToken, @RequestParam String lineNumber) throws ValidationException
+    @PutMapping("/telephoneLines/suspend/{lineNumber}")
+    public ResponseEntity<TelephoneLine> suspendTelephoneLine(@RequestHeader("Authorization")String sessionToken, @PathVariable String lineNumber) throws ValidationException
     {
         return telephoneLineController.suspendTelephoneLine(lineNumber);
     }
 
-    @PutMapping("/telephoneLines/active")
-    public ResponseEntity<TelephoneLine> activeTelephoneLine(@RequestHeader("Authorization")String sessionToken, @RequestParam String lineNumber) throws ValidationException
+    @PutMapping("/telephoneLines/active/{lineNumber}")
+    public ResponseEntity<TelephoneLine> activeTelephoneLine(@RequestHeader("Authorization")String sessionToken, @PathVariable String lineNumber) throws ValidationException
     {
         return telephoneLineController.activeTelephoneLine(lineNumber);
     }
 
     @GetMapping("/calls/simple/{dni}")
-    public ResponseEntity<CallsFromUserSimple> getCallsFromUserSimple(@RequestHeader("Authorization")String sessionToken, @RequestParam String dni) throws UserNotExistsException
+    public ResponseEntity<CallsFromUserSimple> getCallsFromUserSimple(@RequestHeader("Authorization")String sessionToken, @PathVariable String dni) throws UserNotExistsException
     {
         ResponseEntity<CallsFromUserSimple> callsFromUserSimple = callController.getCallsFromUserSimple(dni);
         return (callsFromUserSimple != null) ? callsFromUserSimple : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/calls/{dni}")
+    @GetMapping(value = "/calls", params = "dni")
     public ResponseEntity<List<CallsFromUser>> getCallsFromUser(@RequestHeader("Authorization")String sessionToken, @RequestParam String dni) throws UserNotExistsException
     {
-        ResponseEntity<List<CallsFromUser>> callsFromUsers = callController.getCallsFromUser(dni);
-        return (callsFromUsers != null) ? callsFromUsers : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        ResponseEntity<List<CallsFromUser>> callsFromUsersList = callController.getCallsFromUser(dni);
+        //  return (callsFromUsersList != null) ? callsFromUsersList : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return callsFromUsersList;
     }
 
-    @GetMapping("/fees/{idCityFrom}/{idCityTo}")
+
+    @GetMapping("/calls")
+    public ResponseEntity<List<Call>> getCalls(@RequestHeader("Authorization")String sessionToken){
+        ResponseEntity<List<Call>> calls = callController.getAll();
+        return (calls != null) ? calls : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+
+    @GetMapping(value = "/fees",params = {"idCityFrom","idCityTo"})
     public ResponseEntity<FeeRequest> getFeeByIdCities(@RequestHeader("Authorization")String sessionToken, @RequestParam Integer idCityFrom, @RequestParam Integer idCityTo) throws ValidationException
     {
         ResponseEntity<FeeRequest> feeRequest = feeController.getFeeByIdCities(idCityFrom, idCityTo);
         return (feeRequest != null) ? feeRequest : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/fees/{cityFrom}/{cityTo}")
+    @GetMapping(value = "/fees",params = {"cityFrom","cityTo"})
     public ResponseEntity<FeeRequest> getFeeByNameCities(@RequestHeader("Authorization")String sessionToken, @RequestParam String cityFrom, @RequestParam String cityTo) throws ValidationException
     {
         ResponseEntity<FeeRequest> feeRequest = feeController.getFeeByNameCities(cityFrom, cityTo);
         return (feeRequest != null) ? feeRequest : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/invoices/{dni}")
+    @GetMapping(value = "/invoices", params = "dni")
     public ResponseEntity<List<InvoicesFromUser>> getInvoicesFromUser(@RequestHeader("Authorization")String sessionToken, @RequestParam String dni) throws ValidationException, UserNotExistsException
     {
         ResponseEntity<List<InvoicesFromUser>> invoicesFromUsers = invoiceController.getInvoicesFromUser(dni);
         return (invoicesFromUsers != null) ? invoicesFromUsers : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/invoices/paid/{dni}")
+    @GetMapping("/invoices/paid")
     public ResponseEntity<List<InvoicesFromUser>> getInvoicesPaidFromUser(@RequestHeader("Authorization")String sessionToken, @RequestParam String dni) throws ValidationException, UserNotExistsException
     {
         ResponseEntity<List<InvoicesFromUser>> invoicesFromUsers = invoiceController.getInvoicesPaidFromUser(dni);
-        return (invoicesFromUsers != null) ? invoicesFromUsers : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return (!invoicesFromUsers.getBody().isEmpty()) ? invoicesFromUsers : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/invoices/notPaid/{dni}")
+    @GetMapping("/invoices/notPaid")
     public ResponseEntity<List<InvoicesFromUser>> getInvoicesNotPaidFromUser(@RequestHeader("Authorization")String sessionToken, @RequestParam String dni) throws ValidationException, UserNotExistsException
     {
         ResponseEntity<List<InvoicesFromUser>> invoicesFromUsers = invoiceController.getInvoicesNotPaidFromUser(dni);
-        return (invoicesFromUsers != null) ? invoicesFromUsers : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return (!invoicesFromUsers.getBody().isEmpty()) ? invoicesFromUsers : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/invoices/{monthI}")
-    public ResponseEntity<List<InvoicesRequestFromPeriods>> getInvoicesFromMonth(@RequestHeader("Authorization")String sessionToken, @RequestParam String monthI) throws ValidationException
+    @GetMapping(value = "/invoices",params = {"month","year"})
+    public ResponseEntity<List<InvoicesRequestFromPeriods>> getInvoicesFromMonth(@RequestHeader("Authorization")String sessionToken, @RequestParam String month, @RequestParam String year) throws ValidationException
     {
-        ResponseEntity<List<InvoicesRequestFromPeriods>> invoicesRequestFromPeriods = invoiceController.getInvoicesFromMonth(monthI);
-        return (invoicesRequestFromPeriods != null) ? invoicesRequestFromPeriods : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        ResponseEntity<List<InvoicesRequestFromPeriods>> invoicesRequestFromPeriods = invoiceController.getInvoicesFromMonth(month,year);
+        return (!invoicesRequestFromPeriods.getBody().isEmpty()) ? invoicesRequestFromPeriods : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/invoices/{yearI}")
-    public ResponseEntity<List<InvoicesRequestFromPeriods>> getInvoicesFromYear(@RequestHeader("Authorization")String sessionToken, @RequestParam String yearI) throws ValidationException
+    @GetMapping(value = "/invoices",params = "year")
+    public ResponseEntity<List<InvoicesRequestFromPeriods>> getInvoicesFromYear(@RequestHeader("Authorization")String sessionToken, @RequestParam String year) throws ValidationException
     {
-        ResponseEntity<List<InvoicesRequestFromPeriods>> invoicesRequestFromPeriods = invoiceController.getInvoicesFromYear(yearI);
-        return (invoicesRequestFromPeriods != null) ? invoicesRequestFromPeriods : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        ResponseEntity<List<InvoicesRequestFromPeriods>> invoicesRequestFromPeriods = invoiceController.getInvoicesFromYear(year);
+        return (!invoicesRequestFromPeriods.getBody().isEmpty()) ? invoicesRequestFromPeriods : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/invoices/{fromI}/{toI}")
-    public ResponseEntity<List<InvoicesRequestFromPeriods>> getInvoicesBetweenDates(@RequestHeader("Authorization")String sessionToken, @RequestParam Date fromI, @RequestParam Date toI) throws ValidationException
+    @GetMapping(value = "/invoices",params = {"from","to"})
+    public ResponseEntity<List<InvoicesRequestFromPeriods>> getInvoicesBetweenDates(@RequestHeader("Authorization")String sessionToken, @RequestParam Date from, @RequestParam Date to) throws ValidationException
     {
-        ResponseEntity<List<InvoicesRequestFromPeriods>> invoicesRequestFromPeriods = invoiceController.getInvoicesBetweenDates(fromI, toI);
-        return (invoicesRequestFromPeriods != null) ? invoicesRequestFromPeriods : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        ResponseEntity<List<InvoicesRequestFromPeriods>> invoicesRequestFromPeriods = invoiceController.getInvoicesBetweenDates(from, to);
+        return (!invoicesRequestFromPeriods.getBody().isEmpty()) ? invoicesRequestFromPeriods : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/income")
@@ -181,17 +180,17 @@ public class EmployeeWebController {
         return (invoiceIncome != null) ? invoiceIncome : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/income/{monthI}")
-    public ResponseEntity<InvoiceIncome> getIncomeMonth(@RequestHeader("Authorization")String sessionToken, @RequestParam String monthI) throws ValidationException
+    @GetMapping(value = "/income",params = {"month","year"})
+    public ResponseEntity<InvoiceIncome> getIncomeMonth(@RequestHeader("Authorization")String sessionToken, @RequestParam String month,@RequestParam String year) throws ValidationException
     {
-        ResponseEntity<InvoiceIncome> invoiceIncome = invoiceController.getIncomeMonth(monthI);
+        ResponseEntity<InvoiceIncome> invoiceIncome = invoiceController.getIncomeMonth(month,year);
         return (invoiceIncome != null) ? invoiceIncome : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/income/{yearI}")
-    public ResponseEntity<InvoiceIncome> getIncomeYear(@RequestHeader("Authorization")String sessionToken, @RequestParam String yearI) throws ValidationException
+    @GetMapping(value = "/income",params = "year")
+    public ResponseEntity<InvoiceIncome> getIncomeYear(@RequestHeader("Authorization")String sessionToken, @RequestParam String year) throws ValidationException
     {
-        ResponseEntity<InvoiceIncome> invoiceIncome = invoiceController.getIncomeYear(yearI);
+        ResponseEntity<InvoiceIncome> invoiceIncome = invoiceController.getIncomeYear(year);
         return (invoiceIncome != null) ? invoiceIncome : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

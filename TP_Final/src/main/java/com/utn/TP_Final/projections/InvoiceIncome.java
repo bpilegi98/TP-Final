@@ -1,8 +1,10 @@
 package com.utn.TP_Final.projections;
 
+import java.math.BigDecimal;
+
 public interface InvoiceIncome {
 
-    float getIncome();
+    BigDecimal getIncome();
 
-    void setIncome(float income);
+    void setIncome(BigDecimal income);
 }

@@ -59,19 +59,19 @@ public class InvoiceService {
         return Optional.ofNullable(invoicesFromUsers).orElseThrow(()-> new UserNotExistsException());
     }
 
-    public List<InvoicesRequestFromPeriods> getInvoicesFromMonth(String monthI)
+    public List<InvoicesRequestFromPeriods> getInvoicesFromMonth(String month,String year)
     {
-        return invoiceRepository.getInvoicesFromMonth(monthI);
+        return invoiceRepository.getInvoicesFromMonth(month,year);
     }
 
-    public List<InvoicesRequestFromPeriods> getInvoicesFromYear(String yearI)
+    public List<InvoicesRequestFromPeriods> getInvoicesFromYear(String year)
     {
-        return invoiceRepository.getInvoicesFromYear(yearI);
+        return invoiceRepository.getInvoicesFromYear(year);
     }
 
-    public List<InvoicesRequestFromPeriods> getInvoicesBetweenDates(Date fromI, Date toI)
+    public List<InvoicesRequestFromPeriods> getInvoicesBetweenDates(Date from, Date to)
     {
-        return invoiceRepository.getInvoicesBetweenDates(fromI, toI);
+        return invoiceRepository.getInvoicesBetweenDates(from, to);
     }
 
     public InvoiceIncome getIncome()
@@ -79,9 +79,9 @@ public class InvoiceService {
         return invoiceRepository.getIncome();
     }
 
-    public InvoiceIncome getIncomeMonth(String monthI)
+    public InvoiceIncome getIncomeMonth(String month,String year)
     {
-        return invoiceRepository.getIncomeMonth(monthI);
+        return invoiceRepository.getIncomeMonth(month,year);
     }
 
     public InvoiceIncome getIncomeYear(String year)

@@ -231,8 +231,8 @@ truncate table fees;
 
 while i < total_cities do
 		while j < total_cities do
-			set aux_ppm = (select TRUNCATE (((50 + (rand() * 250))/100), 2));	
-			set aux_cpm = (select TRUNCATE (aux_ppm * TRUNCATE (((20 + (rand() * 80))/100), 2),2));
+			set aux_ppm = TRUNCATE (((50 + (rand() * 250))/100), 2);	
+			set aux_cpm =TRUNCATE (aux_ppm * TRUNCATE (((20 + (rand() * 80))/100), 2),2);
 			insert into fees (price_per_minute,cost_per_minute,id_source_city,id_destination_city) values ( aux_ppm, aux_cpm,i,j);
 			set j=j+1;
 		end while;
@@ -436,6 +436,8 @@ where u.dni = dni
 group by u.id;
 end //
 
+drop procedure backoffice_request_calls_user
+
 delimiter //
 create procedure backoffice_request_calls_user(IN dni int)
 begin
@@ -446,9 +448,10 @@ inner join telephone_lines t
 on ca.source_number = t.line_number
 inner join users u
 on t.id_user = u.id
-where u.dni = dni;
+where u.dni = dni
+limit 25;
 end //
-
+call backoffice_request_calls_user("41307541");
 -- 6) Consulta de facturación. La facturación se hará directamente por un proceso interno en la base datos.
 
 -- ver facturas de un usuario
@@ -491,14 +494,16 @@ end //
 
 -- ver facturas de un mes
 delimiter //
-create procedure backoffice_invoices_from_month(IN monthI varchar(50))
+create procedure backoffice_invoices_from_month(IN monthI varchar(50),IN yearI varchar(50))
 begin
 select t.line_number, i.date_creation, i.date_expiration, i.total_cost, i.total_price, i.paid
 from telephone_lines t
 inner join invoices i
 on t.id = i.id_telephone_line
-where month(i.date_creation) = monthI;
+where month(i.date_creation) = monthI and year(i.date_creation)=yearI;
 end //
+
+
 
 -- ver facturas de un año
 
@@ -529,30 +534,30 @@ end //
 delimiter //
 create procedure backoffice_check_income()
 begin
-select (sum(i.total_price)-sum(i.total_cost)) as income
+select truncate((sum(i.total_price)-sum(i.total_cost)),2) as income
 from invoices i;
 end //
 
 -- ver ganancias de un mes
 
 delimiter //
-create procedure backoffice_check_income_month(IN monthI varchar(50))
+create procedure backoffice_check_income_month(IN monthI varchar(50), IN yearI varchar(50))
 begin
-select (sum(i.total_price)-sum(i.total_cost)) as income
+select truncate((sum(i.total_price)-sum(i.total_cost)),2) as income
 from invoices i
-where month(i.date_creation) = monthI;
+where month(i.date_creation) = monthI and year(i.date_creation)=yearI;
 end //
 
 -- ver ganancias de un año
-
 delimiter //
 create procedure backoffice_check_income_year(IN yearI varchar(50))
 begin
-select (sum(i.total_price)-sum(i.total_cost)) as income
+select truncate((sum(i.total_price)-sum(i.total_cost)),2) as income
 from invoices i
 where year(i.date_creation) = yearI;
 end //
 
+call backoffice_check_income_year("2020")
 -- AERIAL
 -- Se debe permitir también el agregado de llamadas, con un login especial, ya que
 -- este método de nuestra API será llamado nada más que por el área de

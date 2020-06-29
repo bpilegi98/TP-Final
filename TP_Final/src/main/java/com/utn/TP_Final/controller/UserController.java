@@ -39,12 +39,6 @@ public class UserController {
         return ResponseEntity.created(getUri(userService.addUser(newUser))).build();
     }
 
-
-    public ResponseEntity<User> removeUser(@PathVariable String dni)throws UserNotExistsException, ValidationException
-    {
-        return ResponseEntity.ok(userService.deleteUser(dni));
-    }
-
     public ResponseEntity<User> activeUser(@PathVariable String dni) throws UserNotExistsException
     {
         return ResponseEntity.ok(userService.activeUser(dni));

@@ -21,6 +21,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -214,9 +215,9 @@ public class InvoiceControllerTest {
         List<InvoicesRequestFromPeriods> invoicesRequestFromPeriodsList = new ArrayList<InvoicesRequestFromPeriods>();
         invoicesRequestFromPeriodsList.add(invoicesRequestFromPeriods);
 
-        when(invoiceService.getInvoicesFromMonth("06")).thenReturn(invoicesRequestFromPeriodsList);
+        when(invoiceService.getInvoicesFromMonth("06","2020")).thenReturn(invoicesRequestFromPeriodsList);
 
-        ResponseEntity<List<InvoicesRequestFromPeriods>> invoicesRequestFromPeriodsResult = invoiceController.getInvoicesFromMonth("06");
+        ResponseEntity<List<InvoicesRequestFromPeriods>> invoicesRequestFromPeriodsResult = invoiceController.getInvoicesFromMonth("06","2020");
 
         assertEquals(HttpStatus.OK, invoicesRequestFromPeriodsResult.getStatusCode());
     }
@@ -225,8 +226,8 @@ public class InvoiceControllerTest {
     public void getInvoicesFromMonthEmptyTest()
     {
         List<InvoicesRequestFromPeriods> invoicesRequestFromPeriods = new ArrayList<InvoicesRequestFromPeriods>();
-        when(invoiceService.getInvoicesFromMonth("06")).thenReturn(invoicesRequestFromPeriods);
-        invoiceService.getInvoicesFromMonth("06");
+        when(invoiceService.getInvoicesFromMonth("06","2020")).thenReturn(invoicesRequestFromPeriods);
+        invoiceService.getInvoicesFromMonth("06","2020");
     }
 
     @Test
@@ -322,7 +323,7 @@ public class InvoiceControllerTest {
 
         ProjectionFactory factory = new SpelAwareProxyProjectionFactory();
         InvoiceIncome invoiceIncome = factory.createProjection(InvoiceIncome.class);
-        invoiceIncome.setIncome(3);
+        invoiceIncome.setIncome(BigDecimal.valueOf(3));
 
         when(invoiceService.getIncome()).thenReturn(invoiceIncome);
 
@@ -345,11 +346,11 @@ public class InvoiceControllerTest {
 
         ProjectionFactory factory = new SpelAwareProxyProjectionFactory();
         InvoiceIncome invoiceIncome = factory.createProjection(InvoiceIncome.class);
-        invoiceIncome.setIncome(3);
+        invoiceIncome.setIncome(BigDecimal.valueOf(3));
 
-        when(invoiceService.getIncomeMonth("06")).thenReturn(invoiceIncome);
+        when(invoiceService.getIncomeMonth("06","2020")).thenReturn(invoiceIncome);
 
-        ResponseEntity<InvoiceIncome> invoiceIncomeResult = invoiceController.getIncomeMonth("06");
+        ResponseEntity<InvoiceIncome> invoiceIncomeResult = invoiceController.getIncomeMonth("06","2020");
 
         assertEquals(HttpStatus.OK, invoiceIncomeResult.getStatusCode());
     }
@@ -368,7 +369,7 @@ public class InvoiceControllerTest {
 
         ProjectionFactory factory = new SpelAwareProxyProjectionFactory();
         InvoiceIncome invoiceIncome = factory.createProjection(InvoiceIncome.class);
-        invoiceIncome.setIncome(3);
+        invoiceIncome.setIncome(BigDecimal.valueOf(3));
 
         when(invoiceService.getIncomeYear("2020")).thenReturn(invoiceIncome);
 

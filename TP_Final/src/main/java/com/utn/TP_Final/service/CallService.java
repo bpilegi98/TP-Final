@@ -59,7 +59,7 @@ public class CallService {
 
     public List<CallsFromUser> getCallsFromUser(String dni) throws UserNotExistsException
     {
-        List<CallsFromUser> callsFromUser = callRepository.getCallsFromUser(dni);
-        return Optional.ofNullable(callsFromUser).orElseThrow(()-> new UserNotExistsException());
+        List<CallsFromUser> callsFromUserList = callRepository.getCallsFromUser(dni);
+        return Optional.ofNullable(callsFromUserList).orElseThrow(()-> new UserNotExistsException());
     }
 }

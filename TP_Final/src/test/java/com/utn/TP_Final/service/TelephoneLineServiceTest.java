@@ -48,23 +48,6 @@ public class TelephoneLineServiceTest {
     }
 
     @Test
-    public void deleteTelephoneLineOk() throws ValidationException
-    {
-        TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
-        when(telephoneLineRepository.delete(telephoneLine.getLineNumber())).thenReturn(telephoneLine);
-        TelephoneLine telephoneLineResult = telephoneLineService.deleteTelephoneLine(telephoneLine.getLineNumber());
-        assertEquals(telephoneLine, telephoneLineResult);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void deleteTelephoneLineNotExists() throws ValidationException
-    {
-        TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
-        when(telephoneLineRepository.delete(telephoneLine.getLineNumber())).thenReturn(null);
-        telephoneLineService.deleteTelephoneLine(telephoneLine.getLineNumber());
-    }
-
-    @Test
     public void getAllTest()
     {
         TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
@@ -94,7 +77,7 @@ public class TelephoneLineServiceTest {
     {
         LineStatus lineStatus = LineStatus.ACTIVE;
         TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, lineStatus, null);
-        when(telephoneLineRepository.suspendTelephoneLine(telephoneLine.getLineNumber())).thenReturn(telephoneLine);
+        when(telephoneLineRepository.suspendTelephoneLine(telephoneLine.getLineNumber())).thenReturn(1);
         TelephoneLine telephoneLineResult = telephoneLineService.suspendTelephoneLine(telephoneLine.getLineNumber());
         assertEquals(telephoneLine.getStatus(), telephoneLineResult.getStatus());
     }
@@ -112,7 +95,7 @@ public class TelephoneLineServiceTest {
     {
         LineStatus lineStatus = LineStatus.ACTIVE;
         TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, lineStatus, null);
-        when(telephoneLineRepository.activeTelephoneLine(telephoneLine.getLineNumber())).thenReturn(telephoneLine);
+        when(telephoneLineRepository.activeTelephoneLine(telephoneLine.getLineNumber())).thenReturn(1);
         TelephoneLine telephoneLineResult = telephoneLineService.activeTelephoneLine(telephoneLine.getLineNumber());
         assertEquals(telephoneLine.getStatus(), telephoneLineResult.getStatus());
     }

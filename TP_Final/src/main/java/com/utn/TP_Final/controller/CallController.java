@@ -34,7 +34,6 @@ public class CallController {
     public ResponseEntity<Call> addCall(@RequestBody String sourceNumber, @RequestBody String destinationNumber, @RequestBody Integer duration, @RequestBody LocalDateTime date) throws ValidationException
     {
         Call call = new Call(sourceNumber,destinationNumber,duration,date);
-        System.out.println(call.getSourceNumber() + " //// "+ call.getDestinationNumber());
         return ResponseEntity.created(getUri(callService.addCall(call))).build();
     }
 
@@ -56,13 +55,13 @@ public class CallController {
     }
 
 
-    public ResponseEntity<CallsFromUserSimple> getCallsFromUserSimple(@PathVariable String dni) throws UserNotExistsException
+    public ResponseEntity<CallsFromUserSimple> getCallsFromUserSimple(String dni) throws UserNotExistsException
     {
         return ResponseEntity.ok(callService.getCallsFromUserSimple(dni));
     }
 
 
-    public ResponseEntity<List<CallsFromUser>> getCallsFromUser(@PathVariable String dni) throws UserNotExistsException
+    public ResponseEntity<List<CallsFromUser>> getCallsFromUser(String dni) throws UserNotExistsException
     {
         return ResponseEntity.ok(callService.getCallsFromUser(dni));
     }

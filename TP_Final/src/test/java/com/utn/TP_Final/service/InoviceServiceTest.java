@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -235,9 +236,9 @@ public class InoviceServiceTest {
         List<InvoicesRequestFromPeriods> invoicesRequestFromPeriodsList = new ArrayList<InvoicesRequestFromPeriods>();
         invoicesRequestFromPeriodsList.add(invoicesRequestFromPeriods);
 
-        when(invoiceRepository.getInvoicesFromMonth("06")).thenReturn(invoicesRequestFromPeriodsList);
+        when(invoiceRepository.getInvoicesFromMonth("06","2020")).thenReturn(invoicesRequestFromPeriodsList);
 
-        List<InvoicesRequestFromPeriods> invoicesRequestFromPeriodsResult = invoiceService.getInvoicesFromMonth("06");
+        List<InvoicesRequestFromPeriods> invoicesRequestFromPeriodsResult = invoiceService.getInvoicesFromMonth("06","2020");
 
         assertEquals(invoicesRequestFromPeriodsList, invoicesRequestFromPeriodsResult);
     }
@@ -246,8 +247,8 @@ public class InoviceServiceTest {
     public void getInvoicesFromMonthEmptyTest()
     {
         List<InvoicesRequestFromPeriods> invoicesRequestFromPeriods = new ArrayList<InvoicesRequestFromPeriods>();
-        when(invoiceRepository.getInvoicesFromMonth("06")).thenReturn(invoicesRequestFromPeriods);
-        invoiceRepository.getInvoicesFromMonth("06");
+        when(invoiceRepository.getInvoicesFromMonth("06","2020")).thenReturn(invoicesRequestFromPeriods);
+        invoiceRepository.getInvoicesFromMonth("06","2020");
     }
 
     @Test
@@ -345,7 +346,7 @@ public class InoviceServiceTest {
 
         ProjectionFactory factory = new SpelAwareProxyProjectionFactory();
         InvoiceIncome invoiceIncome = factory.createProjection(InvoiceIncome.class);
-        invoiceIncome.setIncome(3);
+        invoiceIncome.setIncome(BigDecimal.valueOf(3));
 
         when(invoiceRepository.getIncome()).thenReturn(invoiceIncome);
 
@@ -369,11 +370,11 @@ public class InoviceServiceTest {
 
         ProjectionFactory factory = new SpelAwareProxyProjectionFactory();
         InvoiceIncome invoiceIncome = factory.createProjection(InvoiceIncome.class);
-        invoiceIncome.setIncome(3);
+        invoiceIncome.setIncome(BigDecimal.valueOf(3));
 
-        when(invoiceRepository.getIncomeMonth("06")).thenReturn(invoiceIncome);
+        when(invoiceRepository.getIncomeMonth("06","2020")).thenReturn(invoiceIncome);
 
-        InvoiceIncome invoiceIncomeResult = invoiceService.getIncomeMonth("06");
+        InvoiceIncome invoiceIncomeResult = invoiceService.getIncomeMonth("06","2020");
 
         assertEquals(invoiceIncome, invoiceIncomeResult);
     }
@@ -393,7 +394,7 @@ public class InoviceServiceTest {
 
         ProjectionFactory factory = new SpelAwareProxyProjectionFactory();
         InvoiceIncome invoiceIncome = factory.createProjection(InvoiceIncome.class);
-        invoiceIncome.setIncome(3);
+        invoiceIncome.setIncome(BigDecimal.valueOf(3));
 
         when(invoiceRepository.getIncomeYear("2020")).thenReturn(invoiceIncome);
 

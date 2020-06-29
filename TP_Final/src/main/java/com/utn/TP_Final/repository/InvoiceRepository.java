@@ -29,21 +29,21 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
     @Query(value = "call backoffice_invoices_from_user_not_paid(:dni);", nativeQuery = true)
     List<InvoicesFromUser> getInvoicesNotPaidFromUser(@Param("dni")String dni);
 
-    @Query(value = "call backoffice_invoices_from_month(:monthI);", nativeQuery = true)
-    List<InvoicesRequestFromPeriods> getInvoicesFromMonth(@Param("monthI")String monthI);
+    @Query(value = "call backoffice_invoices_from_month(:month, :year);", nativeQuery = true)
+    List<InvoicesRequestFromPeriods> getInvoicesFromMonth(@Param("month")String month,@Param("year") String year);
 
-    @Query(value = "call backoffice_invoices_from_year(:yearI);", nativeQuery = true)
-    List<InvoicesRequestFromPeriods> getInvoicesFromYear(@Param("yearI")String yearI);
+    @Query(value = "call backoffice_invoices_from_year(:year);", nativeQuery = true)
+    List<InvoicesRequestFromPeriods> getInvoicesFromYear(@Param("year")String year);
 
-    @Query(value = "call backoffice_invoices_between_dates(:fromI, :toI);", nativeQuery = true)
-    List<InvoicesRequestFromPeriods> getInvoicesBetweenDates(@Param("fromI")Date fromI, @Param("toI")Date toI);
+    @Query(value = "call backoffice_invoices_between_dates(:from, :to);", nativeQuery = true)
+    List<InvoicesRequestFromPeriods> getInvoicesBetweenDates(@Param("from")Date from, @Param("to")Date to);
 
     @Query(value = "call backoffice_check_income();", nativeQuery = true)
     InvoiceIncome getIncome();
 
-    @Query(value = "call backoffice_check_income_month(:monthI);", nativeQuery = true)
-    InvoiceIncome getIncomeMonth(@Param("monthI")String monthI);
+    @Query(value = "call backoffice_check_income_month(:month,:year);", nativeQuery = true)
+    InvoiceIncome getIncomeMonth(@Param("month")String month,@Param("year")String year);
 
-    @Query(value = "call backoffice_check_income_year(:yearI);", nativeQuery = true)
-    InvoiceIncome getIncomeYear(@Param("yearI")String yearI);
+    @Query(value = "call backoffice_check_income_year(:year);", nativeQuery = true)
+    InvoiceIncome getIncomeYear(@Param("year")String year);
 }

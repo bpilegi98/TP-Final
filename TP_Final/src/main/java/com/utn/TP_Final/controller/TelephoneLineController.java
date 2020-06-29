@@ -31,12 +31,6 @@ public class TelephoneLineController {
     }
 
 
-    public ResponseEntity<TelephoneLine> removeTelephoneLine(@PathVariable String lineNumber) throws ValidationException
-    {
-        return ResponseEntity.ok(telephoneLineService.deleteTelephoneLine(lineNumber));
-    }
-
-
     public ResponseEntity<List<TelephoneLine>> getAll(@PathVariable String lineNumber)
     {
         return ResponseEntity.ok(telephoneLineService.getAll(lineNumber));

@@ -22,7 +22,6 @@ public class Province {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    @JsonIgnore
     private int id;
 
     @Column(name = "name")

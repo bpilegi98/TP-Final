@@ -47,16 +47,6 @@ public class TelephoneLineControllerTest {
         assertEquals(HttpStatus.CREATED, telephoneLineResult.getStatusCode());
     }
 
-
-    @Test
-    public void deleteTelephoneLineOk() throws ValidationException {
-        TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
-        when(telephoneLineService.deleteTelephoneLine(telephoneLine.getLineNumber())).thenReturn(telephoneLine);
-        ResponseEntity<TelephoneLine> telephoneLineResult = telephoneLineController.removeTelephoneLine(telephoneLine.getLineNumber());
-        assertEquals(HttpStatus.OK, telephoneLineResult.getStatusCode());
-    }
-
-
     @Test
     public void getAllTest()
     {

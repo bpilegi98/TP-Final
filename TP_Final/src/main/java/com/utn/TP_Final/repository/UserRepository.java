@@ -6,9 +6,11 @@ import com.utn.TP_Final.projections.CallsBetweenDates;
 import com.utn.TP_Final.projections.InvoicesBetweenDatesUser;
 import com.utn.TP_Final.projections.TopMostCalledDestinations;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -22,9 +24,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     //@Query(value = "select * from users where username = ?1 and password = ?2", nativeQuery = true)
     User findByUsername(String username);
 
-    @Query(value = "remove from users where dni = ?1", nativeQuery = true)
-    User delete(String dni);
-
     @Query(value = "call user_calls_between_dates(:fromD, :toD, :idLoggedUser);", nativeQuery = true)
     List<CallsBetweenDates> getCallsBetweenDates(@Param("fromD") Date from, @Param("toD") Date to, @Param("idLoggedUser") Integer idLoggedUser); //agregar exceptions correspondientes
 
@@ -34,9 +33,13 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query(value = "call user_top_most_called(:idLoggedUser);", nativeQuery = true)
     List<TopMostCalledDestinations> getTopMostCalledDestinations(@Param("idLoggedUser") Integer idLoggedUser);
 
+    @Transactional
+    @Modifying(clearAutomatically = true)
     @Query(value = "update users set is_active = true where dni = ?1", nativeQuery = true)
-    User activeUser(String dni);
+    int activeUser(String dni);
 
+    @Transactional
+    @Modifying(clearAutomatically = true)
     @Query(value = "update users set is_active = false where dni = ?1", nativeQuery = true)
-    User suspendUser(String dni);
+    int suspendUser(String dni);
 }

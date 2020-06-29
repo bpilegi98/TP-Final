@@ -18,7 +18,6 @@ public class Fee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    @JsonIgnore
     private Integer id;
 
     @Column(name = "price_per_minute")

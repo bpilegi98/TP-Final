@@ -31,7 +31,7 @@ public class InvoiceController {
     }
 
 
-    public ResponseEntity<Invoice> addInvoice(@RequestBody Invoice newInvoice)
+    public ResponseEntity<Invoice> addInvoice(Invoice newInvoice)
     {
         return ResponseEntity.created(getUri(invoiceService.addInvoice(newInvoice))).build();
     }
@@ -49,37 +49,37 @@ public class InvoiceController {
     }
 
 
-    public ResponseEntity<List<InvoicesFromUser>> getInvoicesFromUser(@PathVariable String dni) throws UserNotExistsException
+    public ResponseEntity<List<InvoicesFromUser>> getInvoicesFromUser(String dni) throws UserNotExistsException
     {
         return ResponseEntity.ok(invoiceService.getInvoicesFromUser(dni));
     }
 
 
-    public ResponseEntity<List<InvoicesFromUser>> getInvoicesPaidFromUser(@PathVariable String dni) throws UserNotExistsException
+    public ResponseEntity<List<InvoicesFromUser>> getInvoicesPaidFromUser(String dni) throws UserNotExistsException
     {
         return ResponseEntity.ok(invoiceService.getInvoicesPaidFromUser(dni));
     }
 
 
-    public ResponseEntity<List<InvoicesFromUser>> getInvoicesNotPaidFromUser(@PathVariable String dni) throws UserNotExistsException
+    public ResponseEntity<List<InvoicesFromUser>> getInvoicesNotPaidFromUser(String dni) throws UserNotExistsException
     {
         return ResponseEntity.ok(invoiceService.getInvoicesNotPaidFromUser(dni));
     }
 
 
-    public ResponseEntity<List<InvoicesRequestFromPeriods>> getInvoicesFromMonth(@PathVariable String monthI)
+    public ResponseEntity<List<InvoicesRequestFromPeriods>> getInvoicesFromMonth(String month, String year )
     {
-        return ResponseEntity.ok(invoiceService.getInvoicesFromMonth(monthI));
+        return ResponseEntity.ok(invoiceService.getInvoicesFromMonth(month,year));
     }
 
 
-    public ResponseEntity<List<InvoicesRequestFromPeriods>> getInvoicesFromYear(@PathVariable String yearI)
+    public ResponseEntity<List<InvoicesRequestFromPeriods>> getInvoicesFromYear(String yearI)
     {
         return ResponseEntity.ok(invoiceService.getInvoicesFromYear(yearI));
     }
 
 
-    public ResponseEntity<List<InvoicesRequestFromPeriods>> getInvoicesBetweenDates(@PathVariable Date fromI, @PathVariable Date toI)
+    public ResponseEntity<List<InvoicesRequestFromPeriods>> getInvoicesBetweenDates(Date fromI, Date toI)
     {
         return ResponseEntity.ok(invoiceService.getInvoicesBetweenDates(fromI, toI));
     }
@@ -91,15 +91,15 @@ public class InvoiceController {
     }
 
 
-    public ResponseEntity<InvoiceIncome> getIncomeMonth(@PathVariable String monthI)
+    public ResponseEntity<InvoiceIncome> getIncomeMonth( String month, String year)
     {
-        return ResponseEntity.ok(invoiceService.getIncomeMonth(monthI));
+        return ResponseEntity.ok(invoiceService.getIncomeMonth(month,"2020"));
     }
 
 
-    public ResponseEntity<InvoiceIncome> getIncomeYear(@PathVariable String yearI)
+    public ResponseEntity<InvoiceIncome> getIncomeYear(String year)
     {
-        return ResponseEntity.ok(invoiceService.getIncomeYear(yearI));
+        return ResponseEntity.ok(invoiceService.getIncomeYear(year));
     }
 
     private URI getUri(Invoice invoice)

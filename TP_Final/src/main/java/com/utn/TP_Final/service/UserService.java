@@ -37,22 +37,18 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-
-    public User deleteUser(String dni) throws UserNotExistsException
-    {
-        User user = userRepository.delete(dni);
-        return Optional.ofNullable(user).orElseThrow(()-> new UserNotExistsException());
-    }
-
     public User activeUser(String dni) throws UserNotExistsException
     {
-        User user = userRepository.activeUser(dni);
+        userRepository.activeUser(dni);
+        User user = userRepository.findByDni(dni);
         return Optional.ofNullable(user).orElseThrow(()-> new UserNotExistsException());
     }
 
     public User suspendUser(String dni) throws UserNotExistsException
     {
-        User user = userRepository.suspendUser(dni);
+        userRepository.suspendUser(dni);
+        User user = userRepository.findByDni(dni);
+
         return Optional.ofNullable(user).orElseThrow(()-> new UserNotExistsException());
     }
 
@@ -108,9 +104,7 @@ public class UserService {
     //CREAR USUARIO
     public User addUser(User newUser) throws UserAlreadyExistsException, NoSuchAlgorithmException, InvalidKeySpecException {
 
-
         newUser.setPassword(newUser.generateStrongPasswordHash(newUser.getPassword()));
-
         User user = userRepository.save(newUser);
         return Optional.ofNullable(user).orElseThrow(()-> new UserAlreadyExistsException());
     }
