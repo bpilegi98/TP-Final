@@ -1,6 +1,7 @@
 package com.utn.TP_Final.repository;
 
 
+import com.utn.TP_Final.dto.CallsUserDto;
 import com.utn.TP_Final.model.Call;
 import com.utn.TP_Final.model.Fee;
 import com.utn.TP_Final.projections.CallsFromUser;
@@ -21,8 +22,16 @@ public interface CallRepository extends JpaRepository<Call, Integer> {
     @Query(value = "call backoffice_request_calls_user_simple(:dni);", nativeQuery = true)
     CallsFromUserSimple getCallsFromUserSimple(@Param("dni")String dni);
 
-    @Query(value = "call backoffice_request_calls_user(:dni);", nativeQuery = true)
-    List<CallsFromUser> getCallsFromUser(@Param("dni")String dni);
+    @Query(value = "select new CallsUserDto ( ca.source_number as sourceNumber , (select name from cities where id=ca.id_source_number) as sourceCity ,  " +
+            " ca.destination_number as destinationNumber , (select name from cities where id=ca.id_destination_number) as destinationCity ,  " +
+            " ca.total_price as totalPrice, ca.date_call as dateCall) " +
+            " from calls ca " +
+            " inner join telephone_lines t " +
+            " on ca.source_number = t.line_number " +
+            " inner join users u " +
+            " on t.id_user = u.id " +
+            " where u.dni = ?1", nativeQuery = true)
+    List<CallsUserDto> getCallsFromUser(String dni);
 
     @Query(value = "remove from calls where id = ?1", nativeQuery = true)
     Call delete(Integer id);

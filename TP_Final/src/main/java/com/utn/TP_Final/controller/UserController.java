@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Controller
+@RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
@@ -33,7 +34,7 @@ public class UserController {
     }
 
 
-
+    @PostMapping("/")
     public ResponseEntity<User> addUser(@RequestBody User newUser) throws UserAlreadyExistsException, ValidationException, InvalidKeySpecException, NoSuchAlgorithmException
     {
         return ResponseEntity.created(getUri(userService.addUser(newUser))).build();

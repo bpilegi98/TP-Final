@@ -2,6 +2,7 @@ package com.utn.TP_Final.controller.web;
 
 
 import com.utn.TP_Final.controller.*;
+import com.utn.TP_Final.dto.CallsUserDto;
 import com.utn.TP_Final.exceptions.*;
 import com.utn.TP_Final.model.Call;
 import com.utn.TP_Final.model.Fee;
@@ -46,7 +47,7 @@ public class EmployeeWebController {
     public ResponseEntity<List<User>> getUsers(@RequestHeader(HttpHeaders.AUTHORIZATION) String sessionToken)
     {
         ResponseEntity<List<User>> users = userController.getAll(null);
-        return (users != null) ? users : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return (!users.getBody().isEmpty()) ? users : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 
@@ -73,7 +74,7 @@ public class EmployeeWebController {
     public ResponseEntity<List<TelephoneLine>> getTelephoneLines(@RequestHeader("Authorization") String sessionToken)
     {
         ResponseEntity<List<TelephoneLine>> telephoneLines = telephoneLineController.getAll(null);
-        return (telephoneLines != null) ? telephoneLines : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return (!telephoneLines.getBody().isEmpty()) ? telephoneLines : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PostMapping("/telephoneLines")
@@ -102,18 +103,18 @@ public class EmployeeWebController {
     }
 
     @GetMapping(value = "/calls", params = "dni")
-    public ResponseEntity<List<CallsFromUser>> getCallsFromUser(@RequestHeader("Authorization")String sessionToken, @RequestParam String dni) throws UserNotExistsException
+    public ResponseEntity<List<CallsUserDto>> getCallsFromUser(@RequestHeader("Authorization")String sessionToken, @RequestParam String dni) throws UserNotExistsException
     {
-        ResponseEntity<List<CallsFromUser>> callsFromUsersList = callController.getCallsFromUser(dni);
-        //  return (callsFromUsersList != null) ? callsFromUsersList : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        return callsFromUsersList;
+        ResponseEntity<List<CallsUserDto>> callsFromUsersList = callController.getCallsFromUser(dni);
+        return (!callsFromUsersList.getBody().isEmpty()) ? callsFromUsersList : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        //return callsFromUsersList;
     }
 
 
     @GetMapping("/calls")
     public ResponseEntity<List<Call>> getCalls(@RequestHeader("Authorization")String sessionToken){
         ResponseEntity<List<Call>> calls = callController.getAll();
-        return (calls != null) ? calls : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return (!calls.getBody().isEmpty()) ? calls : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 
@@ -135,7 +136,7 @@ public class EmployeeWebController {
     public ResponseEntity<List<InvoicesFromUser>> getInvoicesFromUser(@RequestHeader("Authorization")String sessionToken, @RequestParam String dni) throws ValidationException, UserNotExistsException
     {
         ResponseEntity<List<InvoicesFromUser>> invoicesFromUsers = invoiceController.getInvoicesFromUser(dni);
-        return (invoicesFromUsers != null) ? invoicesFromUsers : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return (!invoicesFromUsers.getBody().isEmpty()) ? invoicesFromUsers : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/invoices/paid")

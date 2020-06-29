@@ -38,7 +38,7 @@ public class CustomerWebController {
 
 
 
-    @GetMapping("/calls")
+    @GetMapping(value = "/calls", params = {"from", "to"})
     public ResponseEntity<List<CallsBetweenDates>> getCallsBetweenDates(@RequestHeader("Authorization") String sessionToken,
                                                                         @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date from,
                                                                         @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date to,
@@ -48,10 +48,10 @@ public class CustomerWebController {
             User currentUser = sessionManager.getLoggedUser(sessionToken);
 
             ResponseEntity<List<CallsBetweenDates>> callsBetweenDates = userController.getCallsBetweenDates(from, to, currentUser.getId());
-            return (callsBetweenDates != null) ? callsBetweenDates : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            return (!callsBetweenDates.getBody().isEmpty()) ? callsBetweenDates : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
        }
 
-    @GetMapping("/invoices")
+    @GetMapping(value = "/invoices", params = {"from", "to"})
     public ResponseEntity<List<InvoicesBetweenDatesUser>> getInvoicesBetweenDates(@RequestHeader("Authorization")String sessionToken,
                                                                                   @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date from,
                                                                                   @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date to, Integer idLoggedUser) throws ValidationException, UserNotExistsException
@@ -59,7 +59,7 @@ public class CustomerWebController {
             User currentUser = sessionManager.getLoggedUser(sessionToken);
 
             ResponseEntity<List<InvoicesBetweenDatesUser>> invoicesBetweenDateUsers = userController.getInvoicesBetweenDates(from, to, currentUser.getId());
-            return (invoicesBetweenDateUsers != null) ? invoicesBetweenDateUsers : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            return (!invoicesBetweenDateUsers.getBody().isEmpty()) ? invoicesBetweenDateUsers : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
 
     @GetMapping("/topMostCalledDestinations")
@@ -68,7 +68,7 @@ public class CustomerWebController {
             User currentUser = sessionManager.getLoggedUser(sessionToken);
 
             ResponseEntity<List<TopMostCalledDestinations>> topMostCalledDestinations = userController.getTopMostCalledDestinations(currentUser.getId());
-            return (topMostCalledDestinations != null) ? topMostCalledDestinations : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            return (!topMostCalledDestinations.getBody().isEmpty()) ? topMostCalledDestinations : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }

@@ -1,6 +1,7 @@
 package com.utn.TP_Final.controller;
 
 
+import com.utn.TP_Final.dto.CallsUserDto;
 import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.model.Call;
@@ -61,7 +62,7 @@ public class CallController {
     }
 
 
-    public ResponseEntity<List<CallsFromUser>> getCallsFromUser(String dni) throws UserNotExistsException
+    public ResponseEntity<List<CallsUserDto>> getCallsFromUser(String dni) throws UserNotExistsException
     {
         return ResponseEntity.ok(callService.getCallsFromUser(dni));
     }

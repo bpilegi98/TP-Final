@@ -191,11 +191,8 @@ values
 ("Tucuman",1);              
 end //     
 
--- /////////////////////////////////////////////////
--- STOP STOP STOP //////////////////////////////////
--- /////////////////////////////////////////////////
--- tenemos un script en java que carga las ciudades, aca deberias ir y ejecutarlo
-select * from cities
+
+
 delimiter //
 create procedure add_users()
 begin
@@ -304,20 +301,23 @@ begin
 insert into invoices (total_price, total_cost, date_creation, date_expiration, id_telephone_line, id_user, paid) values (23.3, 7.68, '2020-05-30', '2020-06-15', 2, 1, false);
 end //
 
+
+
 -- CALL STORED PROCEDURES
 
 
 call add_country();
 call create_provinces();
--- ////////////////////////////////////////////////////////
--- script de java 
+-- /////////////////////////////////////////////////
+-- STOP STOP STOP //////////////////////////////////
+-- /////////////////////////////////////////////////
+-- tenemos un script en java que carga las ciudades, aca deberias ir y ejecutarlo
 call add_users();
 call add_telephone_lines();
 call add_fees();
 call add_x_calls(500);
 -- call add_invoices();
 
-select * from users
 
 DELIMITER // 
 CREATE TRIGGER tbi_new_city BEFORE INSERT ON cities FOR EACH ROW
@@ -377,20 +377,23 @@ where u.id = idLoggedUser and i.date_creation between fromD and toD;
 end //
 
 -- 4) Consulta de TOP 10 destinos más llamados por el usuario
-
+-- drop procedure user_top_most_called
 delimiter //
 create procedure user_top_most_called(IN idLoggedUser int)
 begin
-select c.destination_number as number_called, count(c.destination_number) as times_called
+select ct.name as city, count(c.id_destination_city) as times_called
 from calls c 
 join telephone_lines t
 on c.source_number = t.line_number
 join users u
 on t.id_user = u.id
-where u.id = idLoggedUser
-group by number_called
+join cities ct
+on c.id_destination_city = ct.id
+where u.id = idLoggedUser 
+group by city
 limit 10;
 end //
+
 
 -- BACK OFFICE
 -- 2) Manejo de clientes

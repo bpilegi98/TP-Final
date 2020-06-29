@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Controller
+@RequestMapping("/cities")
 public class CityController {
 
     private final CityService cityService;
@@ -61,6 +62,7 @@ public class CityController {
         cityService.uploadCites();
     }
  */
+
 
     private URI getUri(City city)
     {

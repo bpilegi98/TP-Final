@@ -1,8 +1,10 @@
 package com.utn.TP_Final.service;
 
+import com.utn.TP_Final.dto.CallsUserDto;
 import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.Call;
+import com.utn.TP_Final.model.City;
 import com.utn.TP_Final.model.TelephoneLine;
 import com.utn.TP_Final.model.User;
 import com.utn.TP_Final.projections.CallsFromUser;
@@ -155,7 +157,7 @@ public class CallServiceTest {
         List<Call> calls = new ArrayList<Call>();
 
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
-
+        City city = new City(1, "Mar del Plata", "223", null);
         TelephoneLine telephoneLine1 = new TelephoneLine(1, "2235678987", null, null, user);
         TelephoneLine telephoneLine2 = new TelephoneLine(2, "223555555", null, null, null);
 
@@ -169,24 +171,15 @@ public class CallServiceTest {
 
         calls.add(call1);
 
-        ProjectionFactory factory = new SpelAwareProxyProjectionFactory();
-        CallsFromUser callsFromUser = factory.createProjection(CallsFromUser.class);
-        callsFromUser.setDni(user.getDni());
-        callsFromUser.setDateCall(null);
-        callsFromUser.setDestinationNumber(null);
-        callsFromUser.setFirstname(user.getFirstname());
-        callsFromUser.setLastname(user.getLastname());
-        callsFromUser.setSourceNumber(telephoneLine2.getLineNumber());
-        callsFromUser.setIdCall(call1.getId());
-        callsFromUser.setTotalCost(call1.getTotalCost());
-        callsFromUser.setTotalPrice(call1.getTotalPrice());
 
-        List<CallsFromUser> callsFromUsersList = new ArrayList<CallsFromUser>();
+        CallsUserDto callsFromUser = new CallsUserDto(call1.getSourceNumber(), city.getName(), call1.getDestinationNumber(), city.getName(), call1.getTotalPrice(), call1.getDateCall());
+
+        List<CallsUserDto> callsFromUsersList = new ArrayList<CallsUserDto>();
         callsFromUsersList.add(callsFromUser);
 
         when(callRepository.getCallsFromUser(user.getDni())).thenReturn(callsFromUsersList);
 
-        List<CallsFromUser> callsFromUserResult = callService.getCallsFromUser(user.getDni());
+        List<CallsUserDto> callsFromUserResult = callService.getCallsFromUser(user.getDni());
 
         assertEquals(callsFromUsersList, callsFromUserResult);
     }

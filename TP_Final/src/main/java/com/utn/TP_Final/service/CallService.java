@@ -1,6 +1,7 @@
 package com.utn.TP_Final.service;
 
 
+import com.utn.TP_Final.dto.CallsUserDto;
 import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.model.Call;
@@ -57,9 +58,9 @@ public class CallService {
         return Optional.ofNullable(callsFromUserSimple).orElseThrow(()-> new UserNotExistsException());
     }
 
-    public List<CallsFromUser> getCallsFromUser(String dni) throws UserNotExistsException
+    public List<CallsUserDto> getCallsFromUser(String dni) throws UserNotExistsException
     {
-        List<CallsFromUser> callsFromUserList = callRepository.getCallsFromUser(dni);
+        List<CallsUserDto> callsFromUserList = callRepository.getCallsFromUser(dni);
         return Optional.ofNullable(callsFromUserList).orElseThrow(()-> new UserNotExistsException());
     }
 }
