@@ -62,7 +62,7 @@ public class CallController {
     }
 
 
-    public ResponseEntity<List<CallsUserDto>> getCallsFromUser(String dni) throws UserNotExistsException
+    public ResponseEntity<List<Call>> getCallsFromUser(String dni) throws UserNotExistsException
     {
         return ResponseEntity.ok(callService.getCallsFromUser(dni));
     }

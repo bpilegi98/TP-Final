@@ -103,11 +103,10 @@ public class EmployeeWebController {
     }
 
     @GetMapping(value = "/calls", params = "dni")
-    public ResponseEntity<List<CallsUserDto>> getCallsFromUser(@RequestHeader("Authorization")String sessionToken, @RequestParam String dni) throws UserNotExistsException
+    public ResponseEntity<List<Call>> getCallsFromUser(@RequestHeader("Authorization")String sessionToken, @RequestParam String dni) throws UserNotExistsException
     {
-        ResponseEntity<List<CallsUserDto>> callsFromUsersList = callController.getCallsFromUser(dni);
+        ResponseEntity<List<Call>> callsFromUsersList = callController.getCallsFromUser(dni);
         return (!callsFromUsersList.getBody().isEmpty()) ? callsFromUsersList : ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        //return callsFromUsersList;
     }
 
 

@@ -58,9 +58,9 @@ public class CallService {
         return Optional.ofNullable(callsFromUserSimple).orElseThrow(()-> new UserNotExistsException());
     }
 
-    public List<CallsUserDto> getCallsFromUser(String dni) throws UserNotExistsException
+    public List<Call> getCallsFromUser(String dni) throws UserNotExistsException
     {
-        List<CallsUserDto> callsFromUserList = callRepository.getCallsFromUser(dni);
+        List<Call> callsFromUserList = callRepository.getCallsFromUser(dni);
         return Optional.ofNullable(callsFromUserList).orElseThrow(()-> new UserNotExistsException());
     }
 }

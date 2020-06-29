@@ -172,16 +172,11 @@ public class CallServiceTest {
         calls.add(call1);
 
 
-        CallsUserDto callsFromUser = new CallsUserDto(call1.getSourceNumber(), city.getName(), call1.getDestinationNumber(), city.getName(), call1.getTotalPrice(), call1.getDateCall());
+        when(callRepository.getCallsFromUser(user.getDni())).thenReturn(calls);
 
-        List<CallsUserDto> callsFromUsersList = new ArrayList<CallsUserDto>();
-        callsFromUsersList.add(callsFromUser);
+        List<Call> callsFromUserResult = callService.getCallsFromUser(user.getDni());
 
-        when(callRepository.getCallsFromUser(user.getDni())).thenReturn(callsFromUsersList);
-
-        List<CallsUserDto> callsFromUserResult = callService.getCallsFromUser(user.getDni());
-
-        assertEquals(callsFromUsersList, callsFromUserResult);
+        assertEquals(calls, callsFromUserResult);
     }
 
     @Test(expected = UserNotExistsException.class)

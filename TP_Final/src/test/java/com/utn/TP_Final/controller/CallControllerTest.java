@@ -174,15 +174,10 @@ public class CallControllerTest {
 
         calls.add(call1);
 
-        CallsUserDto callsFromUser = new CallsUserDto(call1.getSourceNumber(), city.getName(), call1.getDestinationNumber(), city.getName(), call1.getTotalPrice(), call1.getDateCall());
 
+        when(callService.getCallsFromUser(user.getDni())).thenReturn(calls);
 
-        List<CallsUserDto> callsFromUsersList = new ArrayList<CallsUserDto>();
-        callsFromUsersList.add(callsFromUser);
-
-        when(callService.getCallsFromUser(user.getDni())).thenReturn(callsFromUsersList);
-
-        ResponseEntity<List<CallsUserDto>> callsFromUserResult = callController.getCallsFromUser(user.getDni());
+        ResponseEntity<List<Call>> callsFromUserResult = callController.getCallsFromUser(user.getDni());
 
         assertEquals(HttpStatus.OK, callsFromUserResult.getStatusCode());
     }
