@@ -439,22 +439,26 @@ where u.dni = dni
 group by u.id;
 end //
 
-drop procedure backoffice_request_calls_user
-
+-- drop procedure backoffice_request_calls_user
 delimiter //
 create procedure backoffice_request_calls_user(IN dni int)
 begin
-select u.firstname, u.lastname, u.dni, ca.id as idCall, ca.total_cost as totalCost, ca.total_price as totalPrice, ca.date_call as dateCall,
-ca.source_number as sourceNumber, ca.destination_number as destinationNumber
+select ca.source_number as sourceNumber , (select name from cities where id=ca.id_source_number) as sourceCity , 
+ca.destination_number as destinationNumber , (select name from cities where id=ca.id_destination_number) as destinationCity , 
+ca.total_price as totalPrice, ca.date_call as dateCall 
 from calls ca
 inner join telephone_lines t
 on ca.source_number = t.line_number
 inner join users u
 on t.id_user = u.id
-where u.dni = dni
-limit 25;
+where u.dni = dni;
 end //
+
+
 call backoffice_request_calls_user("41307541");
+
+
+
 -- 6) Consulta de facturación. La facturación se hará directamente por un proceso interno en la base datos.
 
 -- ver facturas de un usuario
