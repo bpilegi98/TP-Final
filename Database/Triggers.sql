@@ -53,6 +53,7 @@ SET NEW.id_source_city = id_source;
 SET NEW.id_destination_city = id_dest;
 END//
 
+-- crearlo despues de correr el script
 DELIMITER // 
 CREATE TRIGGER tbi_new_city BEFORE INSERT ON cities FOR EACH ROW
 BEGIN 

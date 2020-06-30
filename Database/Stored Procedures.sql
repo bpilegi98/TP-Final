@@ -48,8 +48,8 @@ declare total_cities int;
 declare aux_ppm float;
 declare aux_cpm float;
 
--- SET total_cities = (select count(id) from cities);
-SET total_cities = 750;
+SET total_cities = (select count(id) from cities);
+-- SET total_cities = 750;
 SET i = 1;
 set j=1;
 set aux_ppm = 0;
@@ -75,14 +75,10 @@ end //
 delimiter //
 create procedure add_telephone_lines()
 begin
-insert into telephone_lines (line_number, line_type, id_user, status) values ('2236784509', 'MOBILE', 1, 'ACTIVE');
-insert into telephone_lines (line_number, line_type, id_user, status) values ('2235436785', 'MOBILE', 2, 'ACTIVE');
-insert into telephone_lines (line_number, line_type, id_user, status) values ('2215908654', 'MOBILE', 3, 'ACTIVE');
-insert into telephone_lines (line_number, line_type, id_user, status) values ('2914127384', 'MOBILE', 4, 'ACTIVE');
-insert into telephone_lines (line_number, line_type, id_user, status) values ('2916987653', 'MOBILE', 5, 'ACTIVE');
-insert into telephone_lines (line_number, line_type, id_user, status) values ('115098521', 'MOBILE', 6, 'ACTIVE');
-insert into telephone_lines (line_number, line_type, id_user, status) values ('2234678564', 'RESIDENTIAL', 1, 'ACTIVE');
-insert into telephone_lines (line_number, line_type, id_user, status) values ('2914738495', 'RESIDENTIAL', 4, 'ACTIVE');
+insert into telephone_lines (line_number, line_type, id_user, status) values  ('116784509', 'MOBILE', 1, 'ACTIVE'),
+('116784777', 'MOBILE', 1, 'ACTIVE'), ('2201234509', 'MOBILE', 2, 'ACTIVE'), ('2203214509', 'MOBILE', 2, 'ACTIVE'), ('2205554509', 'MOBILE', 3, 'ACTIVE'),
+('2215141639', 'MOBILE', 4, 'ACTIVE'), ('221893147', 'MOBILE', 4, 'ACTIVE'), ('2236784509', 'MOBILE', 5, 'ACTIVE'), ('2306982659', 'MOBILE', 6, 'ACTIVE'),
+('2306554409', 'MOBILE', 6, 'ACTIVE'), ('236921209', 'RESIDENTIAL', 7, 'ACTIVE'), ('2377788869', 'MOBILE', 8, 'ACTIVE'), ('35476784509', 'RESIDENTIAL', 1, 'ACTIVE');
 end //
 
 -- Script de cargar llamadas 
@@ -109,7 +105,7 @@ start transaction;
 		end while;
         -- un mes tiene 2628000 segundos, 10 dias 864000
 		set date_var = FROM_UNIXTIME(UNIX_TIMESTAMP(now()- interval 10 day) + FLOOR(0 + (RAND() * 863000)));
-		set duration_var = ROUND((50+ rand()*4000),0);
+		set duration_var = ROUND((50+ rand()*1000),0);
 		insert into calls (source_number, destination_number, duration_secs, date_call) values (source_number_var, destination_number_var, duration_var, date_var);
 		set i=i+1;
       set destination_number_var = 0;
@@ -125,12 +121,10 @@ call create_provinces();
 -- STOP STOP STOP //////////////////////////////////
 -- /////////////////////////////////////////////////
 -- tenemos un script en java que carga las ciudades, aca deberias ir y ejecutarlo
-call add_telephone_lines();
-call add_fees();
-call add_x_calls(500);
-
-
-
+-- agregar usuarios por java ya que si los agregas por sql no tendran sus passwords hasheadas y no podran logear
+ call add_fees();
+ call add_x_calls(5000);
+ 
 -- ///FACTURACION///
 DELIMITER //
 CREATE PROCEDURE facturation()
@@ -210,6 +204,7 @@ CREATE EVENT facturation_event
 ON SCHEDULE EVERY 1 MONTH STARTS '2020-07-01 00:00:00'
 DO CALL facturation();
 
+select * from invoices
 
 
 -- API 
