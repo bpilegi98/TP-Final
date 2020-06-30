@@ -116,17 +116,38 @@ public class UserControllerTest {
         verify(userService, times(1)).getByUsername("bpilegi98");
     }
 
-    @Test(expected = UserNotExistsException.class)
-    public void loginTestUserNotFound() throws UserNotExistsException, ValidationException, InvalidKeySpecException, NoSuchAlgorithmException {
-        when(userService.getByUsername("user")).thenReturn(null);
-        userController.login("user", "password");
-    }
-
-
  */
 
     @Test
-    public void getByDniOk() throws UserNotExistsException, ValidationException {
+    public void loginFailedTest() throws ValidationException, InvalidKeySpecException, NoSuchAlgorithmException {
+        when(userService.login("user","password")).thenReturn(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+        ResponseEntity<User> loginResult = userController.login("user","password");
+        assertEquals(HttpStatus.BAD_REQUEST,loginResult.getStatusCode());
+    }
+    @Test
+    public void loginOkTest()throws ValidationException, InvalidKeySpecException, NoSuchAlgorithmException{
+        when(userService.login("bpilegi98","1234")).thenReturn(ResponseEntity.ok(new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null)));
+        ResponseEntity<User> loginResult = userController.login("bpilegi98","1234");
+        assertEquals(HttpStatus.OK,loginResult.getStatusCode());
+
+    }
+    @Test(expected = ValidationException.class)
+    public void nullUserLoginDataTest()throws ValidationException, InvalidKeySpecException, NoSuchAlgorithmException{
+        userController.login(null,"123");
+    }
+
+    @Test(expected = ValidationException.class)
+    public void nullPasswordLoginDataTest()throws ValidationException, InvalidKeySpecException, NoSuchAlgorithmException{
+        userController.login("user",null);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void nullLoginDataTest()throws ValidationException, InvalidKeySpecException, NoSuchAlgorithmException{
+        userController.login(null,null);
+    }
+
+    @Test
+    public void getByDniOk() throws UserNotExistsException {
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
         when(userService.getByDni("41307541")).thenReturn(user);
         ResponseEntity<User> userResult = userController.getByDni("41307541");
@@ -136,7 +157,7 @@ public class UserControllerTest {
 
 
     @Test
-    public void getByUsernameOk() throws UserNotExistsException, ValidationException {
+    public void getByUsernameOk() throws UserNotExistsException {
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
         when(userService.getByUsername("bpilegi98")).thenReturn(user);
         ResponseEntity<User> result = userController.getByUsername("bpilegi98");

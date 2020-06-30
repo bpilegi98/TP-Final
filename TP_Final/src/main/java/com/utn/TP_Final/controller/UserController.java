@@ -35,7 +35,7 @@ public class UserController {
 
 
     @PostMapping("/")
-    public ResponseEntity<User> addUser(@RequestBody User newUser) throws UserAlreadyExistsException, ValidationException, InvalidKeySpecException, NoSuchAlgorithmException
+    public ResponseEntity<User> addUser(@RequestBody User newUser) throws UserAlreadyExistsException, InvalidKeySpecException, NoSuchAlgorithmException
     {
         return ResponseEntity.created(getUri(userService.addUser(newUser))).build();
     }
@@ -57,25 +57,25 @@ public class UserController {
     }
 
 
-    public ResponseEntity<User> getByDni(@PathVariable String dni) throws UserNotExistsException, ValidationException
+    public ResponseEntity<User> getByDni(@PathVariable String dni) throws UserNotExistsException
     {
         return ResponseEntity.ok(userService.getByDni(dni));
     }
 
 
-    public ResponseEntity<Optional<User>> getById(@PathVariable Integer id)throws UserNotExistsException, ValidationException
+    public ResponseEntity<Optional<User>> getById(@PathVariable Integer id)throws UserNotExistsException
     {
         return ResponseEntity.ok(userService.getById(id));
     }
 
 
-    public ResponseEntity<User> getByUsername(@PathVariable String username) throws UserNotExistsException, ValidationException
+    public ResponseEntity<User> getByUsername(@PathVariable String username) throws UserNotExistsException
     {
         return ResponseEntity.ok(userService.getByUsername(username));
     }
 
 
-    public ResponseEntity<User> login(@RequestBody String username, @RequestBody String password) throws UserNotExistsException, ValidationException, InvalidKeySpecException, NoSuchAlgorithmException {
+    public ResponseEntity<User> login(@RequestBody String username, @RequestBody String password) throws ValidationException, InvalidKeySpecException, NoSuchAlgorithmException {
         if((username != null) && (password != null))
         {
             return userService.login(username, password);
@@ -95,7 +95,7 @@ public class UserController {
     }
 
 
-    public ResponseEntity<List<TopMostCalledDestinations>> getTopMostCalledDestinations(Integer idLoggedUser)throws UserNotExistsException, ValidationException
+    public ResponseEntity<List<TopMostCalledDestinations>> getTopMostCalledDestinations(Integer idLoggedUser)throws UserNotExistsException
     {
         return ResponseEntity.ok(userService.getTopMostCalledDestinations(idLoggedUser));
     }

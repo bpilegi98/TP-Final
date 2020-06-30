@@ -40,7 +40,7 @@ public class LoginController {
             User user = userController.login(loginDto.getUsername(), loginDto.getPassword()).getBody();
             String token = sessionManager.createSession(user);
             responseEntity = ResponseEntity.ok().headers(createHeaders(token)).build();
-        }catch (UserNotExistsException | InvalidKeySpecException | NoSuchAlgorithmException e){
+        }catch (InvalidKeySpecException | NoSuchAlgorithmException e){
             throw new InvalidLoginException(e.getMessage());
         }
         return responseEntity;
