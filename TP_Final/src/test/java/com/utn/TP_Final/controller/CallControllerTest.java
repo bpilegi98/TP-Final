@@ -1,14 +1,11 @@
 package com.utn.TP_Final.controller;
 
-import com.utn.TP_Final.dto.CallsUserDto;
 import com.utn.TP_Final.exceptions.UserNotExistsException;
 import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.Call;
 import com.utn.TP_Final.model.City;
 import com.utn.TP_Final.model.TelephoneLine;
 import com.utn.TP_Final.model.User;
-import com.utn.TP_Final.model.enums.UserType;
-import com.utn.TP_Final.projections.CallsFromUser;
 import com.utn.TP_Final.projections.CallsFromUserSimple;
 import com.utn.TP_Final.service.CallService;
 import org.junit.Before;
@@ -23,7 +20,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -72,6 +68,7 @@ public class CallControllerTest {
 
         assertEquals(HttpStatus.CREATED, callResult.getStatusCode());
     }
+
 
      */
     @Test

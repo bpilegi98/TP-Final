@@ -2,6 +2,7 @@ package com.utn.TP_Final.service;
 
 import com.utn.TP_Final.exceptions.ValidationException;
 import com.utn.TP_Final.model.City;
+import com.utn.TP_Final.model.User;
 import com.utn.TP_Final.repository.CityRepository;
 import com.utn.TP_Final.repository.ProvinceRepository;
 import org.junit.Before;
@@ -82,6 +83,16 @@ public class CityServiceTest {
         List<City> cityList = cityService.getAll(null);
         assertEquals(2, cityList.size());
         verify(cityRepository, times(1)).findAll();
+    }
+
+    @Test
+    public void getAllOneCityTest() {
+        List<City> cities = new ArrayList<City>();
+        City city1 = new City(1, "Mar del Plata", "223", null);
+        cities.add(city1);
+        when(cityRepository.findByName("Mar del Plata")).thenReturn(cities);
+        List<City> result = cityService.getAll("Mar del Plata");
+        assertEquals(cities, result);
     }
 
     @Test

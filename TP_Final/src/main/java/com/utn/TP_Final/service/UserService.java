@@ -109,14 +109,17 @@ public class UserService {
         return Optional.ofNullable(user).orElseThrow(()-> new UserAlreadyExistsException());
     }
 
-    public ResponseEntity<User> login(String username, String password) throws  InvalidKeySpecException, NoSuchAlgorithmException {
+    public ResponseEntity<User> login(String username, String password) throws  UserNotExistsException, InvalidKeySpecException, NoSuchAlgorithmException {
         User user = userRepository.findByUsername(username);
-        Boolean validate = user.validatePassword(password,user.getPassword());
+        if(!isNull(user)) {
+            Boolean validate = user.validatePassword(password, user.getPassword());
 
-        if(validate)
-            return ResponseEntity.ok(user);
-        else
-           return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            if (validate)
+                return ResponseEntity.ok(user);
+            else
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        else throw new UserNotExistsException();
     }
 
 }

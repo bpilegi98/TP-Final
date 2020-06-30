@@ -1,6 +1,7 @@
 package com.utn.TP_Final.service;
 
 import com.utn.TP_Final.exceptions.ValidationException;
+import com.utn.TP_Final.model.City;
 import com.utn.TP_Final.model.TelephoneLine;
 import com.utn.TP_Final.model.enums.LineStatus;
 import com.utn.TP_Final.repository.TelephoneLineRepository;
@@ -61,6 +62,16 @@ public class TelephoneLineServiceTest {
         List<TelephoneLine> telephoneLineList = telephoneLineService.getAll(null);
         assertEquals(2, telephoneLineList.size());
         verify(telephoneLineRepository, times(1)).findAll();
+    }
+
+    @Test
+    public void getAllOneCityTest() {
+        List<TelephoneLine> telephoneLines = new ArrayList<TelephoneLine>();
+        TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
+        telephoneLines.add(telephoneLine);
+        when(telephoneLineRepository.findByLineNumber("2235388479")).thenReturn(telephoneLine);
+        List<TelephoneLine> result = telephoneLineService.getAll("2235388479");
+        assertEquals(telephoneLines, result);
     }
 
     @Test

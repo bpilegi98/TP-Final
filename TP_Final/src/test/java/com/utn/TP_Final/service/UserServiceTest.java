@@ -136,6 +136,17 @@ public class UserServiceTest {
     }
 
     @Test
+    public void getAllOneUserTest()
+    {
+        List<User> users = new ArrayList<User>();
+        User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
+        users.add(user);
+        when(userRepository.findByDni("41307541")).thenReturn(user);
+        List<User> result =(userService.getAll("41307541"));
+        assertEquals(users, result);
+    }
+
+    @Test
     public void getByIdOk() throws UserNotExistsException
     {
         User user = new User(1, "Bianca", "Pilegi", "41307541", "bpilegi98", "1234", null, true, null, null, null);
@@ -158,24 +169,36 @@ public class UserServiceTest {
     }
 
 
-    /*
+/*
     @Test
-    public void loginTestOk() throws UserNotExistsException, ValidationException, InvalidKeySpecException, NoSuchAlgorithmException, UserAlreadyExistsException {
+    public void loginTestOk() throws UserNotExistsException, InvalidKeySpecException, NoSuchAlgorithmException{
         User user = new User(1, "Nombre", "Apellido", "11111111", "prueba", "1234", null, true, null, null, null);
-        User loggedUser = userService.addUser(user);
-        when(userRepository.findByUsername("prueba")).thenReturn(loggedUser);
-        ResponseEntity<User> userResult = userService.login("prueba", "1234");
-        assertEquals(HttpStatus.OK, userResult.getStatusCode());
-        verify(userRepository, times(1)).findByUsername("prueba");
+        String password = "1000:c7b800fca4e825ea6a0f6aeb488580d2:59f9fd1dc1f048f217657f2933840ad784626d0aaa1f9043c4f1e759f1326cdb70ccd57cbdc93bcd010458014ecdc27c5be0456d6c6c6d5c7e58827afc02b379";
+        when(userRepository.findByUsername("prueba")).thenReturn(user);
+        when(user.validatePassword("1234",password)).thenReturn(true);
+        ResponseEntity<User> response = userService.login("prueba","1234");
+        assertEquals(HttpStatus.OK,response.getStatusCode());
     }
 
+
+    @Test
+    public void loginWrongPasswordTest()throws UserNotExistsException, InvalidKeySpecException, NoSuchAlgorithmException{
+        User user = new User(1, "Nombre", "Apellido", "11111111", "prueba", "1234", null, true, null, null, null);
+        String password = "1000:c7b800fca4e825ea6a0f6aeb488580d2:59f9fd1dc1f048f217657f2933840ad784626d0aaa1f9043c4f1e759f1326cdb70ccd57cbdc93bcd010458014ecdc27c5be0456d6c6c6d5c7e58827afc02b379";
+        when(userRepository.findByUsername("prueba")).thenReturn(user);
+        when(user.validatePassword("12345",password)).thenReturn(false);
+        ResponseEntity<User> response = userService.login("prueba","12345");
+        assertEquals(HttpStatus.BAD_REQUEST,response.getStatusCode());
+    }
+
+     */
     @Test(expected = UserNotExistsException.class)
-    public void loginTestUserNotFound() throws UserNotExistsException, InvalidKeySpecException, NoSuchAlgorithmException, ValidationException {
+    public void loginTestUserNotFound() throws UserNotExistsException, InvalidKeySpecException, NoSuchAlgorithmException {
         when(userRepository.findByUsername("user")).thenReturn(null);
         userService.login("user", "password");
     }
 
-     */
+
 
     @Test
     public void getByDniOk() throws UserNotExistsException

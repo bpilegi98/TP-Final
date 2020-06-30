@@ -41,6 +41,7 @@ public class TelephoneLineService {
         return telephoneLines;
     }
 
+
     public TelephoneLine suspendTelephoneLine(String lineNumber) throws ValidationException
     {
         telephoneLineRepository.suspendTelephoneLine(lineNumber);

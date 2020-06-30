@@ -75,7 +75,7 @@ public class UserController {
     }
 
 
-    public ResponseEntity<User> login(@RequestBody String username, @RequestBody String password) throws ValidationException, InvalidKeySpecException, NoSuchAlgorithmException {
+    public ResponseEntity<User> login(@RequestBody String username, @RequestBody String password) throws ValidationException, InvalidKeySpecException, NoSuchAlgorithmException, UserNotExistsException {
         if((username != null) && (password != null))
         {
             return userService.login(username, password);
