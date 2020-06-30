@@ -33,3 +33,5 @@ call user_invoices_between_dates;
 call user_top_most_called(1);
 select * from telephone_lines;
 call user_calls_between_dates("2020-06-20","2020-06-27",3);
+
+select * from users

@@ -24,6 +24,12 @@ END IF;
 if (NEW.destination_number = NEW.source_number) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'Los numeros son iguales', mysql_errno = 1000;
 END IF;
 
+if ((select t.status from telephone_lines t where t.line_number = NEW.source_number) != "ACTIVE") THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'El numero origen no se encuentra activo', mysql_errno = 1000;
+END IF;
+
+if ((select t.status from telephone_lines t where t.line_number = NEW.destination_number) != "ACTIVE") THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'El numero destino no se encuentra activo', mysql_errno = 1000;
+END IF;
+
 IF
 (NEW.duration_secs <= 0) THEN SIGNAL SQLSTATE '45000' set MESSAGE_TEXT = 'Los duracion debe ser mayor que cero', mysql_errno = 1000;
 END IF;
@@ -37,6 +43,7 @@ END IF;
 -- Este metodo busca la ciudad por el prefijo, pero como hay prefijos repetidos entre ciudades no se si esta del todo bien
 SET id_source = (SELECT c.id FROM cities c WHERE new.source_number LIKE CONCAT(c.prefix_number, '%') ORDER BY LENGTH(c.prefix_number) DESC LIMIT 1);
 SET id_dest = (SELECT c.id FROM cities c WHERE new.destination_number LIKE CONCAT(c.prefix_number, '%') ORDER BY LENGTH(c.prefix_number) DESC LIMIT 1);
+-- esto es un control por si alguna fee no esta cargada
 select IFNULL(f.price_per_minute,2), IFNULL(f.cost_per_minute,1)
 from fees f
 where (f.id_source_city = id_source) and (f.id_destination_city = id_dest) into ppp,cpp;

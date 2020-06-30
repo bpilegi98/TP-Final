@@ -1,6 +1,6 @@
 SET GLOBAL event_scheduler = ON;
 SET GLOBAL time_zone = '-3:00';
-drop database tpfinal;
+-- drop database tpfinal;
 create database tpfinal;
 use tpfinal;
 
@@ -34,7 +34,7 @@ dni varchar(50) unique,
 username varchar(50) UNIQUE,
 password varchar(500),
 user_type enum('AERIAL', 'EMPLOYEE', 'CUSTOMER'),
-is_active boolean,
+is_active boolean default true,
 id_city int,
 constraint fk_city_user foreign key (id_city) references cities(id)
 );

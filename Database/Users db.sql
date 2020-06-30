@@ -37,3 +37,4 @@ grant update on tpfinal.users to 'backoffice'@'localhost';
 grant execute on procedure user_calls_between_dates to 'customer'@'localhost';
 grant execute on procedure user_invoices_between_dates to 'customer'@'localhost';
 grant execute on procedure user_top_most_called to 'customer'@'localhost';
+grant execute on procedure user_top_most_called_lines to 'customer'@'localhost';

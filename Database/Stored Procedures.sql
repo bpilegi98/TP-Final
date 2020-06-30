@@ -6,7 +6,6 @@ begin
 insert into countries (name) values ('Argentina');
 end //
 
-
 delimiter //
 create procedure create_provinces()
 begin
@@ -145,6 +144,7 @@ DECLARE vFinished INTEGER DEFAULT 0;
 DECLARE cur_telephone_lines CURSOR FOR 
 SELECT id, id_user
 FROM telephone_lines;
+
 DECLARE cur_calls CURSOR FOR 
 SELECT id, total_cost, total_price,id_source_number
 FROM calls
@@ -251,6 +251,22 @@ join cities ct
 on c.id_destination_city = ct.id
 where u.id = idLoggedUser 
 group by city
+order by times_called DESC
+limit 10;
+end //
+
+delimiter //
+create procedure user_top_most_called_lines(IN idLoggedUser int)
+begin
+select c.destination_number as number_called, count(c.destination_number) as times_called
+from calls c 
+join telephone_lines t
+on c.source_number = t.line_number
+join users u
+on t.id_user = u.id
+where u.id = idLoggedUser
+group by number_called
+order by times_called DESC
 limit 10;
 end //
 
