@@ -66,8 +66,8 @@ public class CityService {
 
 /*
     public void uploadCites() throws IOException {
-        //List<String> lista = Files.readAllLines(Paths.get("C:\\Users\\Juan\\Desktop\\cityPrefix.txt"), StandardCharsets.ISO_8859_1);
-        List<String> lista = Files.readAllLines(Paths.get("C:\\Users\\Bianca\\Desktop\\cityPrefix.txt"), StandardCharsets.ISO_8859_1);
+        List<String> lista = Files.readAllLines(Paths.get("C:\\Users\\Juan\\Desktop\\cityPrefix.txt"), StandardCharsets.ISO_8859_1);
+        //List<String> lista = Files.readAllLines(Paths.get("C:\\Users\\Bianca\\Desktop\\cityPrefix.txt"), StandardCharsets.ISO_8859_1);
         List<String> ciudades = new ArrayList<>();
         String prefix = null;
         Province province = new Province();
@@ -105,6 +105,7 @@ public class CityService {
             }
         }
     }
+
  */
 
 }

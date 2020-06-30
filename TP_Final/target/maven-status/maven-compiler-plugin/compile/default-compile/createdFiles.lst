@@ -27,6 +27,7 @@ com\utn\TP_Final\exceptions\InvalidLoginException.class
 com\utn\TP_Final\model\City.class
 com\utn\TP_Final\projections\CallsBetweenDates.class
 com\utn\TP_Final\exceptions\ValidationException.class
+com\utn\TP_Final\dto\CallsUserDto.class
 com\utn\TP_Final\repository\UserRepository.class
 com\utn\TP_Final\repository\TelephoneLineRepository.class
 com\utn\TP_Final\controller\InvoiceController.class

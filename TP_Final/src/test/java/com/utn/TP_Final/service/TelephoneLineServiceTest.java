@@ -9,8 +9,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -78,33 +78,37 @@ public class TelephoneLineServiceTest {
         LineStatus lineStatus = LineStatus.ACTIVE;
         TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, lineStatus, null);
         when(telephoneLineRepository.suspendTelephoneLine(telephoneLine.getLineNumber())).thenReturn(1);
+        when(telephoneLineRepository.findByLineNumber(telephoneLine.getLineNumber())).thenReturn(new TelephoneLine(1, "2235388479", null, LineStatus.SUSPENDED, null));
         TelephoneLine telephoneLineResult = telephoneLineService.suspendTelephoneLine(telephoneLine.getLineNumber());
-        assertEquals(telephoneLine.getStatus(), telephoneLineResult.getStatus());
+        assertEquals(lineStatus.SUSPENDED, telephoneLineResult.getStatus());
     }
 
     @Test(expected = ValidationException.class)
     public void suspendTelephoneLineNotExists() throws ValidationException
     {
         TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
-        when(telephoneLineRepository.suspendTelephoneLine(telephoneLine.getLineNumber())).thenReturn(null);
+        when(telephoneLineRepository.findByLineNumber(telephoneLine.getLineNumber())).thenReturn(null);
         telephoneLineService.suspendTelephoneLine(telephoneLine.getLineNumber());
     }
 
     @Test
     public void activeTelephoneLineOK() throws ValidationException
     {
-        LineStatus lineStatus = LineStatus.ACTIVE;
+        LineStatus lineStatus = LineStatus.SUSPENDED;
         TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, lineStatus, null);
         when(telephoneLineRepository.activeTelephoneLine(telephoneLine.getLineNumber())).thenReturn(1);
+        telephoneLine.setStatus(LineStatus.ACTIVE);
+        when(telephoneLineRepository.findByLineNumber(telephoneLine.getLineNumber())).thenReturn(telephoneLine);
         TelephoneLine telephoneLineResult = telephoneLineService.activeTelephoneLine(telephoneLine.getLineNumber());
-        assertEquals(telephoneLine.getStatus(), telephoneLineResult.getStatus());
+        assertEquals(LineStatus.ACTIVE, telephoneLineResult.getStatus());
     }
 
     @Test(expected = ValidationException.class)
     public void activeTelephoneLineNotExists() throws ValidationException
     {
         TelephoneLine telephoneLine = new TelephoneLine(1, "2235388479", null, null, null);
-        when(telephoneLineRepository.activeTelephoneLine(telephoneLine.getLineNumber())).thenReturn(null);
+        when(telephoneLineRepository.activeTelephoneLine(telephoneLine.getLineNumber())).thenReturn(0);
+        when(telephoneLineRepository.findByLineNumber(telephoneLine.getLineNumber())).thenReturn(null);
         telephoneLineService.activeTelephoneLine(telephoneLine.getLineNumber());
     }
 
