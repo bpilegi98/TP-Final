@@ -173,8 +173,7 @@ cumplimentar lo siguiente :
     
     b) CLIENTES, que permitirá consultas de llamadas y facturación.
     
-    c) INFRAESTRUCTURA , que será el sistema que enviará la información de
-llamadas a la base de datos.
+    c) INFRAESTRUCTURA , que será el sistema que enviará la información de llamadas a la base de datos.
 
     d) FACTURACIÓN , proceso automático de facturación.
     
